@@ -90,14 +90,14 @@ function render(){
       return `<label><input type="checkbox" data-k="${esc(k)}" ${on ? 'checked' : ''}><span class="${on ? 'x' : ''}">${esc(t)}</span></label>`;
     }).join('');
     const link = /^https?:\/\//.test(h.link || '') ? `<p><a href="${esc(h.link)}" target="_blank" rel="noopener noreferrer">🔗 参考链接 / 提交入口</a></p>` : '';
-    const text = h.title + '\n' + h.items.map((t,i) => `${i+1}. ${t}`).join('\n');
+    const text = (h.title ? h.title + '\n' : '') + h.items.map((t,i) => `${i+1}. ${t}`).join('\n');
     return `<div class="card ${cardCls}">
       <div class="top"><div>
         <span class="tag">${esc(h.className)}</span>
         <span class="tag ${personal ? 'p' : ''}">${personal ? '🎯 专属任务' : '📢 全班作业'}</span>
         <span class="tag ${due.urgent ? 'u' : ''}">${due.text}</span>
       </div><span class="small">发布：${esc(h.date)}</span></div>
-      <h2>${esc(h.title)}</h2>
+      ${h.title ? `<h2>${esc(h.title)}</h2>` : ''}
       <span class="tag ${all ? 'ok' : 'p'}">${all ? '🎉 已全部完成' : `进度 ${done}/${h.items.length}`}</span>
       <div class="subs">${subs}</div>${link}
       <div class="foot"><button data-copy="${esc(text)}">📋 一键复制作业</button><span>勾选记录保存在本设备</span></div>
