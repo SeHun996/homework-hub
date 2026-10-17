@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>科能未来 - 学员作业发布中心</title>
+    <!-- 引入 Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50 min-h-screen text-slate-800">
+
+    <!-- 顶部标题栏 -->
+    <header class="bg-indigo-600 text-white shadow-md py-6 px-4 mb-8">
+        <div class="max-w-4xl mx-auto text-center">
+            <h1 class="text-2xl md:text-3xl font-bold">🚀 科能未来学员作业发布中心</h1>
+            <p class="text-indigo-200 text-sm mt-2">请选择你的班级查看对应的最新作业与要求</p>
+        </div>
+    </header>
+
+    <!-- 主体内容区 -->
+    <main class="max-w-4xl mx-auto px-4 pb-12">
+        
+        <!-- 班级筛选栏 -->
+        <div class="bg-white p-4 rounded-xl shadow-sm mb-6 flex flex-wrap items-center justify-between gap-4">
+            <label class="font-semibold text-slate-700 flex items-center gap-2">
+                <span>📍 选择班级：</span>
+                <select id="classSelector" class="border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white">
+                    <option value="all">全部班级 (展示所有)</option>
+                    <!-- 班级选项会自动从数据中生成 -->
+                </select>
+            </label>
+            <span id="updateTime" class="text-xs text-slate-400">数据最后更新：2026-10-16</span>
+        </div>
+
+        <!-- 作业列表展示容器 -->
+        <div id="homeworkContainer" class="space-y-4">
+            <!-- 作业卡片会通过 JS 动态渲染 -->
+        </div>
+
+        <!-- 无数据提示 -->
+        <div id="emptyTip" class="hidden text-center py-12 text-slate-400">
+            暂无该班级的作业信息，请稍候或核对班级选项~
+        </div>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="text-center py-6 text-xs text-slate-400">
+        © 2026 科能未来 | 严选优质少儿编程教育
+    </footer>
+
+    <!-- 核心业务逻辑脚本 -->
+    <script>
+        // ==========================================
+        // 📝【你只需要在这里修改和添加作业数据！】
+        // ==========================================
+        const homeworkList = [
+            {
+                className: "C++周末提高班",
+                date: "2026-10-16",
+                title: "第8课：循环结构与分支嵌套综合练习",
+                content: "1. 完成课本第 45 页的习题 3、4、5。\n2. 在洛谷平台完成 2 道指定入门题。\n3. 注意处理好边界条件，下节课上课前检查源码。",
+                link: "https://www.luogu.com.cn"
+            },
+            {
+                className: "Python基础班",
+                date: "2026-10-15",
+                title: "第5课：条件判断语句 if-else 实战",
+                content: "1. 编写一个“BMI健康计算器”程序，根据用户输入的体重和身高计算结果并输出评语。\n2. 尝试使用多分支结构优化之前的猜数字小游戏。",
+                link: "#"
+            },
+            {
+                className: "大颗粒乐高创意班",
+                date: "2026-10-14",
+                title: "第4课：齿轮传动与省力结构搭建",
+                content: "1. 复习课堂上学到的齿轮加速与减速原理。\n2. 下节课请带好自己的积木收纳盒，我们将进行“小小工程师”大比拼。",
+                link: ""
+            }
+        ];
+
+        // 初始化渲染
+        const classSelector = document.getElementById('classSelector');
+        const homeworkContainer = document.getElementById('homeworkContainer');
+        const emptyTip = document.getElementById('emptyTip');
+
+        function init() {
+            // 1. 自动提取所有不重复的班级到下拉菜单
+            const classes = [...new Set(homeworkList.map(item => item.className))];
+            classes.forEach(cls => {
+                const option = document.createElement('option');
+                option.value = cls;
+                option.textContent = cls;
+                classSelector.appendChild(option);
+            });
+
+            // 2. 默认渲染全部作业
+            renderHomework('all');
+
+            // 3. 监听下拉框切换
+            classSelector.addEventListener('change', (e) => {
+                renderHomework(e.target.value);
+            });
+        }
+
+        // 渲染函数
+        function renderHomework(selectedClass) {
+            homeworkContainer.innerHTML = '';
+            
+            const filtered = selectedClass === 'all' 
+                ? homeworkList 
+                : homeworkList.filter(item => item.className === selectedClass);
+
+            if (filtered.length === 0) {
+                emptyTip.classList.remove('hidden');
+                return;
+            } else {
+                emptyTip.classList.add('hidden');
+            }
+
+            filtered.forEach(item => {
+                const card = document.createElement('div');
+                card.className = "bg-white p-6 rounded-xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow";
+                
+                // 处理换行符
+                const formattedContent = item.content.replace(/\n/g, '<br>');
+
+                card.innerHTML = `
+                    <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                        <span class="bg-indigo-50 text-indigo-700 text-xs font-semibold px-3 py-1 rounded-full">${item.className}</span>
+                        <span class="text-xs text-slate-400">发布日期：${item.date}</span>
+                    </div>
+                    <h2 class="text-lg font-bold text-slate-800 mb-2">${item.title}</h2>
+                    <p class="text-slate-600 text-sm leading-relaxed mb-4">${formattedContent}</p>
+                    ${item.link && item.link !== '#' ? `<a href="${item.link}" target="_blank" class="inline-flex items-center text-xs text-indigo-600 hover:text-indigo-800 font-medium">🔗 相关参考链接 / 提交传送门 &rarr;</a>` : ''}
+                `;
+                homeworkContainer.appendChild(card);
+            });
+        }
+
+        // 启动
+        init();
+    </script>
+</body>
+</html>
