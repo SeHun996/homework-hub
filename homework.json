@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-17T12:17:25.217Z",
+  "updated": "2026-10-17T12:23:31.063Z",
   "roster": {
     "【张老师】周六 09:00 C++班级": [
       "郭梓辰",
@@ -42,6 +42,16 @@
     ]
   },
   "homework": [
+    {
+      "id": "hw_mvcdb37t",
+      "className": "【张老师】周六 19:00 Python班级",
+      "target": "全班",
+      "date": "2026-10-17",
+      "items": [
+        "1、完成GESP Python 1级 大题汇总前8题"
+      ],
+      "link": ""
+    },
     {
       "id": "hw_mvcd36mb",
       "className": "【张老师】周六 16:00 C++班级",
