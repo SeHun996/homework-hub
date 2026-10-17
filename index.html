@@ -1,143 +1,163 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>科能未来 - 学员作业发布中心</title>
-    <!-- 引入 Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>科能未来 - 学员作业发布中心</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font:15px/1.6 system-ui,"PingFang SC","Microsoft YaHei",sans-serif;background:#f3f6fb;color:#1b2a4a}
+header{background:#1b2a4a;color:#fff;text-align:center;padding:22px 12px}
+h1{margin:0;font-size:22px}
+header p{margin:6px 0 0;color:#a9b8d8;font-size:13px}
+main{max-width:760px;margin:18px auto;padding:0 14px}
+.box,.card{background:#fff;border:1px solid #dde4f0;border-radius:10px;padding:16px;margin-bottom:14px}
+.box{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+select,button{font:inherit;padding:6px 10px;border:1px solid #c5cfe3;border-radius:8px;background:#fff;color:inherit}
+button{cursor:pointer}
+button:focus-visible,select:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid #ff7a1a;outline-offset:2px}
+.tag{display:inline-block;font-size:12px;padding:2px 9px;border-radius:99px;background:#e8eefb;color:#2c4a8a;margin:0 6px 6px 0}
+.tag.p{background:#ffe9d2;color:#9a4a00}.tag.u{background:#ffe0e0;color:#b42323}.tag.ok{background:#d7f3e6;color:#13744d}
+.card.u{border-color:#f0a5a5}.card.d{border-color:#7fd1ab}.card.p{border-color:#ffc58a}
+.card h2{font-size:17px;margin:2px 0 8px}
+.top{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.subs{background:#f3f6fb;border-radius:8px;padding:6px 12px;margin:8px 0}
+.subs label{display:flex;gap:8px;padding:5px 0;cursor:pointer}
+.subs .x{text-decoration:line-through;color:#8a97b3}
+.foot{display:flex;justify-content:space-between;align-items:center;gap:8px;border-top:1px solid #e8edf6;padding-top:10px;margin-top:8px;font-size:12px;color:#8a97b3}
+.tip{text-align:center;color:#8a97b3;padding:20px}.small{font-size:12px;padding:6px}
+a{color:#2c4a8a}
+</style>
 </head>
-<body class="bg-slate-50 min-h-screen text-slate-800">
+<body>
+<header>
+  <h1>🚀 科能未来学员作业发布中心</h1>
+  <p>选择班级和姓名，逐题勾选，完成打卡</p>
+</header>
+<main>
+  <div class="box">
+    <label>📍 班级 <select id="cls"><option value="">-- 请选择班级 --</option></select></label>
+    <label>👤 姓名 <select id="stu" disabled><option value="">-- 请先选择班级 --</option></select></label>
+    <button id="reset" hidden>🔄 切换班级/姓名</button>
+  </div>
+  <div id="list"></div>
+  <p id="tip" class="tip">请先选择班级和姓名，查看你的作业</p>
+  <p id="upd" class="tip small"></p>
+</main>
+<script>
+const GRACE = 3; // 超期超过几天后不再显示
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const store = {
+  get(k){ try { return localStorage.getItem(k); } catch(e){ return null; } },
+  set(k,v){ try { localStorage.setItem(k,v); } catch(e){} },
+  del(k){ try { localStorage.removeItem(k); } catch(e){} }
+};
+const hash = s => { let h = 0; for (const c of s) h = (h*31 + c.charCodeAt(0)) | 0; return (h >>> 0).toString(36); };
+let D = { roster: {}, homework: [] };
 
-    <!-- 顶部标题栏 -->
-    <header class="bg-indigo-600 text-white shadow-md py-6 px-4 mb-8">
-        <div class="max-w-4xl mx-auto text-center">
-            <h1 class="text-2xl md:text-3xl font-bold">🚀 科能未来学员作业发布中心</h1>
-            <p class="text-indigo-200 text-sm mt-2">请选择你的班级查看对应的最新作业与要求</p>
-        </div>
-    </header>
+// 截止日 = 发布日 + 7 天（按本地日历日计算，当天结束前都算今天截止）
+function dueInfo(dateStr){
+  const [y,m,d] = dateStr.split('-').map(Number);
+  const due = new Date(y, m-1, d+7), t = new Date(); t.setHours(0,0,0,0);
+  const n = Math.round((due - t) / 864e5);
+  if (n < 0)  return {n, text:'⚠️ 已超期', urgent:true};
+  if (n === 0) return {n, text:'🔥 今天截止', urgent:true};
+  if (n <= 2) return {n, text:`⏰ 仅剩 ${n} 天`, urgent:true};
+  return {n, text:`⏳ 剩余 ${n} 天`, urgent:false};
+}
+const subKey = (stu, hw, text) => `done_${stu}_${hw.id}_${hash(text)}`;
 
-    <!-- 主体内容区 -->
-    <main class="max-w-4xl mx-auto px-4 pb-12">
-        
-        <!-- 班级筛选栏 -->
-        <div class="bg-white p-4 rounded-xl shadow-sm mb-6 flex flex-wrap items-center justify-between gap-4">
-            <label class="font-semibold text-slate-700 flex items-center gap-2">
-                <span>📍 选择班级：</span>
-                <select id="classSelector" class="border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white">
-                    <option value="all">全部班级 (展示所有)</option>
-                    <!-- 班级选项会自动从数据中生成 -->
-                </select>
-            </label>
-            <span id="updateTime" class="text-xs text-slate-400">数据最后更新：2026-10-16</span>
-        </div>
+function render(){
+  const cls = $('cls').value, stu = $('stu').value, box = $('list'), tip = $('tip');
+  box.innerHTML = '';
+  if (!cls || !stu) { tip.textContent = '请先选择班级和姓名，查看你的作业'; tip.hidden = false; return; }
+  const rows = D.homework
+    .filter(h => h.className === cls && [].concat(h.target).some(t => t === '全班' || t === stu))
+    .map(h => ({h, due: dueInfo(h.date)}))
+    .filter(r => r.due.n >= -GRACE)
+    .sort((a,b) => b.h.date.localeCompare(a.h.date));
+  tip.hidden = rows.length > 0;
+  tip.textContent = '本周暂无作业';
+  box.innerHTML = rows.map(({h, due}) => {
+    const personal = ![].concat(h.target).includes('全班');
+    const done = h.items.filter(t => store.get(subKey(stu, h, t)) === '1').length;
+    const all = done === h.items.length;
+    const cardCls = all ? 'd' : due.urgent ? 'u' : personal ? 'p' : '';
+    const subs = h.items.map(t => {
+      const k = subKey(stu, h, t), on = store.get(k) === '1';
+      return `<label><input type="checkbox" data-k="${esc(k)}" ${on ? 'checked' : ''}><span class="${on ? 'x' : ''}">${esc(t)}</span></label>`;
+    }).join('');
+    const link = /^https?:\/\//.test(h.link || '') ? `<p><a href="${esc(h.link)}" target="_blank" rel="noopener noreferrer">🔗 参考链接 / 提交入口</a></p>` : '';
+    const text = h.title + '\n' + h.items.map((t,i) => `${i+1}. ${t}`).join('\n');
+    return `<div class="card ${cardCls}">
+      <div class="top"><div>
+        <span class="tag">${esc(h.className)}</span>
+        <span class="tag ${personal ? 'p' : ''}">${personal ? '🎯 专属任务' : '📢 全班作业'}</span>
+        <span class="tag ${due.urgent ? 'u' : ''}">${due.text}</span>
+      </div><span class="small">发布：${esc(h.date)}</span></div>
+      <h2>${esc(h.title)}</h2>
+      <span class="tag ${all ? 'ok' : 'p'}">${all ? '🎉 已全部完成' : `进度 ${done}/${h.items.length}`}</span>
+      <div class="subs">${subs}</div>${link}
+      <div class="foot"><button data-copy="${esc(text)}">📋 一键复制作业</button><span>勾选记录保存在本设备</span></div>
+    </div>`;
+  }).join('');
+}
 
-        <!-- 作业列表展示容器 -->
-        <div id="homeworkContainer" class="space-y-4">
-            <!-- 作业卡片会通过 JS 动态渲染 -->
-        </div>
+function copyText(text, btn){
+  const ok = () => { btn.textContent = '✨ 已复制'; setTimeout(() => btn.textContent = '📋 一键复制作业', 2000); };
+  const fallback = () => {
+    const a = document.createElement('textarea'); a.value = text; document.body.appendChild(a); a.select();
+    try { document.execCommand('copy'); ok(); } catch(e) { alert('复制失败，请手动复制'); }
+    a.remove();
+  };
+  if (navigator.clipboard) navigator.clipboard.writeText(text).then(ok, fallback); else fallback();
+}
 
-        <!-- 无数据提示 -->
-        <div id="emptyTip" class="hidden text-center py-12 text-slate-400">
-            暂无该班级的作业信息，请稍候或核对班级选项~
-        </div>
-    </main>
+function fillStudents(selected){
+  const cls = $('cls').value, s = $('stu');
+  s.innerHTML = '<option value="">-- 请选择姓名 --</option>' +
+    (D.roster[cls] || []).map(n => `<option>${esc(n)}</option>`).join('');
+  s.disabled = !cls;
+  if (!cls) s.innerHTML = '<option value="">-- 请先选择班级 --</option>';
+  if (selected && (D.roster[cls] || []).includes(selected)) s.value = selected;
+}
 
-    <!-- 页脚 -->
-    <footer class="text-center py-6 text-xs text-slate-400">
-        © 2026 科能未来 | 严选优质少儿编程教育
-    </footer>
+function saveSel(){
+  const c = $('cls').value, s = $('stu').value;
+  if (c && s) { store.set('sel_cls', c); store.set('sel_stu', s); $('reset').hidden = false; }
+}
 
-    <!-- 核心业务逻辑脚本 -->
-    <script>
-        // ==========================================
-        // 📝【你只需要在这里修改和添加作业数据！】
-        // ==========================================
-        const homeworkList = [
-            {
-                className: "C++周末提高班",
-                date: "2026-10-16",
-                title: "第8课：循环结构与分支嵌套综合练习",
-                content: "1. 完成课本第 45 页的习题 3、4、5。\n2. 在洛谷平台完成 2 道指定入门题。\n3. 注意处理好边界条件，下节课上课前检查源码。",
-                link: "https://www.luogu.com.cn"
-            },
-            {
-                className: "Python基础班",
-                date: "2026-10-15",
-                title: "第5课：条件判断语句 if-else 实战",
-                content: "1. 编写一个“BMI健康计算器”程序，根据用户输入的体重和身高计算结果并输出评语。\n2. 尝试使用多分支结构优化之前的猜数字小游戏。",
-                link: "#"
-            },
-            {
-                className: "大颗粒乐高创意班",
-                date: "2026-10-14",
-                title: "第4课：齿轮传动与省力结构搭建",
-                content: "1. 复习课堂上学到的齿轮加速与减速原理。\n2. 下节课请带好自己的积木收纳盒，我们将进行“小小工程师”大比拼。",
-                link: ""
-            }
-        ];
+function init(){
+  $('cls').insertAdjacentHTML('beforeend', Object.keys(D.roster).map(c => `<option>${esc(c)}</option>`).join(''));
+  const c = store.get('sel_cls'), s = store.get('sel_stu');
+  if (c && D.roster[c] && (D.roster[c]).includes(s)) {
+    $('cls').value = c; fillStudents(s); $('reset').hidden = false;
+  }
+  if (D.updated) $('upd').textContent = '作业最后更新：' + new Date(D.updated).toLocaleString('zh-CN', {hour12:false});
+  render();
+}
 
-        // 初始化渲染
-        const classSelector = document.getElementById('classSelector');
-        const homeworkContainer = document.getElementById('homeworkContainer');
-        const emptyTip = document.getElementById('emptyTip');
+$('cls').addEventListener('change', () => { fillStudents(); render(); });
+$('stu').addEventListener('change', () => { saveSel(); render(); });
+$('reset').addEventListener('click', () => {
+  store.del('sel_cls'); store.del('sel_stu');
+  $('cls').value = ''; fillStudents(); $('reset').hidden = true; render();
+});
+$('list').addEventListener('change', e => {
+  const k = e.target.dataset.k;
+  if (k) { store.set(k, e.target.checked ? '1' : '0'); render(); }
+});
+$('list').addEventListener('click', e => {
+  const b = e.target.closest('[data-copy]');
+  if (b) copyText(b.dataset.copy, b);
+});
 
-        function init() {
-            // 1. 自动提取所有不重复的班级到下拉菜单
-            const classes = [...new Set(homeworkList.map(item => item.className))];
-            classes.forEach(cls => {
-                const option = document.createElement('option');
-                option.value = cls;
-                option.textContent = cls;
-                classSelector.appendChild(option);
-            });
-
-            // 2. 默认渲染全部作业
-            renderHomework('all');
-
-            // 3. 监听下拉框切换
-            classSelector.addEventListener('change', (e) => {
-                renderHomework(e.target.value);
-            });
-        }
-
-        // 渲染函数
-        function renderHomework(selectedClass) {
-            homeworkContainer.innerHTML = '';
-            
-            const filtered = selectedClass === 'all' 
-                ? homeworkList 
-                : homeworkList.filter(item => item.className === selectedClass);
-
-            if (filtered.length === 0) {
-                emptyTip.classList.remove('hidden');
-                return;
-            } else {
-                emptyTip.classList.add('hidden');
-            }
-
-            filtered.forEach(item => {
-                const card = document.createElement('div');
-                card.className = "bg-white p-6 rounded-xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow";
-                
-                // 处理换行符
-                const formattedContent = item.content.replace(/\n/g, '<br>');
-
-                card.innerHTML = `
-                    <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
-                        <span class="bg-indigo-50 text-indigo-700 text-xs font-semibold px-3 py-1 rounded-full">${item.className}</span>
-                        <span class="text-xs text-slate-400">发布日期：${item.date}</span>
-                    </div>
-                    <h2 class="text-lg font-bold text-slate-800 mb-2">${item.title}</h2>
-                    <p class="text-slate-600 text-sm leading-relaxed mb-4">${formattedContent}</p>
-                    ${item.link && item.link !== '#' ? `<a href="${item.link}" target="_blank" class="inline-flex items-center text-xs text-indigo-600 hover:text-indigo-800 font-medium">🔗 相关参考链接 / 提交传送门 &rarr;</a>` : ''}
-                `;
-                homeworkContainer.appendChild(card);
-            });
-        }
-
-        // 启动
-        init();
-    </script>
+fetch('homework.json?t=' + Date.now())
+  .then(r => { if (!r.ok) throw 0; return r.json(); })
+  .then(j => { D = j; init(); })
+  .catch(() => { $('tip').textContent = '作业加载失败，请检查网络后刷新页面'; });
+</script>
 </body>
 </html>
