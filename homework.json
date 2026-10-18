@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-18T04:00:17.315Z",
+  "updated": "2026-10-18T09:08:18.297Z",
   "roster": {
     "【张老师】周六 09:00 C++班级": [
       "郭梓辰",
@@ -42,6 +42,16 @@
     ]
   },
   "homework": [
+    {
+      "id": "hw_mvdlrwl3",
+      "className": "【张老师】周日 14:30 CSP-J复赛集训班",
+      "target": "林楚炫",
+      "date": "2026-10-18",
+      "items": [
+        "看一元二次方程PPT"
+      ],
+      "link": "https://www.feixianglaoshi.com/#/chat?share=1&communityContentId=7CBB92EFE1C37E3E5B91369E0459BD9F&featureId=20&si=undefined&suid=1158160385&from=user-page"
+    },
     {
       "id": "hw_mvdart2q",
       "className": "【张老师】周日 09:00 CSP-S复赛集训班",
