@@ -57,15 +57,27 @@ const store = {
 const hash = s => { let h = 0; for (const c of s) h = (h*31 + c.charCodeAt(0)) | 0; return (h >>> 0).toString(36); };
 let D = { roster: {}, homework: [] };
 
-// 截止日 = 发布日 + 7 天（按本地日历日计算，当天结束前都算今天截止）
-function dueInfo(dateStr){
+// 日期加天数：优先使用教师设置的实际截止日期，否则按发布日 + 7 天计算
+function addDays(dateStr, days){
+  if (!dateStr || !/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return '';
   const [y,m,d] = dateStr.split('-').map(Number);
-  const due = new Date(y, m-1, d+7), t = new Date(); t.setHours(0,0,0,0);
+  const x = new Date(y, m-1, d + days);
+  return `${x.getFullYear()}-${String(x.getMonth()+1).padStart(2,'0')}-${String(x.getDate()).padStart(2,'0')}`;
+}
+// 作业按“截止日期 + 原有宽限期 + 老师为该学生设置的延期天数”决定是否继续显示
+function dueInfo(hw, student){
+  const dueDate = hw.dueDate || addDays(hw.date, 7);
+  const [y,m,d] = dueDate.split('-').map(Number);
+  const due = new Date(y, m-1, d), t = new Date(); t.setHours(0,0,0,0);
   const n = Math.round((due - t) / 864e5);
-  if (n < 0)  return {n, text:'⚠️ 已超期', urgent:true};
-  if (n === 0) return {n, text:'🔥 今天截止', urgent:true};
-  if (n <= 2) return {n, text:`⏰ 仅剩 ${n} 天`, urgent:true};
-  return {n, text:`⏳ 剩余 ${n} 天`, urgent:false};
+  const ext = Math.max(0, Number(hw.extensions && hw.extensions[student]) || 0);
+  const visibleUntil = new Date(y, m-1, d + GRACE + ext);
+  const visibleDays = Math.round((visibleUntil - t) / 864e5);
+  if (n < 0 && ext > 0) return {n, visibleDays, text:`📅 缺课延期 +${ext} 天`, urgent:visibleDays <= 2};
+  if (n < 0) return {n, visibleDays, text:'⚠️ 已超期', urgent:true};
+  if (n === 0) return {n, visibleDays, text:'🔥 今天截止', urgent:true};
+  if (n <= 2) return {n, visibleDays, text:`⏰ 仅剩 ${n} 天`, urgent:true};
+  return {n, visibleDays, text:`⏳ 剩余 ${n} 天`, urgent:false};
 }
 const subKey = (stu, hw, text) => `done_${stu}_${hw.id}_${hash(text)}`;
 
@@ -75,8 +87,8 @@ function render(){
   if (!cls || !stu) { tip.textContent = '请先选择班级和姓名，查看你的作业'; tip.hidden = false; return; }
   const rows = D.homework
     .filter(h => h.className === cls && [].concat(h.target).some(t => t === '全班' || t === stu))
-    .map(h => ({h, due: dueInfo(h.date)}))
-    .filter(r => r.due.n >= -GRACE)
+    .map(h => ({h, due: dueInfo(h, stu)}))
+    .filter(r => r.due.visibleDays >= 0)
     .sort((a,b) => b.h.date.localeCompare(a.h.date));
   tip.hidden = rows.length > 0;
   tip.textContent = '本周暂无作业';
