@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex">
+<title>教师作业发布台</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font:15px/1.6 system-ui,"PingFang SC","Microsoft YaHei",sans-serif;background:#f3f6fb;color:#1b2a4a}main{max-width:1060px;margin:0 auto;padding:18px 14px 40px}h1{font-size:23px;margin:0 0 12px}h2{font-size:17px;margin:0 0 10px}.box{background:#fff;border:1px solid #dde4f0;border-radius:12px;padding:16px;margin-bottom:14px}label{display:block;font-size:13px;font-weight:650;margin:8px 0 4px}input[type=text],input[type=date],input[type=password],input[type=number],select,textarea{width:100%;font:inherit;padding:8px 10px;border:1px solid #c5cfe3;border-radius:8px;background:#fff;color:#1b2a4a}textarea{min-height:100px}button{font:inherit;padding:8px 13px;border:1px solid #c5cfe3;border-radius:8px;background:#fff;cursor:pointer;color:#1b2a4a}button:disabled{opacity:.55;cursor:wait}button.main{background:#ff7a1a;border-color:#ff7a1a;color:#fff;font-weight:700}button.dark{background:#1b2a4a;border-color:#1b2a4a;color:#fff}button.danger{color:#b42323}.row{display:flex;flex-wrap:wrap;gap:9px;align-items:center}.grid{display:grid;grid-template-columns:repeat(3,minmax(170px,1fr));gap:8px 14px}.stu{display:flex;flex-wrap:wrap;gap:7px 14px}.stu label{display:inline-flex;align-items:center;gap:5px;font-weight:400;margin:0}.note{padding:10px 13px;border-radius:9px;margin-bottom:14px;font-size:14px;background:#e8eefb}.note.ok{background:#d7f3e6;color:#146747}.note.warn{background:#fff0cf;color:#805100}.note.bad{background:#ffe0e0;color:#982222}.meta{font-size:12px;color:#71809e}.item{border-top:1px solid #e8edf6;padding:12px 0;display:flex;justify-content:space-between;align-items:flex-start;gap:14px}.item:first-child{border-top:0}.item-body{min-width:0;flex:1}.pill{display:inline-block;padding:2px 8px;margin:0 5px 5px 0;border-radius:999px;background:#edf1f8;color:#435170;font-size:12px}.item-actions{display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end}.filters{display:grid;grid-template-columns:170px 1fr 220px;gap:12px;align-items:end}.filters label{margin-top:0}.all-date{display:flex;align-items:center;gap:8px;font-size:13px;margin-top:6px}.all-date input{width:auto}.empty{padding:26px 8px;text-align:center;color:#71809e}.modal-backdrop{position:fixed;inset:0;background:rgba(15,24,45,.5);display:none;align-items:center;justify-content:center;padding:16px;z-index:999}.modal-backdrop.show{display:flex}.modal{background:#fff;border-radius:16px;box-shadow:0 20px 70px #0003;width:min(480px,100%);padding:22px}.modal h2{font-size:20px;margin-bottom:8px}.modal p{white-space:pre-line;margin:0 0 18px}.modal-actions{display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap}.success-icon{font-size:32px;margin-bottom:6px}.token-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.small-muted{font-size:12px;color:#71809e;margin:8px 0 0}.class-archive-status{display:inline-flex;align-items:center;min-height:38px;padding:7px 10px;border-radius:8px;background:#e8eefb;color:#294777;font-size:13px}.class-archive-status.archived{background:#fff0cf;color:#805100}.archive-toggle{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:500;margin:8px 0 0}.archive-toggle input{width:16px;height:16px}details summary{cursor:pointer;font-weight:700}.publish-actions{display:flex;gap:8px;flex-wrap:wrap}@media(max-width:720px){.grid,.filters,.token-grid{grid-template-columns:1fr}.item{flex-direction:column}.item-actions{justify-content:flex-start}.publish-actions{width:100%}}
+
+/* 筛选区域视觉修正：统一标签、输入框与结果提示的顶部和高度 */
+.filters{
+  grid-template-columns:minmax(210px,280px) minmax(280px,1fr) minmax(185px,230px);
+  gap:14px;
+  align-items:start;
+  padding:16px;
+  background:#f8faff;
+  border:1px solid #e2e9f5;
+  border-radius:12px;
+}
+.filters>div{min-width:0;display:flex;flex-direction:column;align-self:start}
+.filters>div>label:not(.all-date){
+  display:block;
+  min-height:21px;
+  margin:0 0 7px;
+  line-height:1.5;
+  font-size:13px;
+  color:#536382;
+}
+.filters input[type=date],.filters select{
+  width:100%;
+  height:44px;
+  min-height:44px;
+  padding:8px 12px;
+  border:1px solid #cbd6e8;
+  border-radius:9px;
+  background:#fff;
+  color:#1b2a4a;
+}
+.filters input[type=date]:focus,.filters select:focus{
+  outline:none;
+  border-color:#6c8bd5;
+  box-shadow:0 0 0 3px rgba(74,110,190,.12);
+}
+.filters .all-date{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  min-height:24px;
+  margin:8px 0 0 2px;
+  font-size:13px;
+  font-weight:500;
+  color:#4b5d7d;
+  cursor:pointer;
+}
+.filters .all-date input{
+  width:16px;
+  height:16px;
+  margin:0;
+  accent-color:#345da8;
+}
+.filters #filterCount{
+  display:flex;
+  align-items:center;
+  width:100%;
+  height:44px;
+  min-height:44px;
+  margin:0!important;
+  padding:8px 13px;
+  border:1px solid #dce6fa;
+  border-radius:9px;
+  background:#eaf0fc;
+  color:#244477;
+  font-size:15px;
+  font-weight:650;
+}
+@media(max-width:900px){
+  .filters{grid-template-columns:minmax(0,1fr) minmax(0,1.5fr);}
+  .filters>div:last-child{grid-column:1 / -1;}
+}
+@media(max-width:620px){
+  .filters{grid-template-columns:minmax(0,1fr);gap:12px;padding:12px;}
+  .filters>div:last-child{grid-column:auto;}
+}
+
+
+/* 手机端适配增强：保留电脑端全部功能，只调整触控尺寸、布局和导航 */
+*{-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth;scroll-padding-top:76px}
+body{overflow-x:hidden;-webkit-text-size-adjust:100%}
+button,select,input,textarea{touch-action:manipulation}
+button{min-height:44px}
+input[type=text],input[type=date],input[type=password],input[type=number],select,textarea{font-size:16px;min-height:44px;max-width:100%}
+textarea{min-height:112px}
+input[type=checkbox],input[type=radio]{width:20px;height:20px;flex:0 0 auto;accent-color:#345da8}
+.mobile-nav{display:none}
+@media(max-width:680px){
+  main{padding:12px 10px 34px}
+  h1{font-size:21px;line-height:1.35;overflow-wrap:anywhere}
+  h2{line-height:1.35}
+  .mobile-nav{display:flex;position:sticky;top:0;z-index:50;gap:6px;overflow-x:auto;white-space:nowrap;padding:7px 2px;margin:0 -2px 10px;background:rgba(243,246,251,.97);border-bottom:1px solid #dce3ef;-webkit-overflow-scrolling:touch}
+  .mobile-nav a{display:inline-flex;align-items:center;justify-content:center;min-height:42px;flex:0 0 auto;padding:7px 12px;border:1px solid #d3dcec;border-radius:999px;background:#fff;color:#294777;text-decoration:none;font-size:14px;font-weight:650}
+  .box{padding:13px;border-radius:11px}
+  .grid,.filters,.token-grid{grid-template-columns:minmax(0,1fr);gap:10px}
+  .grid>div,.filters>div,.token-grid>div{min-width:0}
+  .stu{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .stu label{min-height:42px;align-items:center;padding:6px 8px;border:1px solid #e4eaf4;border-radius:8px;background:#fafcff;overflow-wrap:anywhere}
+  .item{gap:10px;padding:13px 0}
+  .item-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));width:100%;justify-content:stretch}
+  .item-actions button{width:100%;padding:9px 7px}
+  .publish-actions{display:grid;grid-template-columns:1fr;width:100%}
+  .publish-actions button{width:100%;min-height:46px}
+  .row{align-items:stretch}
+  .row>button{max-width:100%}
+  .row:not(.stu)>button{flex:1 1 100%;width:100%}
+  #rosterManager .row,#rosterManager .grid{display:grid;grid-template-columns:minmax(0,1fr)}
+  #rosterManager button{width:100%}
+  .filters{padding:12px}
+  .filters #filterCount{height:auto;min-height:44px}
+  .modal-backdrop{align-items:flex-end;padding:8px}
+  .modal{width:100%;max-height:calc(100dvh - 16px);overflow:auto;padding:18px 15px;border-radius:16px}
+  .modal-actions{display:grid;grid-template-columns:1fr;width:100%}
+  .modal-actions button{width:100%}
+  details summary{min-height:44px;display:flex;align-items:center;line-height:1.45}
+  #settings .row,#settings .grid{display:grid;grid-template-columns:minmax(0,1fr)}
+}
+@media(max-width:380px){
+  main{padding-left:8px;padding-right:8px}
+  .stu{grid-template-columns:1fr}
+  .item-actions{grid-template-columns:1fr}
+  .mobile-nav a{font-size:13px;padding:6px 10px}
+}
+
+</style>
+</head>
+<body><main>
+<h1>📝 教师作业发布台</h1><nav class="mobile-nav" aria-label="快速操作"><a href="#publishForm">发布作业</a><a href="#rosterManager" data-open-details="rosterManager">班级名单</a><a href="#historyRecords">作业记录</a><a href="#settings" data-open-details="settings">GitHub设置</a></nav>
+<div id="status" class="note">正在读取线上作业……</div>
+<section class="box" id="publishForm">
+<h2 id="formTitle">发布新作业</h2>
+<div class="grid">
+<div><label for="cls">班级</label><select id="cls"></select></div>
+<div><label for="lessonDate">上课日期</label><input type="date" id="lessonDate"></div>
+<div><label for="date">作业布置日期</label><input type="date" id="date"></div>
+<div><label for="dueDate">完成截止日期（默认布置日期 + 7 天）</label><input type="date" id="dueDate"></div>
+<div style="grid-column:span 2"><label>布置给</label><div class="stu" id="tgt"></div></div>
+</div>
+<label for="items">作业项目（一行一项，学生端可以逐项勾选）</label><textarea id="items" placeholder="例如：\n复习本节课学生讲义\n完成课堂练习第 1、2 题"></textarea>
+<label for="link">参考链接 / 提交入口（可不填）</label><input type="text" id="link" placeholder="https://">
+<p class="row"><button class="main" id="save">保存作业</button><button id="cancel" hidden>取消编辑</button></p>
+</section>
+
+<details class="box" id="rosterManager">
+ <summary style="cursor:pointer;font-weight:750">班级与学生名单管理（新增、转班、移出名单）</summary>
+ <p class="meta">名单修改后请点击上方“发布到学生端”同步。转班只更新当前班级名单，不会删除学生以前的作业发布记录；移出名单也不会删除历史档案。</p>
+ <div class="grid" style="margin-top:10px">
+  <div><label for="rosterClass">当前操作班级</label><select id="rosterClass"></select></div>
+  <div><label for="rosterStudent">选择学生</label><select id="rosterStudent"></select></div>
+  <div><label for="moveTargetClass">转入班级</label><select id="moveTargetClass"></select></div>
+ </div>
+ <div class="grid" style="margin-top:8px">
+  <div><label for="newClassName">新增班级</label><input type="text" id="newClassName" placeholder="输入新班级名称"><button id="addClassBtn" style="margin-top:7px">新增班级</button></div>
+  <div><label for="newRosterStudent">新增学生到当前班级</label><input type="text" id="newRosterStudent" placeholder="输入学生姓名"><button id="addRosterStudentBtn" style="margin-top:7px">新增学生</button></div>
+  <div><label>名单操作</label><div class="row"><button id="moveRosterStudentBtn">转移到所选班级</button><button id="removeRosterStudentBtn" class="danger">从当前班级移除</button></div></div>
+ </div>
+ <div id="rosterManagerHint" class="small-muted">新增、转班或移除后，请点击“发布到学生端”同步教师名单。</div>
+ <div style="border-top:1px solid #e8edf6;margin-top:14px;padding-top:14px">
+  <h3 style="margin:0 0 6px">班级结课归档 / 恢复</h3>
+  <p class="meta">整班结课时使用“班级结课归档”。结课后该班不再出现在新作业发布和学生端班级列表中；历史发布记录、学生档案和课次全部保留。需要继续上课时可以恢复。</p>
+  <div class="grid" style="align-items:end">
+   <div><label for="archiveClassSelect">选择班级</label><select id="archiveClassSelect"><option value="">-- 选择班级 --</option></select></div>
+   <div><label>当前状态</label><div id="classArchiveStatus" class="class-archive-status">请选择班级</div></div>
+   <div class="row"><button id="archiveClassBtn" class="danger">班级结课归档</button><button id="restoreClassBtn" class="main">恢复班级</button></div>
+  </div>
+ </div>
+</details>
+<section class="box">
+<div class="row" style="justify-content:space-between;align-items:flex-start">
+<div><h2 style="margin-bottom:4px">已发布的作业</h2><div class="meta">默认查看今天；可选择日期，再筛选当天有作业的班级。每次发布独立显示。</div></div>
+<div class="publish-actions"><button class="main" id="pub">发布到学生端</button><button class="dark" id="exp">下载 homework.json（备用）</button><button id="imp">导入 JSON</button></div>
+</div>
+<input type="file" id="file" accept=".json,application/json" hidden>
+<div class="filters" id="historyRecords" style="margin-top:14px">
+<div><label for="filterDate">查看日期</label><input type="date" id="filterDate"><label class="all-date"><input type="checkbox" id="allDates"> 查看全部日期</label><label class="archive-toggle"><input type="checkbox" id="showArchivedHistory"> 显示已结课班级历史记录</label></div>
+<div><label for="filterClass">班级（仅显示所选日期有记录的班级）</label><select id="filterClass"><option value="all">全部班级</option></select></div>
+<div><label>查询结果</label><div id="filterCount" class="note" style="margin:0">0 条发布记录</div></div>
+</div>
+<div id="list" style="margin-top:8px"></div>
+</section>
+<details class="box" id="settings">
+<summary>GitHub 发布与档案同步设置（首次使用配置）</summary>
+<p class="meta">学生端作业放在现有 homework-hub 仓库。学员档案必须放在独立的私有仓库中，不能将学生姓名、课次与完成情况写入公开仓库。令牌只保存在当前浏览器中，不要分享或写进 HTML 文件。</p>
+<div class="token-grid">
+<div><label for="tok">GitHub 访问令牌</label><input type="password" id="tok" placeholder="github_pat_……" autocomplete="off"></div>
+<div><label for="archiveOwner">学员档案仓库所有者</label><input type="text" id="archiveOwner" value="sehun996"></div>
+<div><label for="archiveRepo">学员档案私有仓库名</label><input type="text" id="archiveRepo" placeholder="请先创建一个私有仓库"></div>
+<div><label for="archivePath">档案数据文件路径</label><input type="text" id="archivePath" value="student_archives.json"></div>
+</div>
+<p class="row"><button id="tokSave">保存设置</button><button class="danger" id="tokClear">清除令牌</button></p>
+<div class="small-muted">同一 GitHub 令牌需要同时具备 homework-hub 的 Contents 读写权限，以及私有学员档案仓库的 Contents 读写权限。档案仓库尚未配置时，作业仍可发布，但不会自动同步进个人档案。</div>
+</details>
+</main>
+<div class="modal-backdrop" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><div class="modal"><div id="modalIcon" class="success-icon">✅</div><h2 id="modalTitle">提示</h2><p id="modalText"></p><div id="modalExtra"></div><div class="modal-actions"><button id="modalCancel">关闭</button><button class="main" id="modalOK" hidden>确认</button></div></div></div>
+<script>
+const LIVE='https://sehun996.github.io/homework-hub/homework.json', OWNER='sehun996', REPO='homework-hub', FILE='homework.json';
+const API=`https://api.github.com/repos/${OWNER}/${REPO}/contents/${FILE}`;
+const $=id=>document.getElementById(id), DAY=86400000, DK='teacher_draft_v2';
+const token=()=>{try{return localStorage.getItem('gh_token')||''}catch(e){return ''}};
+const hdr=(accept)=>({Authorization:'Bearer '+token(),Accept:accept||'application/vnd.github+json'});
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const ymd=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+const plusDays=(str,n)=>{if(!str)return '';const [y,m,d]=str.split('-').map(Number);return ymd(new Date(y,m-1,d+n))};
+let D={updated:'',roster:{},homework:[],archivedClasses:{}},editing=null,modalHandler=null,extensionHwId=null,rosterManagerClass='';
+function msg(t,kind=''){ $('status').textContent=t;$('status').className='note '+kind; }
+function touch(){D.updated=new Date().toISOString();try{localStorage.setItem(DK,JSON.stringify({savedAt:D.updated,data:D}))}catch(e){} }
+function showModal(title,text,icon='✅',extra='',onOK=null,okLabel='确认'){
+ $('modalTitle').textContent=title;$('modalText').textContent=text;$('modalIcon').textContent=icon;$('modalExtra').innerHTML=extra;
+ $('modalOK').hidden=!onOK;$('modalOK').textContent=okLabel;$('modal').classList.add('show');modalHandler=onOK;
+}
+function closeModal(){ $('modal').classList.remove('show');$('modalExtra').innerHTML='';modalHandler=null; }
+$('modalCancel').onclick=closeModal;$('modalOK').onclick=()=>{const fn=modalHandler;const selector=$('extendStudent');const extStudent=selector?.value||null;if(selector&&!extStudent){$('modalText').textContent='请先选择一名缺课学生，再确认延期。';selector.focus();return}closeModal();if(fn)fn(extStudent)};$('modal').addEventListener('click',e=>{if(e.target===$('modal'))closeModal()});
+function explain(e){const s=e&&e.status;if(s===401)return 'GitHub 令牌无效或已过期，请重新保存令牌。';if(s===403||s===404)return '令牌权限不足，或仓库名、文件路径不正确。';if(s===409||s===422)return 'GitHub 文件可能被其他位置修改，请刷新后重试。';return s?'GitHub 返回状态码 '+s+'。':'网络连接失败，请检查网络后重试。'}
+async function readLive(){if(token()){try{const r=await fetch(API,{headers:hdr('application/vnd.github.raw+json'),cache:'no-store'});if(r.ok)return await r.json()}catch(e){}}try{const r=await fetch(LIVE+'?t='+Date.now());if(r.ok)return await r.json()}catch(e){}return null}
+async function boot(){let live=null,draft=null;live=await readLive();try{draft=JSON.parse(localStorage.getItem(DK))}catch(e){}
+ if(live&&(!draft||draft.savedAt<=(live.updated||''))){D=normalize(live);msg(`已读取线上作业（${D.homework.length} 条）；历史记录不会按天数自动删除。`,'ok')}
+ else if(draft&&draft.data){D=normalize(draft.data);msg(live?'⚠️ 已读取本地草稿；发布前请核对同步状态。':'⚠️ 当前未能读取线上数据，已读取本地草稿。','warn')}
+ else {D=normalize({roster:{},homework:[]});msg('⚠️ 暂未读取到 homework.json。可导入已有 JSON，再保存或发布。','warn')}
+ const today=ymd(new Date());$('date').value=today;$('lessonDate').value=today;$('dueDate').value=plusDays(today,7);$('filterDate').value=today;
+ if($('archiveOwner'))$('archiveOwner').value=localStorage.getItem('archive_owner')||'sehun996';$('archiveRepo').value=localStorage.getItem('archive_repo')||'';$('archivePath').value=localStorage.getItem('archive_path')||'student_archives.json';
+ fillClasses();renderList();}
+function normalize(x){if(!x||typeof x!=='object')x={};x.roster=x.roster&&typeof x.roster==='object'?x.roster:{};x.homework=Array.isArray(x.homework)?x.homework:[];if(Array.isArray(x.archivedClasses))x.archivedClasses=Object.fromEntries(x.archivedClasses.map(c=>[c,true]));x.archivedClasses=x.archivedClasses&&typeof x.archivedClasses==='object'?x.archivedClasses:{};x.homework=x.homework.map(h=>({...h,items:Array.isArray(h.items)?h.items:[],extensions:h.extensions&&typeof h.extensions==='object'?h.extensions:{},dueDate:h.dueDate||plusDays(h.date,7),lessonDate:h.lessonDate||h.date}));return x}
+function isArchivedClass(c){return !!(D.archivedClasses&&D.archivedClasses[c])}
+function allClassNames(){return Object.keys(D.roster||{}).sort((a,b)=>a.localeCompare(b,'zh-CN'))}
+function fillClasses(keep){const names=allClassNames().filter(c=>!isArchivedClass(c));$('cls').innerHTML=names.map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join('');if(!names.length)$('cls').innerHTML='<option value="">暂无正常上课班级（可在班级管理中恢复已结课班级）</option>';if(keep&&names.includes(keep))$('cls').value=keep;else if(names.length&&!names.includes($('cls').value))$('cls').value=names[0];fillTargets();renderRosterManager();renderClassArchiveControl()}
+function fillTargets(selected){const names=D.roster[$('cls').value]||[];let targets=selected===undefined?['全班']:[].concat(selected);if(typeof selected==='string'&&selected==='全班')targets=['全班'];$('tgt').innerHTML=['全班',...names].map(n=>`<label><input type="checkbox" value="${esc(n)}" ${targets.includes(n)?'checked':''}> ${esc(n)}</label>`).join('')}
+$('cls').addEventListener('change',()=>fillTargets());$('tgt').addEventListener('change',e=>{const boxes=[...$('tgt').querySelectorAll('input')],all=boxes[0];if(e.target===all&&all.checked)boxes.slice(1).forEach(b=>b.checked=false);else if(e.target!==all&&e.target.checked)all.checked=false;if(!boxes.some(b=>b.checked))all.checked=true});
+$('date').addEventListener('change',()=>{if($('date').value)$('dueDate').value=plusDays($('date').value,7)});
+function resetForm(){editing=null;$('formTitle').textContent='发布新作业';$('cancel').hidden=true;$('items').value='';$('link').value='';const t=ymd(new Date());$('date').value=t;$('lessonDate').value=t;$('dueDate').value=plusDays(t,7);fillTargets()}
+$('save').addEventListener('click',()=>{const items=$('items').value.split('\n').map(s=>s.trim()).filter(Boolean);if(!$('cls').value)return showModal('无法保存','请先选择正常上课的班级。','⚠️');if(isArchivedClass($('cls').value))return showModal('班级已结课','不能向已结课班级发布新作业。需要继续上课请先恢复班级。','⚠️');if(!items.length)return showModal('无法保存','请至少填写一条作业项目。','⚠️');if(!$('date').value||!$('dueDate').value)return showModal('无法保存','请填写作业布置日期和截止日期。','⚠️');const picked=[...$('tgt').querySelectorAll('input:checked')].map(b=>b.value);const target=picked.includes('全班')?'全班':picked.length===1?picked[0]:picked;if(!target||(Array.isArray(target)&&!target.length))return showModal('无法保存','请选择布置对象。','⚠️');
+ const old=D.homework.find(h=>h.id===editing);const hw={...(old||{}),id:editing||'hw_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,6),className:$('cls').value,target,date:$('date').value,lessonDate:$('lessonDate').value||$('date').value,dueDate:$('dueDate').value,items,link:$('link').value.trim(),extensions:old?.extensions||{}};const i=D.homework.findIndex(h=>h.id===editing);if(i>=0)D.homework[i]=hw;else D.homework.unshift(hw);touch();resetForm();renderList();showModal('作业保存成功','这条发布记录已保存到当前教师发布台的本地草稿。确认后，点击“发布到学生端”才会同步给学生。','✅');msg('作业已保存到当前浏览器草稿，尚未发布到学生端。','warn')});
+$('cancel').addEventListener('click',resetForm);
+function recordClasses(){const filtered=D.homework.filter(h=>($('allDates').checked||!$('filterDate').value||h.date===$('filterDate').value)&&($('showArchivedHistory').checked||!isArchivedClass(h.className)));return [...new Set(filtered.map(h=>h.className).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'zh-CN'))}
+function renderRosterManager(keep){
+ const clsEl=$('rosterClass'),stuEl=$('rosterStudent'),destEl=$('moveTargetClass');if(!clsEl||!stuEl||!destEl)return;
+ const classes=allClassNames();
+ const old=keep||clsEl.value||rosterManagerClass||$('cls').value||classes[0]||'';
+ clsEl.innerHTML='<option value="">-- 选择班级 --</option>'+classes.map(c=>`<option value="${esc(c)}">${isArchivedClass(c)?'【已结课】 ':''}${esc(c)}</option>`).join('');
+ clsEl.value=classes.includes(old)?old:'';rosterManagerClass=clsEl.value;
+ const names=(D.roster[rosterManagerClass]||[]).slice().sort((a,b)=>a.localeCompare(b,'zh-CN'));
+ const oldStudent=stuEl.value;
+ stuEl.innerHTML='<option value="">-- 选择学生 --</option>'+names.map(n=>`<option value="${esc(n)}">${esc(n)}</option>`).join('');
+ if(names.includes(oldStudent))stuEl.value=oldStudent;
+ const oldDest=destEl.value;
+ destEl.innerHTML='<option value="">-- 选择转入班级 --</option>'+classes.filter(c=>c!==rosterManagerClass&&!isArchivedClass(c)).map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join('');
+ if(classes.includes(oldDest)&&oldDest!==rosterManagerClass&&!isArchivedClass(oldDest))destEl.value=oldDest;
+ const frozen=isArchivedClass(rosterManagerClass);
+ $('moveRosterStudentBtn').disabled=!rosterManagerClass||!names.length||!destEl.options.length||frozen;
+ $('removeRosterStudentBtn').disabled=!rosterManagerClass||!names.length||frozen;
+ $('addRosterStudentBtn').disabled=!rosterManagerClass||frozen;
+ $('rosterManagerHint').textContent=rosterManagerClass?`${rosterManagerClass}：${names.length} 名学生。${frozen?'此班已结课；如需更改名单，请先恢复班级。':'名单修改会先保存为本地草稿；请再点击“发布到学生端”正式同步。'}`:'请先新增班级，或先导入已有 homework.json.';
+}
+function renderClassArchiveControl(keep){
+ const el=$('archiveClassSelect');if(!el)return;const classes=allClassNames();const prev=keep||el.value||rosterManagerClass||'';
+ el.innerHTML='<option value="">-- 选择班级 --</option>'+classes.map(c=>`<option value="${esc(c)}">${isArchivedClass(c)?'【已结课】 ':''}${esc(c)}</option>`).join('');
+ el.value=classes.includes(prev)?prev:'';const c=el.value,archived=!!c&&isArchivedClass(c);
+ $('classArchiveStatus').textContent=!c?'请选择班级':archived?'已结课归档：不会显示在日常发布和学生端班级列表':'正常上课：可发布新作业';
+ $('classArchiveStatus').className='class-archive-status'+(archived?' archived':'');
+ $('archiveClassBtn').disabled=!c||archived;$('restoreClassBtn').disabled=!c||!archived;
+}
+function rosterUpdated(message, focusClass){
+ touch();const current=$('cls').value;fillClasses(current);renderRosterManager(focusClass||rosterManagerClass);renderList();
+ msg(message+'；当前为本地草稿，请点击“发布到学生端”同步。','warn');
+ showModal('班级名单已更新',message+'\n这次修改尚未同步到学生端。请点击“发布到学生端”后生效。','✅');
+}
+$('rosterClass').addEventListener('change',()=>{rosterManagerClass=$('rosterClass').value;renderRosterManager(rosterManagerClass);renderClassArchiveControl(rosterManagerClass)});
+$('archiveClassSelect').addEventListener('change',()=>renderClassArchiveControl());
+$('archiveClassBtn').addEventListener('click',()=>{const c=$('archiveClassSelect').value;if(!c)return showModal('请选择班级','先选择要结课的班级。','⚠️');if(isArchivedClass(c))return;const n=(D.roster[c]||[]).length;if(!confirm(`确定将“${c}”结课归档吗？
+
+班级中的 ${n} 名学生、全部历史作业和学员档案都会保留。归档后该班不会显示在日常新作业发布和学生端班级下拉列表中。`))return;D.archivedClasses[c]=true;touch();fillClasses();renderRosterManager(c);renderClassArchiveControl(c);updateFilterClasses();renderList();msg(`班级“${c}”已标记为结课归档；请点击“发布到学生端”同步生效。`,'warn');showModal('班级已结课归档',`“${c}”已标记为已结课。历史记录没有删除。请点击“发布到学生端”，更新学生主页及私有学员档案。`,'✅')});
+$('restoreClassBtn').addEventListener('click',()=>{const c=$('archiveClassSelect').value;if(!c)return showModal('请选择班级','先选择要恢复的班级。','⚠️');if(!isArchivedClass(c))return;delete D.archivedClasses[c];touch();fillClasses(c);renderRosterManager(c);renderClassArchiveControl(c);updateFilterClasses();renderList();msg(`班级“${c}”已恢复；请点击“发布到学生端”同步生效。`,'warn');showModal('班级已恢复',`“${c}”已恢复为正常上课班级，可以继续发布新作业。历史记录原样保留。请点击“发布到学生端”同步。`,'✅')});
+$('addClassBtn').addEventListener('click',()=>{
+ const name=$('newClassName').value.trim();if(!name)return showModal('无法新增班级','请先输入班级名称。','⚠️');
+ if(Object.prototype.hasOwnProperty.call(D.roster,name))return showModal('班级已存在',`“${name}”已经在名单中。`,'⚠️');
+ D.roster[name]=[];$('newClassName').value='';rosterManagerClass=name;rosterUpdated(`已新增班级“${name}”`,name);
+});
+$('addRosterStudentBtn').addEventListener('click',()=>{
+ const cls=$('rosterClass').value,name=$('newRosterStudent').value.trim();if(!cls)return showModal('请选择班级','先选择要添加学生的班级。','⚠️');if(isArchivedClass(cls))return showModal('班级已结课','请先恢复班级，再添加学生。','⚠️');if(!name)return showModal('请输入姓名','请填写新学生姓名。','⚠️');
+ const other=Object.entries(D.roster).filter(([c,a])=>c!==cls&&(a||[]).includes(name)).map(([c])=>c);
+ if((D.roster[cls]||[]).includes(name))return showModal('学生已存在',`${name} 已经在 ${cls}。`,'⚠️');
+ if(other.length)return showModal('学生已在其他班级',`${name} 已在：${other.join('、')}。如果是转班，请使用“转移到所选班级”，避免重复名单。`,'⚠️');
+ D.roster[cls]=Array.isArray(D.roster[cls])?D.roster[cls]:[];D.roster[cls].push(name);$('newRosterStudent').value='';rosterUpdated(`已将 ${name} 添加到 ${cls}`,cls);
+});
+$('moveRosterStudentBtn').addEventListener('click',()=>{
+ const from=$('rosterClass').value,name=$('rosterStudent').value,to=$('moveTargetClass').value;
+ if(!from||!name)return showModal('请选择学生','先选择原班级和学生。','⚠️');if(isArchivedClass(from))return showModal('原班级已结课','请先恢复原班级，再转移学生。','⚠️');if(!to)return showModal('请选择转入班级','请选择学生要转入的班级。','⚠️');if(isArchivedClass(to))return showModal('转入班级已结课','请选择正常上课的班级。','⚠️');
+ D.roster[from]=(D.roster[from]||[]).filter(n=>n!==name);
+ // 按“转班”处理：同名学生从所有现有班级名单移除，再加入新班级；既有作业/档案历史原样保留。
+ for(const c of Object.keys(D.roster))D.roster[c]=(D.roster[c]||[]).filter(n=>n!==name);
+ D.roster[to]=Array.isArray(D.roster[to])?D.roster[to]:[];D.roster[to].push(name);rosterUpdated(`已将 ${name} 从 ${from} 转到 ${to}。历史作业和学员档案未删除。`,to);
+});
+$('removeRosterStudentBtn').addEventListener('click',()=>{
+ const cls=$('rosterClass').value,name=$('rosterStudent').value;if(!cls||!name)return showModal('请选择学生','先选择当前班级和学生。','⚠️');if(isArchivedClass(cls))return showModal('班级已结课','请先恢复班级，再修改学生名单。','⚠️');
+ if(!confirm(`确定将 ${name} 从 ${cls} 的当前名单中移除吗？\n不会删除该学生以前发布的作业记录，也不会删除私有学员档案。`))return;
+ D.roster[cls]=(D.roster[cls]||[]).filter(n=>n!==name);rosterUpdated(`已将 ${name} 从 ${cls} 当前名单移除；历史记录保留。`,cls);
+});
+function updateFilterClasses(){const prev=$('filterClass').value,classes=recordClasses();$('filterClass').innerHTML='<option value="all">全部班级</option>'+classes.map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join('');if(prev==='all'||classes.includes(prev))$('filterClass').value=prev;else $('filterClass').value='all'}
+$('filterDate').addEventListener('change',()=>{ $('allDates').checked=false;$('filterClass').value='all';updateFilterClasses();renderList()});$('allDates').addEventListener('change',()=>{updateFilterClasses();renderList()});$('filterClass').addEventListener('change',renderList);$('showArchivedHistory').addEventListener('change',()=>{updateFilterClasses();renderList()});
+function targetText(t){return [].concat(t||[]).join('、')||'未指定'}
+function renderList(){updateFilterClasses();const dateAll=$('allDates').checked,fd=$('filterDate').value,fc=$('filterClass').value,showArchived=$('showArchivedHistory').checked;const rows=[...D.homework].filter(h=>(dateAll||!fd||h.date===fd)&&(fc==='all'||h.className===fc)&&(showArchived||!isArchivedClass(h.className))).sort((a,b)=>(b.date||'').localeCompare(a.date||'')||(b.id||'').localeCompare(a.id||''));$('filterCount').textContent=rows.length+' 条发布记录';$('list').innerHTML=rows.map(h=>{const archived=isArchivedClass(h.className),ext=h.extensions||{},extNames=Object.entries(ext).filter(([n,v])=>Number(v)>0).map(([n,v])=>`${n} +${v}天`);const items=(h.items||[]).map((t,i)=>`${i+1}. ${esc(t)}`).join('<br>');const actions=archived?'<span class="pill" style="background:#fff0cf;color:#805100">已结课，仅保留历史</span>':`<button data-extend="${esc(h.id)}">选择学生并延期 +7 天</button><button data-edit="${esc(h.id)}">编辑</button><button class="danger" data-del="${esc(h.id)}">删除</button>`;return `<div class="item"><div class="item-body"><div class="meta">布置：${esc(h.date||'')} · 上课：${esc(h.lessonDate||h.date||'')} · 截止：${esc(h.dueDate||plusDays(h.date,7))}</div><div style="margin:5px 0"><span class="pill">${esc(h.className||'未分班')}</span>${archived?'<span class="pill" style="background:#fff0cf;color:#805100">已结课班级</span>':''}<span class="pill">${esc(targetText(h.target))}</span>${extNames.map(n=>`<span class="pill" style="background:#fff0cf;color:#805100">缺课延期：${esc(n)}</span>`).join('')}</div>${h.title?`<strong>${esc(h.title)}</strong>`:''}<div>${items}</div>${h.link?`<div class="meta">链接：${esc(h.link)}</div>`:''}</div><div class="item-actions">${actions}</div></div>`}).join('')||'<div class="empty">当前筛选条件下没有作业发布记录。已结课班级的历史记录可勾选“显示已结课班级历史记录”查看。</div>'}
+$('list').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;const id=b.dataset.edit||b.dataset.del||b.dataset.extend,h=D.homework.find(x=>x.id===id);if(!h)return;if(b.dataset.del){if(isArchivedClass(h.className))return showModal('班级已结课','为保留历史，已结课班级的作业记录不能从日常列表删除。','⚠️');if(!confirm(`确定删除这条发布记录吗？\n${(h.items||[])[0]||h.id}`))return;D.homework=D.homework.filter(x=>x.id!==id);touch();renderList();msg('已删除本地草稿中的记录；如需同步删除，请重新发布到学生端。','warn');return}if(b.dataset.edit){if(isArchivedClass(h.className))return showModal('班级已结课','该记录属于已结课班级，默认只保留历史，不再编辑或发布新作业。需要继续使用请先恢复班级。','⚠️');editing=id;$('formTitle').textContent='编辑作业';$('cancel').hidden=false;$('cls').value=h.className;fillTargets(h.target);$('date').value=h.date||ymd(new Date());$('lessonDate').value=h.lessonDate||h.date||ymd(new Date());$('dueDate').value=h.dueDate||plusDays(h.date,7);$('items').value=(h.items||[]).join('\n');$('link').value=h.link||'';scrollTo({top:0,behavior:'smooth'});return}if(b.dataset.extend){const names=[].concat(h.target||[]).includes('全班')?(D.roster[h.className]||[]):[].concat(h.target||[]);const opts='<option value="" selected>-- 请选择缺课学生 --</option>'+names.map(n=>`<option value="${esc(n)}">${esc(n)}</option>`).join('');if(!names.length)return showModal('无法延期','没有匹配到学生名单，请检查班级名单或作业布置对象。','⚠️');extensionHwId=id;showModal('为指定学生延期','请选择缺课学生。只会为选中的学生额外延长 7 天，不会影响同班其他学生；班级作业仍然对全班其他学生正常显示。重复操作会继续累计延期天数。','📅',`<label for="extendStudent">缺课学生（必选）</label><select id="extendStudent" required style="width:100%;padding:9px;border:1px solid #c5cfe3;border-radius:8px">${opts}</select><p class="meta" style="margin:8px 0 0">延期仅绑定到这名学生，不会修改作业的全班布置对象。</p>`,applyExtension,'确认延期 +7 天')}});
+function applyExtension(stu){const h=D.homework.find(x=>x.id===extensionHwId);if(!h||!stu)return;h.extensions=h.extensions||{};h.extensions[stu]=(Number(h.extensions[stu])||0)+7;touch();renderList();msg(`已为 ${stu} 单独设置延期 +7 天；点击“发布到学生端”后，学生端才会更新。`,'warn');showModal('指定学生延期已设置',`${stu} 的这份作业可见期限已额外增加 7 天。同班其他学生不受影响。请继续点击“发布到学生端”同步给学生。`,'✅')}
+$('exp').addEventListener('click',()=>{touch();const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(D,null,2)],{type:'application/json'}));a.download='homework.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);msg(`已导出全部 ${D.homework.length} 条记录；不会因超过 21 天自动删除。`,'ok')});
+$('imp').addEventListener('click',()=>$('file').click());$('file').addEventListener('change',async e=>{try{const f=e.target.files[0];if(!f)return;const j=JSON.parse(await f.text());if(!j.roster||!Array.isArray(j.homework))throw new Error('format');D=normalize(j);touch();fillClasses();renderList();showModal('导入成功',`已导入 ${D.homework.length} 条发布记录。`,'✅');msg(`已导入 ${D.homework.length} 条记录。`,'ok')}catch(err){showModal('导入失败','文件格式不正确，请选择原系统导出的 homework.json。','⚠️')}e.target.value=''});
+$('tokSave').addEventListener('click',()=>{const v=$('tok').value.trim();if(!v&&!token())return showModal('缺少令牌','请先输入 GitHub 访问令牌。','⚠️');if(v){try{localStorage.setItem('gh_token',v)}catch(e){return showModal('保存失败','浏览器不允许保存，请检查浏览器设置。','⚠️')}}try{localStorage.setItem('archive_owner',$('archiveOwner').value.trim()||'sehun996');localStorage.setItem('archive_repo',$('archiveRepo').value.trim());localStorage.setItem('archive_path',$('archivePath').value.trim()||'student_archives.json')}catch(e){}$('tok').value='';showModal('设置已保存','令牌和档案仓库设置已保存到当前浏览器。','✅')});$('tokClear').addEventListener('click',()=>{try{localStorage.removeItem('gh_token')}catch(e){}showModal('令牌已清除','GitHub 令牌已从当前浏览器清除。','✅')});
+function maxLesson(stu){const p=stu||{};let n=Number(p.nextLessonNumber)||0;for(const l of p.lessons||[]){const ms=String(l.lessonLabel||'').match(/\d+/g)||[];for(const x of ms)n=Math.max(n,Number(x)||0);n=Math.max(n,Number(l.endNumber)||0,Number(l.startNumber)||0)}return n}
+function ensureProfile(db,name){db.students=db.students||{};if(!db.students[name])db.students[name]={name,className:'',classNames:[],nextLessonNumber:0,lessons:[]};const p=db.students[name];p.name=name;p.lessons=Array.isArray(p.lessons)?p.lessons:[];p.classNames=Array.isArray(p.classNames)?p.classNames:[];p.nextLessonNumber=maxLesson(p);return p}
+function makeTaskId(h,i){return `${h.id||h.date}_${i}`}
+async function ghReadJson(owner,repo,path){const url=`https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/contents/${path.split('/').map(encodeURIComponent).join('/')}`;const r=await fetch(url,{headers:hdr(),cache:'no-store'});if(r.status===404)return {data:null,sha:null};if(!r.ok)throw r;const j=await r.json();let txt;try{txt=decodeURIComponent(escape(atob((j.content||'').replace(/\n/g,''))))}catch(e){txt=atob((j.content||'').replace(/\n/g,''))}return {data:JSON.parse(txt),sha:j.sha}}
+async function ghWriteJson(owner,repo,path,data,sha,message){const url=`https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/contents/${path.split('/').map(encodeURIComponent).join('/')}`;const body={message,content:btoa(unescape(encodeURIComponent(JSON.stringify(data,null,2))))};if(sha)body.sha=sha;const r=await fetch(url,{method:'PUT',headers:{...hdr(),'Content-Type':'application/json'},body:JSON.stringify(body)});if(!r.ok)throw r;return await r.json()}
+async function syncArchiveFromHomework(homework){
+ const owner=($('archiveOwner').value.trim()||localStorage.getItem('archive_owner')||'sehun996'),repo=($('archiveRepo').value.trim()||localStorage.getItem('archive_repo')||''),path=($('archivePath').value.trim()||localStorage.getItem('archive_path')||'student_archives.json');
+ if(!token()||!repo)return {ok:false,skip:true,message:'未配置私有档案仓库，未同步学员档案。'};
+ let got;try{got=await ghReadJson(owner,repo,path)}catch(e){return {ok:false,message:'学员档案读取失败：'+explain(e)}}
+ const db=got.data&&typeof got.data==='object'?got.data:{schemaVersion:1,updatedAt:'',students:{}};db.students=db.students||{};let changed=0;
+ // 班级名单以教师端 roster 为准。转班只更新 currentClass/className，不更改每一条历史课次的 className。
+ const currentMembership=new Map();
+ for(const [cls,arr] of Object.entries(D.roster||{})){if(isArchivedClass(cls))continue;for(const name of (Array.isArray(arr)?arr:[])){if(!name)continue;if(!currentMembership.has(name))currentMembership.set(name,cls)}}
+ for(const [name,p0] of Object.entries(db.students)){const p=p0||{};p.name=p.name||name;p.classNames=Array.isArray(p.classNames)?p.classNames:[];p.lessons=Array.isArray(p.lessons)?p.lessons:[];const current=currentMembership.get(name)||'';if(p.currentClass!==current||p.className!==current||p.rosterManaged!==true){p.currentClass=current;p.className=current;p.rosterManaged=true;changed++}if(current&&!p.classNames.includes(current))p.classNames.push(current);db.students[name]=p}
+ for(const [name,cls] of currentMembership){let isNew=!db.students[name];const p=ensureProfile(db,name);p.currentClass=cls;p.className=cls;p.rosterManaged=true;p.classNames=Array.isArray(p.classNames)?p.classNames:[];if(!p.classNames.includes(cls))p.classNames.push(cls);if(isNew)changed++}
+ for(const h of homework){const names=[].concat(h.target||[]).includes('全班')?(D.roster[h.className]||[]):[].concat(h.target||[]);for(const name of names){if(!name||name==='全班')continue;const p=ensureProfile(db,name);p.classNames=Array.isArray(p.classNames)?p.classNames:[];const current=currentMembership.get(name)||'';if(current){p.currentClass=current;p.className=current;p.rosterManaged=true;if(!p.classNames.includes(current))p.classNames.push(current)}const date=h.lessonDate||h.date||ymd(new Date()),key=`${h.className}|${name}|${date}`;let lesson=p.lessons.find(l=>l.autoLessonKey===key);if(!lesson){lesson=p.lessons.find(l=>!l.autoLessonKey&&l.importedLegacy&&l.lessonDate===date&&(!l.className||l.className===h.className));if(lesson)lesson.autoLessonKey=key}if(!lesson){const start=p.nextLessonNumber+1;lesson={id:'lesson_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,6),autoLessonKey:key,lessonLabel:`第${start}次`,lessonCount:1,startNumber:start,endNumber:start,className:h.className,lessonDate:date,assignedDate:h.date,dueDate:h.dueDate||plusDays(h.date,7),dueDateText:'',checkedDate:'',items:[],note:'',legacyStatus:'',sourceIds:[]};p.lessons.push(lesson);p.nextLessonNumber=start;changed++}
+ lesson.sourceIds=Array.isArray(lesson.sourceIds)?lesson.sourceIds:[];if(!lesson.sourceIds.includes(h.id))lesson.sourceIds.push(h.id);if(lesson.assignedDate!==h.date||lesson.dueDate!==(h.dueDate||plusDays(h.date,7))){lesson.assignedDate=h.date||lesson.assignedDate;lesson.dueDate=h.dueDate||lesson.dueDate;changed++}for(let i=0;i<(h.items||[]).length;i++){const text=h.items[i];const sourceItemId=makeTaskId(h,i);const existingItem=lesson.items.find(it=>it.sourceItemId===sourceItemId);if(!existingItem){lesson.items.push({id:'task_'+Date.now().toString(36)+'_'+i,text,status:'',note:'',sourceItemId});changed++}else if(existingItem.text!==text){existingItem.text=text;changed++}}}}
+ if(changed===0)return {ok:true,changed:0,message:'学员档案无需新增内容（发布记录可能已同步过）。'};db.updatedAt=new Date().toISOString();try{await ghWriteJson(owner,repo,path,db,got.sha,'同步教师名单及作业到学员档案');return {ok:true,changed,message:`已同步教师名单与学员档案（新增或更新 ${changed} 项）。历史课次保留。`}}catch(e){return {ok:false,message:'学员档案写入失败：'+explain(e)}}
+}
+$('pub').addEventListener('click',async()=>{if(!token()){$('settings').open=true;$('settings').scrollIntoView({behavior:'smooth'});return showModal('需要 GitHub 令牌','请先在页面下方的设置里保存 GitHub 访问令牌。','⚠️')};const btn=$('pub');btn.disabled=true;btn.textContent='发布中……';msg('正在发布到学生端……','warn');try{D.updated=new Date().toISOString();try{localStorage.setItem(DK,JSON.stringify({savedAt:D.updated,data:D}))}catch(e){}let sha;const g=await fetch(API,{headers:hdr(),cache:'no-store'});if(g.ok)sha=(await g.json()).sha;else if(g.status!==404)throw g;const r=await fetch(API,{method:'PUT',headers:{...hdr(),'Content-Type':'application/json'},body:JSON.stringify({message:'更新作业 '+new Date().toLocaleString('zh-CN',{hour12:false}),content:btoa(unescape(encodeURIComponent(JSON.stringify(D,null,2)))),sha})});if(!r.ok)throw r;let extra='已成功发布到学生端。学生端通常会在 GitHub Pages 更新后看到作业。';let icon='✅';const a=await syncArchiveFromHomework(D.homework);if(a.ok)extra+='\n'+a.message;else if(a.skip)extra+='\n⚠️ '+a.message;else{icon='⚠️';extra+='\n但'+a.message}msg(a.ok?'作业发布成功，学员档案同步完成。':a.skip?'作业发布成功，但学员档案尚未配置。':'作业已发布到学生端，但学员档案同步失败。',a.ok?'ok':'warn');renderList();showModal(a.ok?'作业发布成功':a.skip?'作业发布成功（档案未同步）':'作业已发布，档案同步失败',extra,icon)}catch(e){msg('发布失败：'+explain(e),'bad');showModal('作业发布失败',explain(e)+'\n本地草稿仍然保留，可以修复权限或网络后重试。','❌')}finally{btn.disabled=false;btn.textContent='发布到学生端'}});
+boot();
+</script>
+<script>
+(function(){document.addEventListener('click',function(e){const a=e.target.closest('[data-open-details]');if(!a)return;const d=document.getElementById(a.getAttribute('data-open-details'));if(d&&d.tagName.toLowerCase()==='details')d.open=true;});})();
+</script>
+</body></html>

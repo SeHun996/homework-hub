@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex">
+<title>学员档案与作业检查</title>
+<script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+<style>
+:root{--ink:#1b2a4a;--muted:#6d7a92;--line:#dce3ef;--bg:#f3f6fb;--orange:#ff7a1a;--green:#d8f3e4;--green-ink:#166747;--yellow:#fff0bf;--yellow-ink:#805600;--red:#ffe0e0;--red-ink:#9e2626}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 system-ui,"PingFang SC","Microsoft YaHei",sans-serif}main{max-width:1250px;margin:0 auto;padding:18px 14px 48px}h1{font-size:24px;margin:0 0 5px}h2{font-size:18px;margin:0 0 10px}h3{font-size:15px;margin:0 0 8px}.muted{font-size:12px;color:var(--muted)}.box{background:#fff;border:1px solid var(--line);border-radius:13px;padding:15px;margin:13px 0}button,input,select,textarea{font:inherit}button{padding:8px 12px;border:1px solid #c5cfe3;border-radius:9px;background:#fff;color:var(--ink);cursor:pointer}button.primary{background:var(--orange);color:white;border-color:var(--orange);font-weight:700}button.dark{background:var(--ink);color:#fff;border-color:var(--ink)}button.danger{color:#a82222}.row{display:flex;gap:9px;align-items:center;flex-wrap:wrap}.grid{display:grid;grid-template-columns:repeat(4,minmax(150px,1fr));gap:8px 12px}.field{min-width:0}.wide{grid-column:span 2}label{display:block;font-size:13px;font-weight:650;margin:6px 0 4px}input[type=text],input[type=date],input[type=password],input[type=number],select,textarea{width:100%;padding:8px 10px;border:1px solid #c7d0df;border-radius:8px;background:#fff;color:var(--ink)}textarea{min-height:72px;resize:vertical}.note{border-radius:9px;padding:10px 13px;background:#e8eefb;margin:10px 0;white-space:pre-line}.note.ok{background:#d8f3e4;color:#166747}.note.warn{background:#fff0bf;color:#805600}.note.bad{background:#ffe0e0;color:#9e2626}.layout{display:grid;grid-template-columns:260px minmax(0,1fr);gap:14px;align-items:start}.student-list{max-height:65vh;overflow:auto}.student-btn{display:block;width:100%;text-align:left;margin:4px 0;border-color:transparent}.student-btn.active{background:#e8eefb;border-color:#a7b8d8;font-weight:750}.lesson{border:1px solid var(--line);border-radius:12px;margin:10px 0;overflow:hidden;background:white}.lesson-head{display:flex;align-items:start;justify-content:space-between;gap:10px;padding:12px 14px;border-bottom:1px solid #e8edf6}.lesson-body{padding:12px 14px}.status-pill{display:inline-block;border-radius:999px;padding:3px 9px;font-weight:700;font-size:12px}.s-done{background:var(--green);color:var(--green-ink)}.s-partial{background:var(--yellow);color:var(--yellow-ink)}.s-not_done{background:var(--red);color:var(--red-ink)}.s-pending{background:#eef1f6;color:#596780}.lesson.status-done .lesson-head{background:#f0fbf5}.lesson.status-partial .lesson-head{background:#fff9e7}.lesson.status-not_done .lesson-head{background:#fff2f2}.task-editor{border:1px solid #e0e6f0;border-radius:10px;margin:9px 0;padding:10px}.task-grid{display:grid;grid-template-columns:minmax(180px,1fr) 180px;gap:8px}.task-note{grid-column:1/-1}.task-actions{display:flex;justify-content:flex-end}.hidden{display:none!important}.top-actions{display:flex;gap:8px;flex-wrap:wrap}.bar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}.small-input{max-width:120px}.settings-grid{display:grid;grid-template-columns:repeat(4,minmax(150px,1fr));gap:8px 12px}.legend{display:flex;gap:8px;flex-wrap:wrap}.legend span{font-size:12px;padding:4px 8px;border-radius:7px}.status-done{background:var(--green);color:var(--green-ink)}.status-partial{background:var(--yellow);color:var(--yellow-ink)}.status-not_done{background:var(--red);color:var(--red-ink)}.empty{text-align:center;padding:28px 10px;color:var(--muted)}.hr{height:1px;background:#e8edf6;margin:12px 0}
+@media(max-width:800px){.layout{grid-template-columns:1fr}.student-list{max-height:250px}.grid,.settings-grid{grid-template-columns:repeat(2,minmax(130px,1fr))}}@media(max-width:520px){main{padding:12px 9px 35px}.grid,.settings-grid,.task-grid{grid-template-columns:1fr}.wide{grid-column:span 1}.task-note{grid-column:auto}.lesson-head{flex-direction:column}}
+
+.matrix-controls{display:grid;grid-template-columns:minmax(190px,260px) minmax(260px,1fr);gap:12px;align-items:end;margin:12px 0 14px}.matrix-controls .field{min-width:0}.matrix-wrap{overflow:auto;border:1px solid var(--line);border-radius:10px;background:#fff;max-width:100%}.matrix-table{border-collapse:separate;border-spacing:0;min-width:100%;width:max-content;max-width:none;font-size:13px}.matrix-table th,.matrix-table td{border-right:1px solid #e3e8f1;border-bottom:1px solid #e3e8f1;padding:8px 9px;vertical-align:top}.matrix-table thead th{position:sticky;top:0;background:#1b2a4a;color:#fff;text-align:left;font-weight:700;z-index:2;min-width:190px;max-width:260px;white-space:normal}.matrix-table thead th:first-child{left:0;z-index:4;min-width:140px;max-width:160px}.matrix-table tbody td:first-child{position:sticky;left:0;background:#f7f9fd;font-weight:750;min-width:140px;max-width:160px;z-index:1}.matrix-table tbody td{min-width:190px;max-width:260px}.matrix-table tbody tr:last-child td{border-bottom:0}.matrix-table td:last-child,.matrix-table th:last-child{border-right:0}.matrix-cell{border-radius:8px;padding:6px;min-width:170px}.matrix-cell.done{background:var(--green)}.matrix-cell.partial{background:var(--yellow)}.matrix-cell.not_done{background:var(--red)}.matrix-cell.pending{background:#f2f4f8}.matrix-cell.unassigned{background:#f7f8fa;color:#8a94a6;text-align:center;padding:15px 6px}.matrix-cell select{width:100%;min-width:0;padding:7px 8px;background:rgba(255,255,255,.85);font-size:13px}.matrix-cell input[type=text]{font-size:12px;margin-top:6px;padding:6px 7px}.matrix-task-name{font-weight:750;display:block;margin-bottom:3px;white-space:pre-wrap;overflow-wrap:anywhere}.matrix-meta{display:block;font-weight:400;font-size:11px;color:#64708a;margin-top:4px}.matrix-help{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.matrix-help span{border-radius:7px;padding:4px 8px;font-size:12px}.matrix-count{font-size:12px;color:var(--muted);margin:8px 0}.matrix-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+@media(max-width:650px){.matrix-controls{grid-template-columns:1fr}.matrix-table th,.matrix-table td{padding:6px}.matrix-table thead th:first-child,.matrix-table tbody td:first-child{min-width:110px;max-width:120px}.matrix-table tbody td{min-width:170px;max-width:210px}.matrix-cell{min-width:155px}}
+
+.work-box{padding:18px}.work-heading{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap}.work-heading h2{margin-bottom:4px}.work-step-badge{display:inline-flex;align-items:center;padding:6px 10px;border-radius:999px;background:#e8eefb;color:#2c4a8a;font-size:12px;font-weight:750;white-space:nowrap}.work-selectors{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:15px}.work-selectors-secondary{grid-template-columns:minmax(0,1.6fr) minmax(200px,.7fr);margin-top:7px}.work-selectors label{margin-top:0}.work-selectors select,.work-selectors input{min-height:43px}.work-lesson-meta{margin:16px 0 10px;padding:11px 13px;border-radius:10px;background:#f4f7fc;border:1px solid #e2e8f2;color:#4d5b73;font-size:13px;white-space:pre-line}.work-task-list{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff}.work-task-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(220px,280px);gap:14px;padding:14px;border-bottom:1px solid #e8edf6;align-items:center}.work-task-row:last-child{border-bottom:0}.work-task-main{display:flex;gap:11px;align-items:flex-start;min-width:0}.work-task-no{width:30px;height:30px;flex:0 0 30px;border-radius:9px;display:grid;place-items:center;background:#e8eefb;color:#2c4a8a;font-size:12px;font-weight:800}.work-task-text{white-space:pre-wrap;overflow-wrap:anywhere;padding-top:3px}.work-task-control{min-width:0}.work-task-control select{width:100%;min-height:40px;border:1px solid #c7d0df;border-radius:8px;padding:7px 10px;background:#fff}.work-task-row.done{background:#f5fcf8}.work-task-row.not_done{background:#fff6f6}.work-task-row.partial{background:#fffcf1}.work-task-row.done .work-task-no{background:var(--green);color:var(--green-ink)}.work-task-row.not_done .work-task-no{background:var(--red);color:var(--red-ink)}.work-task-row.partial .work-task-no{background:var(--yellow);color:var(--yellow-ink)}.work-task-note{margin-top:8px}.work-task-note label{font-size:12px;color:var(--yellow-ink);margin:0 0 4px}.work-task-note textarea{width:100%;min-height:58px;background:#fffef9;border-color:#e2c565;font-size:13px}.work-save-row{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-top:16px}.work-save-row button{min-width:220px;min-height:44px}.work-no-tasks{padding:25px 12px;text-align:center;color:var(--muted);background:#fafbfd;border:1px dashed var(--line);border-radius:10px}.bottom-tools-title{margin-bottom:6px}
+@media(max-width:680px){.work-box{padding:13px}.work-selectors,.work-selectors-secondary{grid-template-columns:1fr}.work-task-row{grid-template-columns:1fr;gap:8px;padding:12px}.work-task-control{padding-left:41px}.work-save-row{align-items:stretch}.work-save-row button{width:100%;min-width:0}.work-step-badge{display:none}}
+
+
+/* 手机端适配增强：原有档案、检查、导入导出、同步功能全部保留 */
+*{-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth;scroll-padding-top:78px}
+body{overflow-x:hidden;-webkit-text-size-adjust:100%}
+button,select,input,textarea{touch-action:manipulation}
+button{min-height:44px}
+input[type=text],input[type=date],input[type=password],input[type=number],select,textarea{font-size:16px;min-height:44px;max-width:100%}
+input[type=checkbox],input[type=radio]{width:20px;height:20px;flex:0 0 auto;accent-color:#345da8}
+.mobile-nav{display:none}
+@media(max-width:680px){
+  main{padding:12px 9px 34px}
+  h1{font-size:21px;line-height:1.35;overflow-wrap:anywhere}
+  h2{font-size:17px;line-height:1.4}
+  .mobile-nav{display:flex;position:sticky;top:0;z-index:50;gap:6px;overflow-x:auto;white-space:nowrap;padding:7px 2px;margin:0 -1px 10px;background:rgba(243,246,251,.97);border-bottom:1px solid #dce3ef;-webkit-overflow-scrolling:touch}
+  .mobile-nav a{display:inline-flex;align-items:center;justify-content:center;min-height:42px;flex:0 0 auto;padding:7px 12px;border:1px solid #d3dcec;border-radius:999px;background:#fff;color:#294777;text-decoration:none;font-size:14px;font-weight:650}
+  .box{padding:12px;border-radius:11px}
+  .grid,.settings-grid,.task-grid,.work-selectors,.work-selectors-secondary,.matrix-controls{grid-template-columns:minmax(0,1fr);gap:10px}
+  .wide,.task-note{grid-column:auto}
+  .layout{grid-template-columns:minmax(0,1fr)}
+  .student-list{max-height:220px;overflow:auto;-webkit-overflow-scrolling:touch}
+  .bar{align-items:stretch}
+  .bar>.top-actions,.top-actions{display:grid;grid-template-columns:minmax(0,1fr);width:100%}
+  .top-actions button,.bar button{width:100%}
+  .work-box{padding:12px}
+  .work-heading{display:block}
+  .work-step-badge{display:inline-flex;margin-top:7px;white-space:normal}
+  .work-selectors{margin-top:12px}
+  .work-task-row{grid-template-columns:minmax(0,1fr);gap:9px;padding:12px 10px}
+  .work-task-main{gap:9px}
+  .work-task-text{font-size:15px;overflow-wrap:anywhere}
+  .work-task-control{padding-left:39px}
+  .work-task-control select{font-size:16px;min-height:46px}
+  .work-task-note textarea{font-size:16px;min-height:76px}
+  .work-save-row{display:flex;flex-direction:column;align-items:stretch;gap:9px;background:#fff;padding:10px 0 0}
+  .work-save-row button{width:100%;min-width:0;min-height:48px}
+  .matrix-wrap{max-width:calc(100vw - 42px);overflow:auto;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}
+  .matrix-table{font-size:12px}
+  .matrix-table th,.matrix-table td{padding:6px}
+  .matrix-table thead th:first-child,.matrix-table tbody td:first-child{min-width:108px;max-width:116px}
+  .matrix-table tbody td{min-width:164px;max-width:195px}
+  .matrix-cell{min-width:150px;padding:5px}
+  .matrix-cell select{font-size:16px;min-height:44px}
+  .matrix-cell input[type=text]{font-size:16px;min-height:42px}
+  .lesson-head{flex-direction:column;gap:6px;padding:11px}
+  .lesson-body{padding:10px}
+  .top-actions button{white-space:normal;overflow-wrap:anywhere}
+  .bottom-tools-title{line-height:1.4}
+  details summary{min-height:46px;display:flex;align-items:center;line-height:1.45}
+  #bottomDataTools .bar{align-items:stretch}
+  #bottomDataTools .top-actions{margin-top:8px}
+  #settings .settings-grid{grid-template-columns:minmax(0,1fr)}
+}
+@media(max-width:380px){
+  main{padding-left:7px;padding-right:7px}
+  .mobile-nav a{font-size:13px;padding:6px 10px}
+  .matrix-wrap{max-width:calc(100vw - 30px)}
+  .work-task-no{width:28px;height:28px;flex-basis:28px}
+  .work-task-control{padding-left:37px}
+}
+
+</style>
+</head>
+<body><main>
+<h1>🗂️ 学员档案与作业检查</h1>
+<nav class="mobile-nav" aria-label="快速操作"><a href="#checkWorkspace">作业检查</a><a href="#advancedArchive" data-open-details="advancedArchive">学员档案</a><a href="#bottomDataTools">数据导入导出</a><a href="#settings" data-open-details="settings">GitHub设置</a></nav>
+<div class="muted">每位学员独立保存历史课次；每项作业只允许选择“已完成、未完成、未全部完成”三种检查状态。GitHub 私有仓库作为云端档案位置，本地自动保留草稿。</div>
+<div id="cloudStatus" class="note warn">正在读取学员档案……</div>
+
+
+<section class="box work-box" id="checkWorkspace">
+ <div class="work-heading">
+  <div><h2>📝 学员作业检查</h2><div class="muted">按“班级 → 学生 → 课次”查找作业。选择每项作业的完成情况，填写需要的备注，最后点击保存。</div></div>
+  <span class="work-step-badge">教师检查区</span>
+ </div>
+ <div class="work-selectors">
+  <div class="field"><label for="workClassSelect">第一步　选择班级</label><select id="workClassSelect"><option value="">正在读取班级名单……</option></select></div>
+  <div class="field"><label for="workStudentSelect">第二步　选择学生</label><select id="workStudentSelect" disabled><option value="">请先选择班级</option></select></div>
+ </div>
+ <label style="display:flex;gap:7px;align-items:center;font-weight:500;margin:9px 0"><input type="checkbox" id="showArchivedWorkClasses" style="width:auto">显示已结课班级（仅查看历史作业，不用于新发布）</label>
+ <div class="work-selectors work-selectors-secondary">
+  <div class="field"><label for="workLessonSelect">第三步　选择要检查的课次 / 作业记录</label><select id="workLessonSelect" disabled><option value="">请先选择学生</option></select></div>
+  <div class="field"><label for="workCheckDate">检查日期（默认今天，可修改）</label><input type="date" id="workCheckDate"></div>
+ </div>
+ <div id="workLessonMeta" class="work-lesson-meta">选择班级、学生和课次后，这里会显示对应作业。</div>
+ <div id="workTasksHost"><div class="empty">请先选择班级和学生。</div></div>
+ <div class="work-save-row"><div id="workSaveHint" class="muted">选择状态后，点击保存才会正式记录并同步。</div><button id="saveWorkCheckBtn" class="primary" disabled>保存本次检查记录</button></div>
+</section>
+<details class="box" id="advancedArchive"><summary style="cursor:pointer;font-weight:750">高级档案管理（新增学员、编辑历史课次）</summary><p class="muted">先按当前班级筛选学员，再点击姓名查看完整历史（从早到晚）。教师端转班只更新当前班级，旧课次的班级和记录保留；从教师名单移除的学生可在“已移出教师名单 / 未匹配”中查看并隐藏。</p>
+<section class="layout">
+<aside class="box"><div class="bar"><h2>学员列表</h2><button id="addStudentBtn">补录历史档案</button></div>
+<div class="field"><label for="archiveClassSelect">按班级筛选</label><select id="archiveClassSelect"><option value="">正在读取班级名单……</option></select></div>
+<label style="display:flex;gap:7px;align-items:center;font-weight:500;margin:8px 0"><input type="checkbox" id="showArchivedProfileClasses" style="width:auto">显示已结课班级</label>
+<label style="display:flex;gap:7px;align-items:center;font-weight:500;margin:8px 0"><input type="checkbox" id="showHiddenStudents" style="width:auto">显示已隐藏学员</label>
+<input type="text" id="studentSearch" placeholder="搜索当前班级学员姓名" style="margin:7px 0 10px"><div id="studentList" class="student-list"></div></aside>
+<div>
+<section class="box"><div class="bar"><div><h2 id="profileTitle">请选择学员</h2><div id="profileMeta" class="muted"></div></div><div class="top-actions"><button id="toggleHiddenBtn">隐藏该学员</button><button id="editProfileBtn">编辑学员信息</button><button class="primary" id="addLessonBtn">新增课次</button></div></div><div class="legend" style="margin:10px 0"><span class="status-done">绿色：全部完成</span><span class="status-partial">黄色：未全部完成</span><span class="status-not_done">红色：未完成</span><span class="s-pending" style="padding:4px 8px;border-radius:7px">灰色：待检查</span></div><div id="lessons"></div></section>
+<section class="box hidden" id="editorBox"><div class="bar"><h2 id="editorTitle">编辑课次</h2><button id="cancelEditBtn">取消</button></div>
+<div class="grid">
+<div class="field"><label for="lessonLabelInput">课次显示名称</label><input type="text" id="lessonLabelInput" placeholder="第89次 / 第89、90次"></div>
+<div class="field"><label for="lessonCountInput">本次新增课次数</label><input type="number" id="lessonCountInput" min="1" max="20" value="1"></div>
+<div class="field"><label for="classNameInput">班级</label><input type="text" id="classNameInput" list="classOptions"><datalist id="classOptions"></datalist></div>
+<div class="field"><label for="lessonDateInput">上课日期</label><input type="date" id="lessonDateInput"></div>
+<div class="field"><label for="assignedDateInput">作业布置日期</label><input type="date" id="assignedDateInput"></div>
+<div class="field"><label for="dueDateInput">完成截止日期（默认布置日期 + 7 天）</label><input type="date" id="dueDateInput"></div>
+<div class="field"><label for="checkedDateInput">检查日期（默认今天，可修改）</label><input type="date" id="checkedDateInput"></div>
+<div class="field"><label for="lessonNoteInput">整节课备注</label><input type="text" id="lessonNoteInput" placeholder="例如：下周补做 / 请假延期"></div>
+</div>
+<div class="hr"></div><div class="bar"><h3>本节课作业项目</h3><span class="muted">空白状态表示尚未检查；检查时只能选三种状态之一。</span></div>
+<div id="itemEditor"></div><div class="row"><input id="newTaskInput" type="text" style="flex:1;min-width:180px" placeholder="输入新作业项目后点添加"><button id="addTaskBtn">添加作业项目</button></div>
+<div class="row" style="margin-top:14px"><button class="primary" id="saveLessonBtn">保存课次</button><button id="deleteLessonBtn" class="danger hidden">删除这节课</button></div>
+</section>
+</div></section>
+</details>
+<section class="box" id="bottomDataTools">
+<div class="bar"><h2>数据与备份</h2><div class="top-actions"><button id="refreshRosterBtn">刷新教师端班级名单</button><button id="importRosterBtn">导入 homework.json 班级名单</button><button class="primary" id="importXlsxBtn">导入现有 Excel</button><button id="exportXlsxBtn">导出全部学员 Excel</button><button id="exportJsonBtn">备份 JSON</button><button id="importJsonBtn">恢复 JSON</button><button class="dark" id="saveNowBtn">立即同步 GitHub</button></div></div>
+<input id="xlsxFile" type="file" accept=".xlsx,.xls" hidden><input id="jsonFile" type="file" accept=".json,application/json" hidden><input id="rosterFile" type="file" accept=".json,application/json" hidden>
+<div id="workRosterHint" class="muted" style="margin:8px 0"></div><div class="muted">班级名单优先从原教师发布台 homework-hub 自动读取。旧 Excel 每个工作表只有学生姓名和课次记录、没有班级字段，因此系统会用教师端名单按姓名自动匹配班级；未匹配的学生会显示在“未设置班级”中。导入 Excel 不会修改原文件。</div>
+</section>
+<details class="box" id="settings">
+<summary style="cursor:pointer;font-weight:750">GitHub 私有仓库设置</summary>
+<p class="muted">学员姓名、课次和完成情况只写入私有仓库。令牌仅保存在浏览器，不要写进 HTML 或公开分享。与教师发布台相同浏览器、相同网址下可复用已保存的 gh_token。</p>
+<div class="settings-grid">
+<div><label for="tokenInput">GitHub 访问令牌（可留空使用已保存令牌）</label><input type="password" id="tokenInput" placeholder="github_pat_……" autocomplete="off"></div>
+<div><label for="ownerInput">仓库所有者</label><input type="text" id="ownerInput" value="sehun996"></div>
+<div><label for="repoInput">私有档案仓库名</label><input type="text" id="repoInput" placeholder="例如 student-archives"></div>
+<div><label for="pathInput">JSON 文件路径</label><input type="text" id="pathInput" value="student_archives.json"></div>
+</div><div class="row" style="margin-top:10px"><button class="primary" id="settingsSave">保存设置并读取云端</button><button id="readCloudBtn">重新读取 GitHub</button><button class="danger" id="clearTokenBtn">清除本地令牌</button></div>
+<div class="muted" style="margin-top:8px">需要先创建一个 GitHub 私有仓库。令牌建议仅授权所需仓库的 Contents 读写权限。若仓库未配置，页面仍可本地工作，但无法保证跨设备同步。</div>
+</details>
+</main>
+<script>
+const $=id=>document.getElementById(id),TODAY=localYmd(new Date()),LOCAL_KEY='student_archive_draft_v1';
+function localYmd(d){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
+function plusDays(s,n){if(!s)return '';const m=String(s).match(/^(\d{4})-(\d{2})-(\d{2})$/);if(!m)return '';return localYmd(new Date(+m[1],+m[2]-1,+m[3]+n))}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function uid(p='id'){return p+'_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,8)}
+function emptyDB(){return {schemaVersion:1,updatedAt:'',students:{}}}
+let DB=emptyDB(),selectedName='',editingLessonId=null,draftLesson=null,remoteSha=null,remoteReady=false,saveTimer=null,saving=false,saveAgain=false,lessonStartForNew=1,dueDateManuallyChanged=false,matrixClass='',matrixBatch='';
+let duplicateCleanupPending=false;
+let PUBLIC_ROSTER={},PUBLIC_ARCHIVED_CLASSES={},workClass='',workStudent='',workLessonId='',workDraft=null,workDraftDirty=false;
+function isArchivedPublicClass(cls){const a=PUBLIC_ARCHIVED_CLASSES||{};return Array.isArray(a)?a.includes(cls):!!a[cls];}
+const savedToken=()=>{try{return localStorage.getItem('gh_token')||''}catch(e){return ''}};
+const cfg=()=>({owner:$('ownerInput').value.trim()||localStorage.getItem('archive_owner')||'sehun996',repo:$('repoInput').value.trim()||localStorage.getItem('archive_repo')||'',path:$('pathInput').value.trim()||localStorage.getItem('archive_path')||'student_archives.json',token:savedToken()});
+function statusMsg(text,kind='warn'){$('cloudStatus').textContent=text;$('cloudStatus').className='note '+kind}
+function dateISO(v){if(v instanceof Date && !Number.isNaN(v.getTime()))return localYmd(new Date(v.getFullYear(),v.getMonth(),v.getDate()));if(typeof v==='number'&&Number.isFinite(v)){const d=new Date(Date.UTC(1899,11,30)+Math.round(v)*86400000);return `${d.getUTCFullYear()}-${String(d.getUTCMonth()+1).padStart(2,'0')}-${String(d.getUTCDate()).padStart(2,'0')}`}const s=String(v??'').trim();let m=s.match(/^(\d{4})[-/.年](\d{1,2})[-/.月](\d{1,2})/);if(m)return `${m[1]}-${String(+m[2]).padStart(2,'0')}-${String(+m[3]).padStart(2,'0')}`;return ''}
+function lessonNumbers(label){return (String(label||'').match(/\d+/g)||[]).map(Number).filter(n=>n>0)}
+function maxNo(p){let n=Number(p.nextLessonNumber)||0;for(const l of p.lessons||[]){const a=lessonNumbers(l.lessonLabel);n=Math.max(n,Number(l.startNumber)||0,Number(l.endNumber)||0,...a,0)}return n}
+function ensureStudent(name){DB.students=DB.students||{};if(!DB.students[name])DB.students[name]={name,className:'',currentClass:'',classNames:[],hidden:false,rosterManaged:false,nextLessonNumber:0,lessons:[]};const p=DB.students[name];p.name=name;p.classNames=Array.isArray(p.classNames)?p.classNames:[];p.lessons=Array.isArray(p.lessons)?p.lessons:[];p.nextLessonNumber=maxNo(p);return p}
+function statusCode(s){if(['done','已完成','√','完成'].includes(s))return 'done';if(['not_done','未完成','×','没做'].includes(s))return 'not_done';if(['partial','未全部完成','未全部'].includes(s))return 'partial';return ''}
+function cleanTaskPrefix(value){let s=String(value??'').trim();const re=/^\s*(?:(?:\d+\s*[、.．:：)）])|[-•])\s*/;let guard=0;while(re.test(s)&&guard++<5)s=s.replace(re,'').trim();return s}
+function taskDedupKey(value){return cleanTaskPrefix(value).replace(/\u3000/g,' ').replace(/\s+/g,' ').trim().toLocaleLowerCase()}
+function mergeTaskNotes(a,b){const x=String(a||'').trim(),y=String(b||'').trim();if(!x)return y;if(!y||x===y)return x;return x+'\n'+y}
+function dedupeLessonItems(items){const out=[],byKey=new Map();for(const raw of Array.isArray(items)?items:[]){const it={id:raw?.id||uid('task'),text:cleanTaskPrefix(raw?.text),status:statusCode(raw?.status),note:String(raw?.note??''),sourceItemId:raw?.sourceItemId||''};const key=taskDedupKey(it.text);if(key&&byKey.has(key)){duplicateCleanupPending=true;const keep=out[byKey.get(key)];if(!keep.status&&it.status)keep.status=it.status;else if(keep.status&&it.status&&keep.status!==it.status){const oldLabel=keep.status==='done'?'已完成':keep.status==='not_done'?'未完成':'未全部完成';const newLabel=it.status==='done'?'已完成':it.status==='not_done'?'未完成':'未全部完成';keep.status='partial';keep.note=mergeTaskNotes(keep.note,`重复项目原状态不一致（${oldLabel} / ${newLabel}），请核对。`)}keep.note=mergeTaskNotes(keep.note,it.note);continue;}if(key)byKey.set(key,out.length);out.push(it)}return out}
+function statusLabel(s){return s==='done'?'已完成':s==='not_done'?'未完成':s==='partial'?'未全部完成':'待检查'}
+function agg(l){const items=Array.isArray(l.items)?l.items:[],statuses=items.map(i=>statusCode(i.status));if(statuses.length&&statuses.every(s=>s==='done'))return 'done';if(statuses.length&&statuses.every(s=>s==='not_done'))return 'not_done';if(statuses.some(s=>s==='partial')||(statuses.some(s=>s==='done')&&statuses.some(s=>s==='not_done'))||statuses.some(Boolean))return 'partial';return statusCode(l.legacyStatus)||''}
+function statusClass(s){return s==='done'?'status-done':s==='partial'?'status-partial':s==='not_done'?'status-not_done':'s-pending'}
+function statusTextForExport(l){const s=agg(l);return s==='done'?'√':s==='not_done'?'×':s==='partial'?'未全部完成':''}
+function currentStudent(){return selectedName?ensureStudent(selectedName):null}
+function persistLocal(){DB.updatedAt=new Date().toISOString();try{localStorage.setItem(LOCAL_KEY,JSON.stringify({savedAt:DB.updatedAt,data:DB}))}catch(e){} }
+function changed(msg='本地草稿已保存，正在同步 GitHub……'){persistLocal();renderAll();statusMsg(msg,'warn');queueSync()}
+function ghHeaders(){return {Authorization:'Bearer '+savedToken(),Accept:'application/vnd.github+json','Content-Type':'application/json'}}
+async function readGitHub(){const c=cfg();if(!c.token||!c.repo)return {ok:false,skip:true};const url=`https://api.github.com/repos/${encodeURIComponent(c.owner)}/${encodeURIComponent(c.repo)}/contents/${c.path.split('/').map(encodeURIComponent).join('/')}`;const r=await fetch(url,{headers:ghHeaders(),cache:'no-store'});if(r.status===404)return {ok:true,data:null,sha:null};if(!r.ok)throw new Error(`读取 GitHub 失败（HTTP ${r.status}）。请检查仓库名称、令牌权限。`);const j=await r.json();const txt=decodeURIComponent(escape(atob((j.content||'').replace(/\n/g,''))));return {ok:true,data:JSON.parse(txt),sha:j.sha}}
+async function putGitHub(data,sha){const c=cfg();if(!c.token||!c.repo)return {skip:true};const url=`https://api.github.com/repos/${encodeURIComponent(c.owner)}/${encodeURIComponent(c.repo)}/contents/${c.path.split('/').map(encodeURIComponent).join('/')}`;const body={message:'更新学员作业档案 '+new Date().toLocaleString('zh-CN',{hour12:false}),content:btoa(unescape(encodeURIComponent(JSON.stringify(data,null,2))))};if(sha)body.sha=sha;const r=await fetch(url,{method:'PUT',headers:ghHeaders(),body:JSON.stringify(body)});if(!r.ok){if(r.status===409||r.status===422)throw new Error('GitHub 数据可能已在其他页面被修改。请先重新读取 GitHub，避免覆盖新数据。');throw new Error(`写入 GitHub 失败（HTTP ${r.status}）。请检查令牌权限及私有仓库设置。`)}const j=await r.json();return {ok:true,sha:j.content&&j.content.sha}}
+function queueSync(){clearTimeout(saveTimer);saveTimer=setTimeout(syncNow,900)}
+async function syncNow(){clearTimeout(saveTimer);const c=cfg();if(!c.token||!c.repo){statusMsg('本地草稿已保存；尚未配置 GitHub 私有仓库，因此暂未云端同步。','warn');return}if(saving){saveAgain=true;return}saving=true;saveAgain=false;const snapshot=JSON.parse(JSON.stringify(DB));try{const result=await putGitHub(snapshot,remoteSha);if(result.skip){statusMsg('本地草稿已保存；未配置 GitHub。','warn')}else{remoteSha=result.sha;remoteReady=true;const localNewer=DB.updatedAt!==snapshot.updatedAt;if(!localNewer)statusMsg('✅ 学员档案已同步到 GitHub 私有仓库。','ok');else saveAgain=true}}catch(e){statusMsg('GitHub 同步失败：'+e.message+' 本地草稿仍保留。','bad')}finally{saving=false;if(saveAgain){saveAgain=false;queueSync()}}}
+async function loadInitial(){const t=savedToken();$('ownerInput').value=localStorage.getItem('archive_owner')||'sehun996';$('repoInput').value=localStorage.getItem('archive_repo')||'';$('pathInput').value=localStorage.getItem('archive_path')||'student_archives.json';let local=null;try{local=JSON.parse(localStorage.getItem(LOCAL_KEY)||'null')}catch(e){}if(local&&local.data)DB=normalizeDB(local.data);const c=cfg();if(t&&c.repo){try{const g=await readGitHub();if(g.data){remoteSha=g.sha;const remote=normalizeDB(g.data);if(!local||String(remote.updatedAt||'')>=String(local.savedAt||'')){DB=remote;persistLocal();statusMsg('已读取 GitHub 私有档案。','ok')}else{DB=normalizeDB(local.data);remoteSha=g.sha;statusMsg('读取到较新的本地草稿，准备同步至 GitHub。','warn');queueSync()}}else{remoteSha=null;remoteReady=true;if(local&&local.data){DB=normalizeDB(local.data);queueSync();statusMsg('GitHub 文件尚不存在，发现本地草稿，准备首次上传。','warn')}else statusMsg('GitHub 档案文件尚不存在。导入 Excel 或新增档案后会自动创建。','warn')}}catch(e){statusMsg('读取云端失败：'+e.message+'；当前使用本地草稿。','bad')}}else statusMsg(local?'已读取本地草稿；请配置私有仓库以启用跨设备同步。':'未找到档案数据。请导入 Excel 或新增学员，然后配置 GitHub 私有仓库。','warn');DB=normalizeDB(DB);if(duplicateCleanupPending){duplicateCleanupPending=false;changed('检测到同一课次存在重复作业项目，已自动合并重复内容并保留已有状态/备注；正在同步 GitHub……')}else renderAll();refreshPublicRoster(false).catch(()=>{})}
+function normalizeDB(x){x=x&&typeof x==='object'?x:emptyDB();x.schemaVersion=1;x.students=x.students&&typeof x.students==='object'?x.students:{};for(const [name,p0] of Object.entries(x.students)){const p=p0||{};p.name=p.name||name;p.classNames=Array.isArray(p.classNames)?p.classNames:[];p.currentClass=String(p.currentClass??p.className??'');p.hidden=!!p.hidden;p.rosterManaged=!!p.rosterManaged;p.lessons=Array.isArray(p.lessons)?p.lessons:[];for(const l of p.lessons){l.items=Array.isArray(l.items)?l.items:[];const originalItemCount=l.items.length;l.items=dedupeLessonItems(l.items);if(l.items.length<originalItemCount)l.itemsDirty=true;l.lessonCount=Number(l.lessonCount)||((Number(l.endNumber)||0)-(Number(l.startNumber)||0)+1)||1;l.note=String(l.note??'');l.legacyStatus=String(l.legacyStatus??'');}p.nextLessonNumber=maxNo(p);x.students[name]=p}return x}
+function renderAll(){renderStudentList();renderProfile();renderWorkArea()}
+function archiveCurrentClass(p){return String(p?.currentClass??p?.className??'').trim()}
+function profileCurrentClassLabel(p){const c=archiveCurrentClass(p);if(c)return c;const closed=(p?.classNames||[]).filter(x=>isArchivedPublicClass(x));if(closed.length)return '已结课：'+closed.join('、');return p?.rosterManaged?'已移出教师名单':'未设置'}
+function archiveClassOptions(){
+ const all=Object.keys(PUBLIC_ROSTER||{}),includeArchived=$('showArchivedProfileClasses')?.checked;
+ if(all.length){const current=all.filter(c=>includeArchived||!isArchivedPublicClass(c));const rosterNames=new Set(Object.values(PUBLIC_ROSTER).flat());const hasOrphans=Object.keys(DB.students).some(name=>!rosterNames.has(name));const seen=new Set(current);if(hasOrphans)seen.add('已移出教师名单 / 未匹配');return [...seen].sort((a,b)=>a.localeCompare(b,'zh-CN'))}
+ const set=new Set();for(const p of Object.values(DB.students)){const c=archiveCurrentClass(p);if(c&&(includeArchived||!isArchivedPublicClass(c)))set.add(c);(p.classNames||[]).forEach(x=>{if(x&&(includeArchived||!isArchivedPublicClass(x)))set.add(x)});(p.lessons||[]).forEach(l=>{if(l.className&&(includeArchived||!isArchivedPublicClass(l.className)))set.add(l.className)})}if(Object.keys(DB.students).length)set.add('已移出教师名单 / 未匹配');return [...set].sort((a,b)=>a.localeCompare(b,'zh-CN'));
+}
+function archiveStudentInClass(name,p,cls){
+ const classes=Object.keys(PUBLIC_ROSTER||{});if(classes.length){if(cls==='已移出教师名单 / 未匹配')return !classes.some(c=>(PUBLIC_ROSTER[c]||[]).includes(name));if(isArchivedPublicClass(cls))return (PUBLIC_ROSTER[cls]||[]).includes(name)||(p.classNames||[]).includes(cls)||(p.lessons||[]).some(l=>l.className===cls);return (PUBLIC_ROSTER[cls]||[]).includes(name)||archiveCurrentClass(p)===cls}
+ if(cls==='已移出教师名单 / 未匹配')return !archiveCurrentClass(p);return archiveCurrentClass(p)===cls||(p.classNames||[]).includes(cls)||(p.lessons||[]).some(l=>l.className===cls)
+}
+function renderStudentList(){
+ const clsEl=$('archiveClassSelect');if(!clsEl)return;const prev=clsEl.value||'';const classes=archiveClassOptions();clsEl.innerHTML='<option value="">-- 选择班级 --</option>'+classes.map(c=>`<option value="${esc(c)}">${isArchivedPublicClass(c)?'【已结课】 ':''}${esc(c)}</option>`).join('');if(classes.includes(prev))clsEl.value=prev;else if(classes.length)clsEl.value=classes[0];
+ const cls=clsEl.value,search=$('studentSearch').value.trim().toLowerCase(),showHidden=$('showHiddenStudents').checked;
+ const names=Object.keys(DB.students).sort((a,b)=>a.localeCompare(b,'zh-CN')).filter(n=>{const p=DB.students[n];return (!p.hidden||showHidden)&&(!cls||archiveStudentInClass(n,p,cls))&&n.toLowerCase().includes(search)});
+ if(selectedName&&!names.includes(selectedName))selectedName=names[0]||'';
+ $('studentList').innerHTML=names.map(n=>{const p=DB.students[n];return `<button class="student-btn ${n===selectedName?'active':''}" data-student="${esc(n)}">${esc(n)}${p.hidden?' <span class="status-pill s-pending">已隐藏</span>':''}<span class="muted" style="display:block">${(p.lessons||[]).length} 条课次记录</span></button>`}).join('')||'<div class="empty">当前班级没有可显示的学员。可刷新教师端班级名单；已退班学员可切换到“已移出教师名单 / 未匹配”。</div>';
+}
+function renderProfile(){const p=currentStudent();$('addLessonBtn').disabled=!p;$('editProfileBtn').disabled=!p;$('toggleHiddenBtn').disabled=!p;$('toggleHiddenBtn').textContent=p?.hidden?'取消隐藏':'隐藏该学员';if(!p){$('profileTitle').textContent='请选择学员';$('profileMeta').textContent='';$('lessons').innerHTML='<div class="empty">请先从左侧选择学员。</div>';return}$('profileTitle').textContent=p.name;$('profileMeta').textContent=`当前班级：${profileCurrentClassLabel(p)} · 历史班级：${(p.classNames||[]).filter(c=>c!==archiveCurrentClass(p)).join('、')||'—'} · 当前最高课次：第 ${maxNo(p)} 次 · 共 ${(p.lessons||[]).length} 条记录`;$('lessons').innerHTML=[...(p.lessons||[])].sort((a,b)=>((Number(a.startNumber)||lessonNumbers(a.lessonLabel)[0]||0)-(Number(b.startNumber)||lessonNumbers(b.lessonLabel)[0]||0))||String(a.lessonDate||a.assignedDate||'').localeCompare(String(b.lessonDate||b.assignedDate||''))).map(l=>{const s=agg(l),items=(l.items||[]);const itemHtml=items.map(it=>`<div class="row" style="justify-content:space-between;border-top:1px solid #edf0f5;padding:7px 0;align-items:flex-start"><div style="flex:1;min-width:0;white-space:pre-wrap">${esc(it.text)}</div><span class="status-pill ${statusClass(statusCode(it.status))}">${esc(statusLabel(statusCode(it.status)))}</span></div>`).join('');return `<article class="lesson status-${s||'pending'}"><div class="lesson-head"><div><strong>${esc(l.lessonLabel||'未命名课次')}</strong><div class="muted">上课：${esc(l.lessonDate||'未记录')} · 布置：${esc(l.assignedDate||'未记录')} · 截止：${esc(l.dueDate||l.dueDateText||'未记录')}</div><div class="muted">检查：${esc(l.checkedDate||'尚未记录')}</div></div><div><span class="status-pill ${statusClass(s)}">${esc(s?statusLabel(s):(l.legacyStatus?statusLabel(statusCode(l.legacyStatus)):'待检查'))}</span><button data-edit-lesson="${esc(l.id)}" style="margin-left:5px">编辑</button></div></div><div class="lesson-body">${itemHtml||`<div class="muted">历史任务：${esc(l.legacyTaskText||'暂无项目')}</div>`}${l.note?`<div class="muted" style="margin-top:8px">备注：${esc(l.note)}</div>`:''}</div></article>`}).join('')||'<div class="empty">该学员暂无课次记录，点击“新增课次”开始记录。</div>';}
+function getStudentClassNames(p){
+ const set=new Set();
+ if(p.className)set.add(String(p.className).trim());
+ (p.classNames||[]).forEach(c=>{if(String(c||'').trim())set.add(String(c).trim())});
+ (p.lessons||[]).forEach(l=>{if(String(l.className||'').trim())set.add(String(l.className).trim())});
+ if(!set.size)set.add('未设置班级');
+ return [...set];
+}
+function lessonClass(p,l){return String(l.className||p.className||((p.classNames||[]).length===1?p.classNames[0]:'未设置班级')||'未设置班级').trim()}
+function matrixSessionKey(className,l){return JSON.stringify([className,String(l.assignedDate||l.lessonDate||''),String(l.lessonDate||'')])}
+function allMatrixClasses(){const s=new Set();Object.values(DB.students).forEach(p=>getStudentClassNames(p).forEach(c=>s.add(c)));return [...s].sort((a,b)=>a.localeCompare(b,'zh-CN'))}
+function getClassSessions(className){const map=new Map();for(const p of Object.values(DB.students)){for(const l of p.lessons||[]){if(lessonClass(p,l)!==className)continue;const key=matrixSessionKey(className,l);if(!map.has(key))map.set(key,{key,className,assignedDate:String(l.assignedDate||l.lessonDate||''),lessonDate:String(l.lessonDate||''),dueDates:new Set(),tasks:new Map(),lessonCount:0});const ses=map.get(key);ses.lessonCount++;if(l.dueDate)ses.dueDates.add(l.dueDate);for(const it of l.items||[]){const text=String(it.text||'').trim();if(!text)continue;if(!ses.tasks.has(text))ses.tasks.set(text,true)}}}return [...map.values()].sort((a,b)=>(b.assignedDate||'').localeCompare(a.assignedDate||'')||(b.lessonDate||'').localeCompare(a.lessonDate||''))}
+function classHasStudent(p,className){return getStudentClassNames(p).includes(className)}
+function findStudentSessionLessons(p,className,sessionKey){return (p.lessons||[]).filter(l=>lessonClass(p,l)===className&&matrixSessionKey(className,l)===sessionKey)}
+function renderClassMatrix(){
+ const clsEl=$('matrixClassSelect'),batchEl=$('matrixBatchSelect');if(!clsEl||!batchEl)return;
+ const classes=allMatrixClasses();
+ if(matrixClass&&!classes.includes(matrixClass))matrixClass='';
+ clsEl.innerHTML='<option value="">-- 请选择班级 --</option>'+classes.map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join('');
+ clsEl.value=matrixClass;
+ if(!matrixClass){batchEl.innerHTML='<option value="">请先选择班级</option>';batchEl.disabled=true;$('matrixCount').textContent='请选择班级查看学生和作业。';$('matrixTableHost').innerHTML='<div class="empty">请选择班级，系统会筛选该班学生及对应的作业记录。</div>';return}
+ const sessions=getClassSessions(matrixClass);
+ if(!sessions.some(s=>s.key===matrixBatch))matrixBatch=sessions[0]?.key||'';
+ batchEl.disabled=!sessions.length;
+ batchEl.innerHTML=sessions.length?sessions.map(s=>{const date=s.assignedDate||'未记录布置日期';const lessonDate=s.lessonDate&&s.lessonDate!==s.assignedDate?` · 上课 ${s.lessonDate}`:'';const taskCount=s.tasks.size;return `<option value="${esc(s.key)}">布置 ${esc(date)}${lessonDate} · ${taskCount} 项作业</option>`}).join(''):'<option value="">该班暂无作业记录</option>';
+ batchEl.value=matrixBatch;
+ if(!sessions.length){$('matrixCount').textContent=`${matrixClass}：暂无可显示的作业记录。`;$('matrixTableHost').innerHTML='<div class="empty">这个班级目前没有课次或作业记录。可以先在对应学员档案中添加班级和课次。</div>';return}
+ const session=sessions.find(s=>s.key===matrixBatch)||sessions[0];
+ const students=Object.values(DB.students).filter(p=>classHasStudent(p,matrixClass)).sort((a,b)=>String(a.name||'').localeCompare(String(b.name||''),'zh-CN'));
+ const tasks=[...session.tasks.keys()];
+ if(!tasks.length){$('matrixCount').textContent=`${matrixClass} · ${session.assignedDate||'日期未记录'}：此记录没有拆分的作业项目。`;$('matrixTableHost').innerHTML='<div class="empty">这条历史记录没有可逐项检查的作业内容。可以在个人档案中编辑该课次补充作业项目。</div>';return}
+ const allRows=students.map(p=>({p,lessons:findStudentSessionLessons(p,matrixClass,session.key)}));
+ const assignedCells=allRows.reduce((n,r)=>n+tasks.filter(t=>r.lessons.some(l=>(l.items||[]).some(it=>String(it.text||'').trim()===t))).length,0);
+ $('matrixCount').textContent=`${matrixClass} · 布置日期：${session.assignedDate||'未记录'}${session.lessonDate?` · 上课日期：${session.lessonDate}`:''} · ${students.length} 名学生 · ${tasks.length} 项作业列 · ${assignedCells} 个已分配作业单元格。修改状态后自动保存。`;
+ const header='<thead><tr><th>学生姓名</th>'+tasks.map((t,i)=>`<th><span class="matrix-task-name">${esc(t)}</span><span class="matrix-meta">作业 ${i+1}</span></th>`).join('')+'</tr></thead>';
+ const body=allRows.map(({p,lessons})=>`<tr><td>${esc(p.name||'未命名学员')}<span class="matrix-meta">${lessons.length?esc(lessons.map(l=>l.lessonLabel||'课次未命名').join('、')):'本次无记录'}</span></td>${tasks.map(task=>{
+  let found=null;for(const l of lessons){const it=(l.items||[]).find(x=>String(x.text||'').trim()===task);if(it){found={l,it};break}}
+  if(!found)return '<td><div class="matrix-cell unassigned">— 未布置 —</div></td>';
+  const st=statusCode(found.it.status),cellClass=st==='done'?'done':st==='partial'?'partial':st==='not_done'?'not_done':'pending';
+  const statuses=[['','待检查'],['done','已完成'],['not_done','未完成'],['partial','未全部完成']];
+  return `<td><div class="matrix-cell ${cellClass}"><select data-matrix-status data-student="${esc(p.name)}" data-lesson="${esc(found.l.id)}" data-item="${esc(found.it.id)}">${statuses.map(([v,label])=>`<option value="${v}" ${st===v?'selected':''}>${label}</option>`).join('')}</select>${st==='partial'?`<input type="text" data-matrix-note data-student="${esc(p.name)}" data-lesson="${esc(found.l.id)}" data-item="${esc(found.it.id)}" value="${esc(found.it.note||'')}" placeholder="备注（可选）" aria-label="${esc(p.name)}：${esc(task)} 的备注">`:''}</div></td>`;
+ }).join('')}</tr>`).join('');
+ $('matrixTableHost').innerHTML=`<div class="matrix-wrap"><table class="matrix-table">${header}<tbody>${body}</tbody></table></div>`;
+}
+function getStudentClassNamesClean(p){
+ const set=new Set();
+ if(p?.className&&String(p.className).trim())set.add(String(p.className).trim());
+ (p?.classNames||[]).forEach(c=>{if(String(c||'').trim())set.add(String(c).trim())});
+ (p?.lessons||[]).forEach(l=>{if(String(l.className||'').trim())set.add(String(l.className).trim())});
+ return [...set];
+}
+function workspaceClasses(){
+ const includeArchived=$('showArchivedWorkClasses')?.checked,all=Object.keys(PUBLIC_ROSTER||{});if(all.length)return all.filter(c=>includeArchived||!isArchivedPublicClass(c)).sort((a,b)=>a.localeCompare(b,'zh-CN'));
+ const set=new Set();for(const p of Object.values(DB.students||{})){const c=archiveCurrentClass(p);if(c&&(includeArchived||!isArchivedPublicClass(c)))set.add(c);(p.classNames||[]).forEach(x=>{if(includeArchived||!isArchivedPublicClass(x))set.add(x)})}return [...set].filter(Boolean).sort((a,b)=>a.localeCompare(b,'zh-CN'));
+}
+function studentsForWorkspaceClass(cls){
+ const set=new Set(),archived=isArchivedPublicClass(cls);
+ if(PUBLIC_ROSTER[cls])PUBLIC_ROSTER[cls].forEach(n=>{if(n&&!DB.students[n]?.hidden)set.add(String(n))});
+ if(!Object.keys(PUBLIC_ROSTER||{}).length){for(const [name,p] of Object.entries(DB.students||{})){if(p.hidden)continue;const cc=archiveCurrentClass(p);if(cc===cls||(p.classNames||[]).includes(cls)||(archived&&(p.lessons||[]).some(l=>l.className===cls)))set.add(name)}}
+ else {for(const [name,p] of Object.entries(DB.students||{})){if(p.hidden)continue;if(archiveCurrentClass(p)===cls||(archived&&((p.classNames||[]).includes(cls)||(p.lessons||[]).some(l=>l.className===cls))))set.add(name)}}
+ return [...set].sort((a,b)=>a.localeCompare(b,'zh-CN'));
+}
+function ensureWorkspaceStudent(name,cls){
+ const p=ensureStudent(name);if(cls){
+  p.classNames=Array.isArray(p.classNames)?p.classNames:[];
+  p.currentClass=cls;p.className=cls;p.rosterManaged=true;
+  if(!p.classNames.includes(cls))p.classNames.push(cls);
+ }
+ return p;
+}
+function workspaceLessons(p,cls){
+ if(!p)return [];
+ // 选中学生后展示其完整历史课次；转班不会把旧课次迁移或删除。
+ return [...(p.lessons||[])].sort((a,b)=>(String(b.assignedDate||b.lessonDate||'')).localeCompare(String(a.assignedDate||a.lessonDate||''))||(Number(b.endNumber)||0)-(Number(a.endNumber)||0));
+}
+function activeWorkspaceLesson(){const p=DB.students[workStudent];return p&&(p.lessons||[]).find(l=>l.id===workLessonId)||null}
+function beginWorkspaceDraft(p,l){workDraft={studentName:p.name,lessonId:l.id,checkedDate:l.checkedDate||TODAY,items:{}};for(const it of l.items||[])workDraft.items[it.id]={status:statusCode(it.status),note:String(it.note||'')};workDraftDirty=false}
+function renderWorkTasks(){
+ const host=$('workTasksHost'),p=DB.students[workStudent],l=activeWorkspaceLesson();
+ $('saveWorkCheckBtn').disabled=!p||!l;
+ if(!p||!l){host.innerHTML='<div class="work-no-tasks">选择班级、学生和课次后，这里会按行显示每一项作业。</div>';return}
+ if(!workDraft||workDraft.studentName!==p.name||workDraft.lessonId!==l.id)beginWorkspaceDraft(p,l);
+ const items=Array.isArray(l.items)?l.items:[];
+ if(!items.length){host.innerHTML=`<div class="work-no-tasks">这条历史课次尚未拆分成独立作业项目。<br>请在页面最底部展开“高级档案管理”，编辑该课次并补充作业项目。</div>`;return}
+ host.innerHTML='<div class="work-task-list">'+items.map((it,i)=>{
+  const d=workDraft.items[it.id]||(workDraft.items[it.id]={status:statusCode(it.status),note:String(it.note||'')});const st=statusCode(d.status);const rowClass=st==='done'?'done':st==='not_done'?'not_done':st==='partial'?'partial':'';
+  return `<div class="work-task-row ${rowClass}" data-work-row="${esc(it.id)}"><div class="work-task-main"><span class="work-task-no">${String(i+1).padStart(2,'0')}</span><div class="work-task-text">${esc(it.text)}</div></div><div class="work-task-control"><label for="workStatus_${esc(it.id)}">完成情况</label><select id="workStatus_${esc(it.id)}" data-work-status="${esc(it.id)}"><option value="" ${!st?'selected':''}>请选择完成情况</option><option value="done" ${st==='done'?'selected':''}>已完成</option><option value="not_done" ${st==='not_done'?'selected':''}>未完成</option><option value="partial" ${st==='partial'?'selected':''}>未全部完成</option></select>${st==='partial'?`<div class="work-task-note"><label for="workNote_${esc(it.id)}">未全部完成备注</label><textarea id="workNote_${esc(it.id)}" data-work-note="${esc(it.id)}" placeholder="请填写未完成的部分或补做安排">${esc(d.note||'')}</textarea></div>`:''}</div></div>`;
+ }).join('')+'</div>';
+}
+function renderWorkArea(){
+ const classEl=$('workClassSelect'),studentEl=$('workStudentSelect'),lessonEl=$('workLessonSelect');if(!classEl||!studentEl||!lessonEl)return;
+ const classes=workspaceClasses();
+ if(workClass&&!classes.includes(workClass))workClass='';
+ classEl.innerHTML='<option value="">-- 请选择班级 --</option>'+classes.map(c=>`<option value="${esc(c)}">${isArchivedPublicClass(c)?'【已结课历史】 ':''}${esc(c)}</option>`).join('');classEl.value=workClass;
+ if(!classes.length){classEl.innerHTML='<option value="">未找到班级，请查看页面最底部的数据与备份</option>';workClass='';}
+ const names=workClass?studentsForWorkspaceClass(workClass):[];
+ if(workStudent&&!names.includes(workStudent))workStudent='';
+ studentEl.disabled=!workClass;studentEl.innerHTML=workClass?'<option value="">-- 请选择学生 --</option>'+names.map(n=>`<option value="${esc(n)}">${esc(n)}</option>`).join(''):'<option value="">请先选择班级</option>';studentEl.value=workStudent;
+ if(workClass&&!names.length)studentEl.innerHTML='<option value="">这个班级还没有关联学生</option>';
+ const p=workStudent?ensureWorkspaceStudent(workStudent,workClass):null;
+ const lessons=p?workspaceLessons(p,workClass):[];
+ if(workLessonId&&!lessons.some(l=>l.id===workLessonId))workLessonId='';
+ if(!workLessonId&&lessons.length)workLessonId=lessons[0].id;
+ lessonEl.disabled=!p||!lessons.length;
+ lessonEl.innerHTML=lessons.length?lessons.map(l=>{const date=l.assignedDate||l.lessonDate||'日期未记录';const tasks=(l.items||[]).length;const extra=l.lessonDate&&l.lessonDate!==date?` · 上课 ${l.lessonDate}`:'';return `<option value="${esc(l.id)}">${esc(l.lessonLabel||'未命名课次')} · 布置 ${esc(date)}${extra} · ${tasks} 项作业</option>`}).join(''):'<option value="">该学生暂无可检查的课次</option>';
+ lessonEl.value=workLessonId||'';
+ const l=activeWorkspaceLesson();
+ if(p&&l){if(!workDraft||workDraft.studentName!==p.name||workDraft.lessonId!==l.id)beginWorkspaceDraft(p,l);$('workCheckDate').value=workDraft.checkedDate||TODAY;$('workLessonMeta').innerHTML=`<strong>${esc(p.name)} · ${esc(l.lessonLabel||'未命名课次')}</strong><br>上课日期：${esc(l.lessonDate||'未记录')}　·　布置日期：${esc(l.assignedDate||'未记录')}　·　截止日期：${esc(l.dueDate||l.dueDateText||'未记录')}<br><span class="muted">共 ${(l.items||[]).length} 项作业。每项分别选择状态；选择“未全部完成”后会出现备注框。</span>`;
+ }else{$('workCheckDate').value=TODAY;$('workLessonMeta').textContent=p?`${p.name} 在这个班级暂无课次记录。请先在页面最底部展开“高级档案管理”补充课次，或确认教师发布台已同步该学生的作业。`:'选择班级和学生后，可查看对应的历史作业课次。'}
+ renderWorkTasks();
+ const rosterLine=PUBLIC_ROSTER && Object.keys(PUBLIC_ROSTER).length?`已读取教师端班级名单：正常上课 ${Object.keys(PUBLIC_ROSTER).filter(c=>!isArchivedPublicClass(c)).length} 个，已结课 ${Object.keys(PUBLIC_ROSTER).filter(c=>isArchivedPublicClass(c)).length} 个。`:'班级名单尚未读取；可在页面最底部点击“刷新教师端班级名单”或导入 homework.json。';
+ $('workSaveHint').textContent=workDraftDirty?'有尚未保存的修改。':'检查日期默认今天；选择状态后点击保存，才会正式记录。';
+ const info=$('workRosterHint');if(info)info.textContent=rosterLine;
+}
+async function applyPublicRoster(obj,showNotice=true){
+ const roster=obj&&obj.roster&&typeof obj.roster==='object'?obj.roster:null;if(!roster)throw new Error('文件中没有 roster 班级名单');
+ const next={};for(const [cls,arr] of Object.entries(roster)){if(!cls)continue;next[cls]=[...new Set((Array.isArray(arr)?arr:[]).map(x=>String(x||'').trim()).filter(Boolean))]}
+ PUBLIC_ROSTER=next;const rawArchived=obj.archivedClasses||{};PUBLIC_ARCHIVED_CLASSES=Array.isArray(rawArchived)?Object.fromEntries(rawArchived.map(c=>[c,true])):(rawArchived&&typeof rawArchived==='object'?rawArchived:{});let changedRoster=false,matched=0;const membership=new Map();
+ for(const [cls,names] of Object.entries(PUBLIC_ROSTER)){if(isArchivedPublicClass(cls))continue;for(const name of names)if(!membership.has(name))membership.set(name,cls)}
+ // 先按最新教师名单更新当前班级。清空当前班级不会触碰历史课次或历史班级字段。
+ for(const [name,p] of Object.entries(DB.students||{})){
+  const current=membership.get(name)||'';const oldCurrent=archiveCurrentClass(p);const oldHidden=!!p.hidden;
+  if(oldCurrent!==current||p.className!==current||p.rosterManaged!==true)changedRoster=true;
+  p.currentClass=current;p.className=current;p.rosterManaged=true;p.hidden=oldHidden;p.classNames=Array.isArray(p.classNames)?p.classNames:[];
+  if(current&&!p.classNames.includes(current)){p.classNames.push(current);changedRoster=true}
+ }
+ // 新增在教师端名单中的学生时，档案端自动补建空档案；不会覆盖同名学生已有的历史。
+ for(const [name,cls] of membership){const existed=!!DB.students[name];const p=ensureStudent(name);if(!existed){changedRoster=true;matched++}else matched++;
+  if(p.currentClass!==cls||p.className!==cls){p.currentClass=cls;p.className=cls;changedRoster=true}
+  p.rosterManaged=true;p.classNames=Array.isArray(p.classNames)?p.classNames:[];if(!p.classNames.includes(cls)){p.classNames.push(cls);changedRoster=true}
+ }
+ if(changedRoster){persistLocal();if(cfg().token&&cfg().repo)queueSync()}
+ renderAll();
+ if(showNotice)statusMsg(`已同步教师端名单：${Object.keys(PUBLIC_ROSTER).length} 个班级、${Object.values(PUBLIC_ROSTER).reduce((n,a)=>n+a.length,0)} 个名单位置；已匹配或建立档案 ${matched} 人。转班只更新当前班级，历史课次保持不变。`,'ok');
+ return {classes:Object.keys(PUBLIC_ROSTER).length,students:Object.values(PUBLIC_ROSTER).reduce((n,a)=>n+a.length,0),matched};
+}
+async function refreshPublicRoster(showNotice=true){
+ let lastError=null;
+ // 优先从 GitHub API 读取最新 homework.json，避免 Pages 部署缓存导致新名单延迟；失败再读公开学生端文件。
+ try{
+  const token=savedToken();const headers={Accept:'application/vnd.github+json'};if(token)headers.Authorization='Bearer '+token;
+  const r=await fetch('https://api.github.com/repos/sehun996/homework-hub/contents/homework.json',{headers,cache:'no-store'});
+  if(r.ok){const meta=await r.json();let j;if(meta.content){const txt=decodeURIComponent(escape(atob(String(meta.content).replace(/\n/g,''))));j=JSON.parse(txt)}else throw new Error('GitHub API 未返回 homework.json 内容');return await applyPublicRoster(j,showNotice)}
+  lastError=new Error('GitHub API HTTP '+r.status);
+ }catch(e){lastError=e}
+ try{const r=await fetch('https://sehun996.github.io/homework-hub/homework.json?t='+Date.now(),{cache:'no-store'});if(!r.ok)throw new Error('HTTP '+r.status);const j=await r.json();return await applyPublicRoster(j,showNotice)}catch(e){renderWorkArea();if(showNotice)statusMsg('自动读取教师端班级名单失败。你可以在页面最底部手动导入 homework.json。原因：'+(lastError?.message||e.message)+'；备用读取：'+e.message,'warn');throw e}
+}
+$('workClassSelect').addEventListener('change',e=>{if(workDraftDirty&&!confirm('当前作业检查有未保存的修改，切换班级会放弃这些修改。是否继续？')){e.target.value=workClass;return}workClass=e.target.value;workStudent='';workLessonId='';workDraft=null;workDraftDirty=false;renderWorkArea()});
+$('workStudentSelect').addEventListener('change',e=>{if(workDraftDirty&&!confirm('当前作业检查有未保存的修改，切换学生会放弃这些修改。是否继续？')){e.target.value=workStudent;return}workStudent=e.target.value;workLessonId='';workDraft=null;workDraftDirty=false;if(workStudent){const p=ensureWorkspaceStudent(workStudent,workClass);selectedName=workStudent;persistLocal()}renderAll()});
+$('workLessonSelect').addEventListener('change',e=>{if(workDraftDirty&&!confirm('当前作业检查有未保存的修改，切换课次会放弃这些修改。是否继续？')){e.target.value=workLessonId;return}workLessonId=e.target.value;workDraft=null;workDraftDirty=false;renderWorkArea()});
+$('workCheckDate').addEventListener('change',e=>{if(!workDraft)return;workDraft.checkedDate=e.target.value||TODAY;workDraftDirty=true;renderWorkArea()});
+$('workTasksHost').addEventListener('change',e=>{const sel=e.target.closest('[data-work-status]');if(!sel||!workDraft)return;const id=sel.dataset.workStatus;workDraft.items[id]=workDraft.items[id]||{status:'',note:''};workDraft.items[id].status=statusCode(sel.value);if(workDraft.items[id].status!=='partial'&&workDraft.items[id].status!=='')workDraft.items[id].note='';workDraftDirty=true;renderWorkTasks();$('workSaveHint').textContent='有尚未保存的修改。';});
+$('workTasksHost').addEventListener('input',e=>{const note=e.target.closest('[data-work-note]');if(!note||!workDraft)return;const id=note.dataset.workNote;workDraft.items[id]=workDraft.items[id]||{status:'partial',note:''};workDraft.items[id].note=note.value;workDraftDirty=true;$('workSaveHint').textContent='有尚未保存的修改。';});
+$('saveWorkCheckBtn').addEventListener('click',()=>{
+ const p=DB.students[workStudent],l=activeWorkspaceLesson();if(!p||!l||!workDraft)return alert('请先选择班级、学生和课次。');
+ const chosen=(l.items||[]).filter(it=>statusCode(workDraft.items[it.id]?.status));if(!chosen.length)return alert('请至少为一项作业选择完成状态后再保存。');
+ for(const it of l.items||[]){const d=workDraft.items[it.id]||{};it.status=statusCode(d.status);it.note=it.status==='partial'?String(d.note||'').trim():''}
+ l.legacyStatus='';l.checkedDate=workDraft.checkedDate||TODAY;l.itemsDirty=true;
+ workDraftDirty=false;workDraft=null;changed(`已保存 ${p.name} ${l.lessonLabel||'本次课次'} 的作业检查记录，正在同步 GitHub……`);
+});
+$('refreshRosterBtn').addEventListener('click',()=>refreshPublicRoster(true).catch(()=>{}));
+$('importRosterBtn').addEventListener('click',()=>$('rosterFile').click());
+$('rosterFile').addEventListener('change',async e=>{const f=e.target.files[0];if(!f)return;try{const j=JSON.parse(await f.text());const result=await applyPublicRoster(j,true);alert(`班级名单导入成功！\n班级：${result.classes} 个\n名单位置：${result.students} 个\n匹配已有档案：${result.matched} 人`)}catch(err){alert('导入失败：请选择教师发布台导出的 homework.json 文件。\n'+err.message)}finally{e.target.value=''}});
+function lessonStart(p,l){if(l&&Number(l.startNumber)>0)return Number(l.startNumber);const a=lessonNumbers(l&&l.lessonLabel);return a[0]||maxNo(p)+1}
+function makeLessonLabel(start,count){if(count<=1)return `第${start}次`;const arr=[];for(let i=0;i<count;i++)arr.push(start+i);return '第'+arr.join('、')+'次'}
+function openNewLesson(){const p=currentStudent();if(!p)return;editingLessonId=null;lessonStartForNew=maxNo(p)+1;draftLesson={id:uid('lesson'),lessonLabel:makeLessonLabel(lessonStartForNew,1),lessonCount:1,startNumber:lessonStartForNew,endNumber:lessonStartForNew,className:p.className||p.classNames?.[0]||'',lessonDate:TODAY,assignedDate:TODAY,dueDate:plusDays(TODAY,7),checkedDate:'',items:[],note:'',legacyStatus:'',legacyTaskText:'',itemsDirty:true};fillEditor(true);}
+function openEditLesson(id){const p=currentStudent();const l=p&&p.lessons.find(x=>x.id===id);if(!l)return;editingLessonId=id;draftLesson=JSON.parse(JSON.stringify(l));lessonStartForNew=lessonStart(p,draftLesson);fillEditor(false)}
+function fillEditor(isNew){dueDateManuallyChanged=!!draftLesson.dueDateEdited;$('editorBox').classList.remove('hidden');$('editorTitle').textContent=isNew?'新增课次':'编辑课次';$('lessonLabelInput').value=draftLesson.lessonLabel||'';$('lessonCountInput').value=Number(draftLesson.lessonCount)||1;$('classNameInput').value=draftLesson.className||currentStudent()?.className||'';$('lessonDateInput').value=draftLesson.lessonDate||TODAY;$('assignedDateInput').value=draftLesson.assignedDate||TODAY;$('dueDateInput').value=draftLesson.dueDate||plusDays(draftLesson.assignedDate||TODAY,7);$('checkedDateInput').value=draftLesson.checkedDate||TODAY;$('lessonNoteInput').value=draftLesson.note||'';$('deleteLessonBtn').classList.toggle('hidden',isNew);renderItemEditor();$('editorBox').scrollIntoView({behavior:'smooth',block:'start'})}
+function renderItemEditor(){$('itemEditor').innerHTML=(draftLesson?.items||[]).map((it,i)=>`<div class="task-editor" data-item="${i}"><div class="task-grid"><div><label>作业内容 ${i+1}</label><textarea data-text>${esc(it.text)}</textarea></div><div><label>完成状态</label><select data-status><option value="">待检查（尚未选择状态）</option><option value="done" ${statusCode(it.status)==='done'?'selected':''}>已完成</option><option value="not_done" ${statusCode(it.status)==='not_done'?'selected':''}>未完成</option><option value="partial" ${statusCode(it.status)==='partial'?'selected':''}>未全部完成</option></select></div><div class="task-note"><label>备注（未全部完成时可填写）</label><textarea data-note placeholder="例如：第 2 题未完成，下周补做">${esc(it.note||'')}</textarea></div><div class="task-actions"><button class="danger" data-remove>删除此项</button></div></div></div>`).join('')||'<div class="empty">尚未添加作业项目。可在下方输入作业内容。</div>'}
+$('itemEditor').addEventListener('input',e=>{const box=e.target.closest('[data-item]');if(!box||!draftLesson)return;const i=Number(box.dataset.item);if(e.target.hasAttribute('data-text')){draftLesson.items[i].text=e.target.value;draftLesson.itemsDirty=true}if(e.target.hasAttribute('data-note'))draftLesson.items[i].note=e.target.value});
+$('itemEditor').addEventListener('change',e=>{const box=e.target.closest('[data-item]');if(!box||!draftLesson)return;const i=Number(box.dataset.item);if(e.target.hasAttribute('data-status')){draftLesson.items[i].status=statusCode(e.target.value);draftLesson.legacyStatus='';if(e.target.value&&!$('checkedDateInput').value)$('checkedDateInput').value=TODAY}});
+$('itemEditor').addEventListener('click',e=>{if(!e.target.closest('[data-remove]'))return;const box=e.target.closest('[data-item]');const i=Number(box.dataset.item);draftLesson.items.splice(i,1);draftLesson.itemsDirty=true;renderItemEditor()});
+$('addTaskBtn').onclick=()=>{const text=$('newTaskInput').value.trim();if(!text||!draftLesson)return;const key=taskDedupKey(text);if((draftLesson.items||[]).some(it=>taskDedupKey(it.text)===key)){alert('本课次已经有相同的作业项目，没有重复添加。');return}draftLesson.items.push({id:uid('task'),text:cleanTaskPrefix(text),status:'',note:''});draftLesson.itemsDirty=true;$('newTaskInput').value='';renderItemEditor()};
+$('newTaskInput').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();$('addTaskBtn').click()}});
+$('assignedDateInput').addEventListener('change',()=>{const d=$('assignedDateInput').value;if(d&&!dueDateManuallyChanged){$('dueDateInput').value=plusDays(d,7);dueDateManuallyChanged=true;if(draftLesson)draftLesson.dueDateEdited=true}});$('dueDateInput').addEventListener('change',()=>{dueDateManuallyChanged=true;if(draftLesson)draftLesson.dueDateEdited=true});
+$('lessonCountInput').addEventListener('change',()=>{const p=currentStudent(),count=Math.max(1,Math.min(20,Number($('lessonCountInput').value)||1));$('lessonCountInput').value=count;const start=editingLessonId?lessonStart(p,draftLesson):lessonStartForNew;draftLesson.lessonCount=count;draftLesson.startNumber=start;draftLesson.endNumber=start+count-1;$('lessonLabelInput').value=makeLessonLabel(start,count)});
+$('lessonLabelInput').addEventListener('input',()=>{if(draftLesson)draftLesson.lessonLabel=$('lessonLabelInput').value});
+$('saveLessonBtn').onclick=()=>{const p=currentStudent();if(!p||!draftLesson)return;const label=$('lessonLabelInput').value.trim();if(!label)return alert('请填写课次显示名称。');const count=Math.max(1,Math.min(20,Number($('lessonCountInput').value)||1));const beforeTasks=(draftLesson.items||[]).filter(x=>String(x.text||'').trim());draftLesson.items=dedupeLessonItems(beforeTasks);const tasks=draftLesson.items;if(tasks.length<beforeTasks.length)alert('检测到重复作业项目，已在本课次内合并相同内容。保存后只会保留一条。');if(!tasks.length)return alert('请至少添加一项作业内容。');if(tasks.some(x=>!String(x.text).trim()))return alert('请补全所有作业内容。');draftLesson.lessonLabel=label;draftLesson.lessonCount=count;const nums=lessonNumbers(label);draftLesson.startNumber=nums.length?nums[0]:lessonStartForNew;draftLesson.endNumber=nums.length?nums[nums.length-1]:draftLesson.startNumber+count-1;draftLesson.className=$('classNameInput').value.trim();draftLesson.lessonDate=$('lessonDateInput').value;draftLesson.assignedDate=$('assignedDateInput').value;draftLesson.dueDate=$('dueDateInput').value;draftLesson.dueDateEdited=dueDateManuallyChanged;draftLesson.checkedDate=draftLesson.items.some(it=>statusCode(it.status))?($('checkedDateInput').value||TODAY):'';draftLesson.note=$('lessonNoteInput').value.trim();if(draftLesson.className){p.className=p.className||draftLesson.className;if(!p.classNames.includes(draftLesson.className))p.classNames.push(draftLesson.className)}if(!editingLessonId){p.lessons.push(draftLesson);p.nextLessonNumber=Math.max(maxNo(p),draftLesson.endNumber)}else{const i=p.lessons.findIndex(l=>l.id===editingLessonId);if(i>=0)p.lessons[i]=draftLesson}p.nextLessonNumber=maxNo(p);editingLessonId=null;draftLesson=null;$('editorBox').classList.add('hidden');changed('课次已保存到本地草稿，正在同步 GitHub……')};
+$('cancelEditBtn').onclick=()=>{$('editorBox').classList.add('hidden');draftLesson=null;editingLessonId=null};
+$('deleteLessonBtn').onclick=()=>{const p=currentStudent();if(!p||!editingLessonId)return;if(!confirm('确定删除这条课次历史吗？此操作同步后也会删除云端对应记录。'))return;p.lessons=p.lessons.filter(l=>l.id!==editingLessonId);p.nextLessonNumber=maxNo(p);draftLesson=null;editingLessonId=null;$('editorBox').classList.add('hidden');changed('课次已删除，正在同步 GitHub……')};
+$('showArchivedWorkClasses').addEventListener('change',()=>{if(workDraftDirty&&!confirm('切换已结课班级显示会重置当前检查选择。是否继续？')){$('showArchivedWorkClasses').checked=!$('showArchivedWorkClasses').checked;return}workClass='';workStudent='';workLessonId='';workDraft=null;workDraftDirty=false;renderWorkArea()});
+$('showArchivedProfileClasses').addEventListener('change',()=>{renderStudentList();renderProfile()});
+$('studentList').addEventListener('click',e=>{const b=e.target.closest('[data-student]');if(!b)return;selectedName=b.dataset.student;$('editorBox').classList.add('hidden');draftLesson=null;renderAll()});$('studentSearch').addEventListener('input',renderStudentList);$('archiveClassSelect').addEventListener('change',()=>{renderStudentList();renderProfile()});$('showHiddenStudents').addEventListener('change',()=>{renderStudentList();renderProfile()});$('toggleHiddenBtn').addEventListener('click',()=>{const p=currentStudent();if(!p)return;p.hidden=!p.hidden;const msg=p.hidden?`${p.name} 已隐藏；历史记录仍保留。勾选“显示已隐藏学员”可取消隐藏。`:`${p.name} 已取消隐藏。`;changed(msg);if(p.hidden&&!$('showHiddenStudents').checked){selectedName='';renderAll()}});$('addLessonBtn').onclick=openNewLesson;$('lessons').addEventListener('click',e=>{const b=e.target.closest('[data-edit-lesson]');if(b)openEditLesson(b.dataset.editLesson)});
+$('editProfileBtn').onclick=()=>{const p=currentStudent();if(!p)return;const name=prompt('学员姓名（会更改档案主键，请谨慎操作）：',p.name);if(name===null)return;const clean=name.trim();if(!clean||clean===selectedName)return;if(DB.students[clean])return alert('已存在同名档案，未执行修改。');DB.students[clean]=DB.students[selectedName];delete DB.students[selectedName];DB.students[clean].name=clean;selectedName=clean;changed('学员信息已更新，正在同步 GitHub……')};
+$('addStudentBtn').onclick=()=>{const name=prompt('请输入新学员姓名：');if(!name||!name.trim())return;const clean=name.trim();if(DB.students[clean]){selectedName=clean;renderAll();return}DB.students[clean]={name:clean,className:'',currentClass:'',classNames:[],hidden:false,rosterManaged:false,nextLessonNumber:0,lessons:[]};selectedName=clean;changed('已新增学员档案，正在同步 GitHub……')};
+$('settingsSave').onclick=async()=>{const t=$('tokenInput').value.trim();if(t)localStorage.setItem('gh_token',t);localStorage.setItem('archive_owner',$('ownerInput').value.trim()||'sehun996');localStorage.setItem('archive_repo',$('repoInput').value.trim());localStorage.setItem('archive_path',$('pathInput').value.trim()||'student_archives.json');$('tokenInput').value='';await readCloud(true)};
+$('readCloudBtn').onclick=()=>readCloud(true);$('clearTokenBtn').onclick=()=>{localStorage.removeItem('gh_token');statusMsg('已从当前浏览器清除 GitHub 令牌；本地草稿保留。','warn')};$('saveNowBtn').onclick=syncNow;
+async function readCloud(force){const c=cfg();if(!c.token||!c.repo){statusMsg('请配置 GitHub 令牌和私有仓库名。当前本地草稿不会丢失。','warn');return}try{duplicateCleanupPending=false;const g=await readGitHub();if(g.data){const remote=normalizeDB(g.data);const remoteHadDuplicates=duplicateCleanupPending;duplicateCleanupPending=false;const localTime=String(DB.updatedAt||'');if(remoteHadDuplicates){DB=remote;persistLocal();renderAll();remoteSha=g.sha;remoteReady=true;changed('已合并同一课次中重复的作业项目，保留已有状态和备注，正在同步修复后的档案到 GitHub……');return}const remoteTime=String(remote.updatedAt||'');let chooseLocal=false;if(force&&localTime&&localTime>remoteTime){chooseLocal=confirm('本地草稿比 GitHub 版本新。选择“确定”将以本地内容上传；选择“取消”则读取云端内容。')}else if(!localTime||remoteTime>=localTime){DB=remote;persistLocal();renderAll();remoteSha=g.sha;remoteReady=true;statusMsg('已读取 GitHub 云端档案。','ok');return}else{DB=remote;persistLocal();renderAll();remoteSha=g.sha;remoteReady=true;statusMsg('已读取 GitHub 云端档案。','ok');return}remoteSha=g.sha;remoteReady=true;if(chooseLocal){queueSync();statusMsg('保留较新的本地草稿，准备同步至 GitHub。','warn')}else{DB=remote;persistLocal();renderAll();statusMsg('已读取 GitHub 云端档案。','ok')}}else{remoteSha=null;remoteReady=true;statusMsg('私有仓库已可访问，尚无档案 JSON 文件。首次变更时会自动创建。','ok');if(DB.updatedAt)queueSync()}}catch(e){statusMsg('GitHub 连接失败：'+e.message,'bad')}}
+$('exportJsonBtn').onclick=()=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(DB,null,2)],{type:'application/json;charset=utf-8'}));a.download='student_archives_backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)};
+$('importJsonBtn').onclick=()=>$('jsonFile').click();$('jsonFile').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const x=JSON.parse(await f.text());if(!x.students||typeof x.students!=='object')throw new Error('format');if(!confirm('导入 JSON 将用文件内容替换当前页面档案。建议先导出当前 JSON 备份。确定继续吗？'))return;DB=normalizeDB(x);selectedName=Object.keys(DB.students)[0]||'';changed('JSON 备份已导入，正在同步 GitHub……')}catch(err){alert('导入失败：不是有效的学员档案 JSON。')}finally{e.target.value=''}};
+$('importXlsxBtn').onclick=()=>$('xlsxFile').click();$('xlsxFile').onchange=async e=>{const f=e.target.files[0];if(!f)return;if(!window.ExcelJS){alert('Excel 导入组件加载失败，请联网刷新页面后重试。');e.target.value='';return}try{const wb=new ExcelJS.Workbook();await wb.xlsx.load(await f.arrayBuffer());let added=0,skipped=0,rows=0;for(const ws of wb.worksheets){const name=String(ws.name||'').trim();if(!name)continue;const p=ensureStudent(name);for(let r=2;r<=ws.rowCount;r++){const row=ws.getRow(r);const label=cellText(row.getCell(1));const dateRaw=cellValue(row.getCell(2));const taskRaw=cellText(row.getCell(3));const dueRaw=row.getCell(4);const statusRaw=cellText(row.getCell(5));const noteRaw=cellText(row.getCell(6));if(!label&&!taskRaw&&!dateRaw)continue;if(!label&&!taskRaw)continue;rows++;const lessonDate=dateISO(dateRaw);const dueText=cellDisplay(dueRaw);let dueDate=dateISO(cellValue(dueRaw));if(!dueDate&&typeof cellValue(dueRaw)==='string'){const dm=String(cellValue(dueRaw)).match(/(\d{1,2})月(\d{1,2})日/);if(dm&&lessonDate){let year=+lessonDate.slice(0,4),month=+dm[1],day=+dm[2];if(+lessonDate.slice(5,7)===12&&month===1)year++;dueDate=`${year}-${String(month).padStart(2,'0')}-${String(day).padStart(2,'0')}`}}if(!dueDate&&((String(cellValue(dueRaw)||'').startsWith('='))||(dueText.startsWith('=')))&&lessonDate)dueDate=plusDays(lessonDate,7);const rawTask=taskRaw;const splitTasks=splitTaskText(rawTask);const rawLineCount=String(rawTask||'').split(/\r?\n/).map(x=>x.trim()).filter(Boolean).length;const items=splitTasks.map((t,i)=>({id:uid('task'),text:t,status:statusCode(statusRaw)==='done'?'done':statusCode(statusRaw)==='not_done'?'not_done':'',note:''}));const nums=lessonNumbers(label);const start=nums[0]||maxNo(p)+1,end=nums.length?nums[nums.length-1]:start,count=Math.max(1,end-start+1);const importKey=[name,label,lessonDate,rawTask].join('|');const duplicate=p.lessons.some(l=>l.importKey===importKey||(l.importedLegacy&&l.lessonLabel===label&&l.lessonDate===lessonDate&&String(l.legacyTaskText||'')===rawTask));if(duplicate){skipped++;continue}const newLesson={id:uid('lesson'),lessonLabel:label,lessonCount:count,startNumber:start,endNumber:end,className:p.className||'',lessonDate,assignedDate:lessonDate,dueDate,dueDateText:dueText,checkedDate:'',items,itemsDirty:false,legacyTaskText:rawTask,itemsDirty:items.length<rawLineCount,note:noteRaw,legacyStatus:statusCode(statusRaw)||statusRaw,importedLegacy:true,importKey,sourceIds:[]};p.lessons.push(newLesson);p.nextLessonNumber=Math.max(maxNo(p),end);added++}}
+if(!rows)throw new Error('empty');selectedName=Object.keys(DB.students)[0]||'';changed(`Excel 导入完成：新增 ${added} 条历史课次，跳过 ${skipped} 条重复记录。原 Excel 文件未被修改。`);alert(`导入完成！\n新增历史课次：${added}\n跳过重复记录：${skipped}\n\n原 Excel 文件保持不变。`)}catch(err){console.error(err);alert('Excel 导入失败：'+(err.message||'请确认文件格式正确，并联网加载 Excel 组件。'))}finally{e.target.value=''}};
+function cellValue(cell){const v=cell&&cell.value;if(v&&typeof v==='object'&&('result'in v))return v.result;if(v&&typeof v==='object'&&v.richText)return v.richText.map(x=>x.text).join('');return v}
+function cellText(cell){const v=cellValue(cell);if(v instanceof Date)return dateISO(v);if(v===null||v===undefined)return '';return String(v).trim()}
+function cellDisplay(cell){if(!cell)return '';if(cell.text!==undefined&&cell.text!=='')return cell.text;const v=cell.value;if(v&&typeof v==='object'&&v.formula)return '='+v.formula;return cellText(cell)}
+function splitTaskText(s){const lines=String(s||'').split(/\r?\n/).map(x=>x.trim()).filter(Boolean);if(!lines.length)return [];const out=[],seen=new Set();let section='';for(const line of lines){if(/^(课后作业|课堂作业|考级练习|考级作业|作业|练习|复习)[：:]?$/.test(line)){section=line;continue}const text=cleanTaskPrefix(line);if(!text)continue;const task=section?`${section}：${text}`:text;const key=taskDedupKey(task);if(seen.has(key))continue;seen.add(key);out.push(task)}return out.length?out:[cleanTaskPrefix(String(s).trim())]}
+$('exportXlsxBtn').onclick=async()=>{if(!window.ExcelJS)return alert('Excel 导出组件加载失败，请联网刷新页面后重试。');try{const wb=new ExcelJS.Workbook();wb.creator='学员档案与作业检查';for(const name of Object.keys(DB.students).sort((a,b)=>a.localeCompare(b,'zh-CN'))){const p=DB.students[name];const safeName=name.replace(/[\\/?*\[\]:]/g,'_').slice(0,31)||'学员';let wsName=safeName,i=2;while(wb.getWorksheet(wsName))wsName=(safeName.slice(0,27)+'_'+i++).slice(0,31);const ws=wb.addWorksheet(wsName);ws.columns=[{width:15},{width:15},{width:62},{width:22},{width:16},{width:34}];ws.addRow(['上课次数','上课时间','布置任务','完成截止时间','完成状态','备注']);const hdr=ws.getRow(1);hdr.height=26;hdr.eachCell(c=>{c.font={bold:true,color:{argb:'FFFFFFFF'}};c.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF1B2A4A'}};c.alignment={vertical:'middle',horizontal:'center',wrapText:true};c.border={bottom:{style:'thin',color:{argb:'FFDCE3EF'}}}});for(const l of [...(p.lessons||[])].sort((a,b)=>(Number(a.startNumber)||0)-(Number(b.startNumber)||0))){const taskText=l.legacyTaskText&&!l.itemsDirty?l.legacyTaskText:(l.items||[]).map((it,i)=>`${i+1}. ${it.text}`).join('\n');const noteParts=[];if(l.note)noteParts.push(l.note);(l.items||[]).forEach((it,i)=>{if(it.note)noteParts.push(`第${i+1}项：${it.note}`)});const due= l.dueDateEdited ? (l.dueDate||'') : (l.dueDateText||l.dueDate||'');const lessonDateVal=l.lessonDate&&/^\d{4}-\d{2}-\d{2}$/.test(l.lessonDate)?new Date(+l.lessonDate.slice(0,4),+l.lessonDate.slice(5,7)-1,+l.lessonDate.slice(8,10)):(l.lessonDate||'');const row=ws.addRow([l.lessonLabel||'',lessonDateVal,taskText,due,statusTextForExport(l),noteParts.join('\n')]);row.getCell(2).numFmt='yyyy-mm-dd';const s=agg(l);const fill=s==='done'?'FFD8F3E4':s==='partial'?'FFFFF0BF':s==='not_done'?'FFFFE0E0':'FFFFFFFF';row.eachCell({includeEmpty:true},c=>{c.fill={type:'pattern',pattern:'solid',fgColor:{argb:fill}};c.alignment={vertical:'top',wrapText:true};c.border={bottom:{style:'hair',color:{argb:'FFE2E8F0'}}}});row.height=Math.min(100,Math.max(24,18*(String(taskText).split('\n').length+String(noteParts.join('\n')).split('\n').length)))}ws.views=[{state:'frozen',ySplit:1}];}const buf=await wb.xlsx.writeBuffer();const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([buf],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}));a.download='学员作业完成记录_导出.xlsx';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500)}catch(e){console.error(e);alert('Excel 导出失败：'+e.message)}};
+// Excel serial/formula compatibility. A formula with an uncached result falls back to assigned date + 7 days while retaining the original display text.
+function bootstrapClassOptions(){const set=new Set();for(const p of Object.values(DB.students)){if(p.className)set.add(p.className);(p.classNames||[]).forEach(c=>set.add(c));(p.lessons||[]).forEach(l=>{if(l.className)set.add(l.className)})}$('classOptions').innerHTML=[...set].map(x=>`<option value="${esc(x)}"></option>`).join('')}
+const oldRenderAll=renderAll;renderAll=function(){bootstrapClassOptions();oldRenderAll()};
+window.addEventListener('beforeunload',()=>{try{persistLocal()}catch(e){}});
+loadInitial();
+</script>
+<script>
+(function(){document.addEventListener('click',function(e){const a=e.target.closest('[data-open-details]');if(!a)return;const d=document.getElementById(a.getAttribute('data-open-details'));if(d&&d.tagName.toLowerCase()==='details')d.open=true;});})();
+</script>
+</body></html>
