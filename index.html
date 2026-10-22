@@ -55,7 +55,8 @@ const store = {
   del(k){ try { localStorage.removeItem(k); } catch(e){} }
 };
 const hash = s => { let h = 0; for (const c of s) h = (h*31 + c.charCodeAt(0)) | 0; return (h >>> 0).toString(36); };
-let D = { roster: {}, homework: [] };
+let D = { roster: {}, homework: [], archivedClasses: {} };
+function isArchivedClass(cls){const a=D.archivedClasses||{};return Array.isArray(a)?a.includes(cls):!!a[cls];}
 
 // 日期加天数：优先使用教师设置的实际截止日期，否则按发布日 + 7 天计算
 function addDays(dateStr, days){
@@ -66,18 +67,26 @@ function addDays(dateStr, days){
 }
 // 作业按“截止日期 + 原有宽限期 + 老师为该学生设置的延期天数”决定是否继续显示
 function dueInfo(hw, student){
-  const dueDate = hw.dueDate || addDays(hw.date, 7);
-  const [y,m,d] = dueDate.split('-').map(Number);
-  const due = new Date(y, m-1, d), t = new Date(); t.setHours(0,0,0,0);
-  const n = Math.round((due - t) / 864e5);
+  const baseDue = hw.dueDate || addDays(hw.date, 7);
+  const [y,m,d] = baseDue.split('-').map(Number);
   const ext = Math.max(0, Number(hw.extensions && hw.extensions[student]) || 0);
-  const visibleUntil = new Date(y, m-1, d + GRACE + ext);
-  const visibleDays = Math.round((visibleUntil - t) / 864e5);
-  if (n < 0 && ext > 0) return {n, visibleDays, text:`📅 缺课延期 +${ext} 天`, urgent:visibleDays <= 2};
-  if (n < 0) return {n, visibleDays, text:'⚠️ 已超期', urgent:true};
-  if (n === 0) return {n, visibleDays, text:'🔥 今天截止', urgent:true};
-  if (n <= 2) return {n, visibleDays, text:`⏰ 仅剩 ${n} 天`, urgent:true};
-  return {n, visibleDays, text:`⏳ 剩余 ${n} 天`, urgent:false};
+  // 缺课延期会把“实际截止日”整体向后移动，而不只是延长卡片的隐藏时间。
+  const effectiveDue = new Date(y, m-1, d + ext);
+  const today = new Date(); today.setHours(0,0,0,0);
+  const n = Math.round((effectiveDue - today) / 864e5);
+  const visibleUntil = new Date(y, m-1, d + ext + GRACE);
+  const visibleDays = Math.round((visibleUntil - today) / 864e5);
+  let text;
+  if(ext>0){
+    if(n>0) text=`📅 缺课延期 +${ext} 天 · 剩余 ${n} 天`;
+    else if(n===0) text=`📅 缺课延期 +${ext} 天 · 今天截止`;
+    else text=`⚠️ 延期后仍已超期 ${Math.abs(n)} 天`;
+  }else if(n<0) text='⚠️ 已超期';
+  else if(n===0) text='🔥 今天截止';
+  else if(n<=2) text=`⏰ 仅剩 ${n} 天`;
+  else text=`⏳ 剩余 ${n} 天`;
+  const urgent=n<=2;
+  return {n,visibleDays,text,urgent,effectiveDue:addDays(baseDue,ext),extensionDays:ext};
 }
 const subKey = (stu, hw, text) => `done_${stu}_${hw.id}_${hash(text)}`;
 
@@ -142,11 +151,13 @@ function saveSel(){
 }
 
 function init(){
-  $('cls').insertAdjacentHTML('beforeend', Object.keys(D.roster).map(c => `<option>${esc(c)}</option>`).join(''));
+  const activeClasses=Object.keys(D.roster||{}).filter(c=>!isArchivedClass(c)).sort((a,b)=>a.localeCompare(b,'zh-CN'));
+  $('cls').insertAdjacentHTML('beforeend', activeClasses.map(c => `<option>${esc(c)}</option>`).join(''));
   const c = store.get('sel_cls'), s = store.get('sel_stu');
-  if (c && D.roster[c] && (D.roster[c]).includes(s)) {
+  if (c && !isArchivedClass(c) && D.roster[c] && (D.roster[c]).includes(s)) {
     $('cls').value = c; fillStudents(s); $('reset').hidden = false;
-  }
+  } else if (c && isArchivedClass(c)) { store.del('sel_cls'); store.del('sel_stu'); }
+  if (!activeClasses.length) $('tip').textContent='目前没有正常上课的班级；已结课班级的历史记录仍由老师保留。';
   if (D.updated) $('upd').textContent = '作业最后更新：' + new Date(D.updated).toLocaleString('zh-CN', {hour12:false});
   render();
 }
@@ -168,7 +179,7 @@ $('list').addEventListener('click', e => {
 
 fetch('homework.json?t=' + Date.now())
   .then(r => { if (!r.ok) throw 0; return r.json(); })
-  .then(j => { D = j; init(); })
+  .then(j => { D = j && typeof j==='object' ? j : {roster:{},homework:[]}; D.roster=D.roster&&typeof D.roster==='object'?D.roster:{}; D.homework=Array.isArray(D.homework)?D.homework:[]; D.archivedClasses=D.archivedClasses||{}; init(); })
   .catch(() => { $('tip').textContent = '作业加载失败，请检查网络后刷新页面'; });
 </script>
 </body>
