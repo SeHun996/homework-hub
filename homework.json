@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-22T14:03:51.776Z",
+  "updated": "2026-10-23T15:23:18.414Z",
   "roster": {
     "【张老师】周六 09:00 C++班级": [
       "郭梓辰",
@@ -42,6 +42,22 @@
     ]
   },
   "homework": [
+    {
+      "id": "hw_mvl4dayj_2g73",
+      "className": "【张老师】周六 10:30 C++班级",
+      "target": [
+        "林楷哲",
+        "徐林暄"
+      ],
+      "date": "2026-10-23",
+      "lessonDate": "2026-10-23",
+      "dueDate": "2026-10-30",
+      "items": [
+        "1.完成信奥专区---》团队题单--》第9课 字符类型char、第13课 printf和scanf函数题单的全部题目"
+      ],
+      "link": "",
+      "extensions": {}
+    },
     {
       "id": "hw_mvdu6bwq",
       "className": "【张老师】周日 19:00 C++班级",
@@ -91,7 +107,7 @@
       "className": "【张老师】周日 14:30 CSP-J复赛集训班",
       "target": [
         "林楚炫",
-        "林婧茹"
+        "林靖茹"
       ],
       "date": "2026-10-18",
       "items": [
@@ -278,5 +294,7 @@
       "dueDate": "2026-10-24",
       "lessonDate": "2026-10-17"
     }
-  ]
+  ],
+  "archivedClasses": {},
+  "studentRenames": {}
 }
