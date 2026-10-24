@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-24T13:38:20.693Z",
+  "updated": "2026-10-24T13:40:35.656Z",
   "roster": {
     "【张老师】周六 09:00 C++班级": [
       "郭梓辰",
@@ -42,6 +42,19 @@
     ]
   },
   "homework": [
+    {
+      "id": "hw_mvmg56rm_yik9",
+      "className": "【张老师】周六 19:00 Python班级",
+      "target": "林瑾浩",
+      "date": "2026-10-24",
+      "lessonDate": "2026-10-24",
+      "dueDate": "2026-10-31",
+      "items": [
+        "2.补做上节课的题目"
+      ],
+      "link": "",
+      "extensions": {}
+    },
     {
       "id": "hw_mvmg2adp_ycuw",
       "className": "【张老师】周日 09:00 CSP-S复赛集训班",
