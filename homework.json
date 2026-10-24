@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-24T13:40:35.656Z",
+  "updated": "2026-10-24T13:41:02.273Z",
   "roster": {
     "【张老师】周六 09:00 C++班级": [
       "郭梓辰",
@@ -42,6 +42,19 @@
     ]
   },
   "homework": [
+    {
+      "id": "hw_mvmg5r7h_gld4",
+      "className": "【张老师】周六 19:00 Python班级",
+      "target": "李霈恒",
+      "date": "2026-10-31",
+      "lessonDate": "2026-10-31",
+      "dueDate": "2026-11-07",
+      "items": [
+        "test"
+      ],
+      "link": "",
+      "extensions": {}
+    },
     {
       "id": "hw_mvmg56rm_yik9",
       "className": "【张老师】周六 19:00 Python班级",
