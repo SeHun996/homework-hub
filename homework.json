@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-24T02:51:38.975Z",
+  "updated": "2026-10-24T09:29:46.724Z",
   "roster": {
     "【张老师】周六 09:00 C++班级": [
       "郭梓辰",
@@ -42,6 +42,58 @@
     ]
   },
   "homework": [
+    {
+      "id": "hw_mvm76lno_6gxd",
+      "className": "【张老师】周六 16:00 C++班级",
+      "target": "叶奕辰",
+      "date": "2026-10-24",
+      "lessonDate": "2026-10-24",
+      "dueDate": "2026-10-31",
+      "items": [
+        "完成洛谷 → 训练题单 → 深入浅出基础篇 → 【入门4】数组中第6~10题"
+      ],
+      "link": "",
+      "extensions": {}
+    },
+    {
+      "id": "hw_mvm75vor_6gn3",
+      "className": "【张老师】周六 16:00 C++班级",
+      "target": "郑黄岩",
+      "date": "2026-10-24",
+      "lessonDate": "2026-10-24",
+      "dueDate": "2026-10-31",
+      "items": [
+        "完成洛谷GESP 三级救命题单第一周题目"
+      ],
+      "link": "",
+      "extensions": {}
+    },
+    {
+      "id": "hw_mvm75qtg_mo9l",
+      "className": "【张老师】周六 16:00 C++班级",
+      "target": "陈俊羽",
+      "date": "2026-10-24",
+      "lessonDate": "2026-10-24",
+      "dueDate": "2026-10-31",
+      "items": [
+        "完成洛谷GESP 四级救命题单第一周题目"
+      ],
+      "link": "",
+      "extensions": {}
+    },
+    {
+      "id": "hw_mvm74z69_uiad",
+      "className": "【张老师】周六 16:00 C++班级",
+      "target": "全班",
+      "date": "2026-10-24",
+      "lessonDate": "2026-10-24",
+      "dueDate": "2026-10-31",
+      "items": [
+        "完成课堂第4、5、6题"
+      ],
+      "link": "",
+      "extensions": {}
+    },
     {
       "id": "hw_mvlsymlr_1uoh",
       "className": "【张老师】周六 09:00 C++班级",
