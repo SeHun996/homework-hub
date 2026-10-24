@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-24T02:29:14.831Z",
+  "updated": "2026-10-24T02:51:38.975Z",
   "roster": {
     "【张老师】周六 09:00 C++班级": [
       "郭梓辰",
@@ -42,6 +42,32 @@
     ]
   },
   "homework": [
+    {
+      "id": "hw_mvlsymlr_1uoh",
+      "className": "【张老师】周六 09:00 C++班级",
+      "target": "廖宇枫",
+      "date": "2026-10-24",
+      "lessonDate": "2026-10-24",
+      "dueDate": "2026-10-31",
+      "items": [
+        "补做课堂第3、4题"
+      ],
+      "link": "",
+      "extensions": {}
+    },
+    {
+      "id": "hw_mvlsyab3_ge7y",
+      "className": "【张老师】周六 09:00 C++班级",
+      "target": "郑杰琨",
+      "date": "2026-10-24",
+      "lessonDate": "2026-10-24",
+      "dueDate": "2026-10-31",
+      "items": [
+        "重做课堂第六题"
+      ],
+      "link": "",
+      "extensions": {}
+    },
     {
       "id": "hw_mvlrygtc_tvk6",
       "className": "【张老师】周六 09:00 C++班级",
