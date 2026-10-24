@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-24T10:21:19.876Z",
+  "updated": "2026-10-24T12:40:43.904Z",
   "roster": {
     "【张老师】周六 09:00 C++班级": [
       "郭梓辰",
@@ -42,6 +42,19 @@
     ]
   },
   "homework": [
+    {
+      "id": "hw_mvme077q_rixb",
+      "className": "【张老师】周六 19:00 Python班级",
+      "target": "全班",
+      "date": "2026-10-24",
+      "lessonDate": "2026-10-24",
+      "dueDate": "2026-10-31",
+      "items": [
+        "完成GESP Python 1级 大题汇总第13~17题共5题"
+      ],
+      "link": "",
+      "extensions": {}
+    },
     {
       "id": "hw_mvm90xcn_qtdn",
       "className": "【张老师】周六 10:30 C++班级",
