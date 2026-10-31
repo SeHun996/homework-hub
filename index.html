@@ -154,7 +154,7 @@ function formatLocalDate(date){
   return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;
 }
 // 截止时间必须根据“这份作业对应的上课日期”计算，不能根据打开网页当天计算。
-// 例如作业对应上课日期为上周六，本周六课程一开始，这份作业就已经超时；
+// 例如作业对应日期为上周六，本周六课程一开始，这份作业就已经超时。
 // 不能因为本周课程已开始而自动把旧作业顺延到下周。
 // 教师为学生延期 +7 天时，再把对应截止课程顺延 7 天。
 function getHomeworkDeadline(hw, student){
@@ -195,6 +195,11 @@ function getPendingHomework(cls, stu){
     if(oldVisibility.visibleDays < 0) continue;
     const due = getHomeworkDeadline(h,stu);
     if(!due) continue;
+
+    // 关键修改：截止时间一到，立即停止提醒。
+    // 已经超时的作业不再进入提醒弹窗，也不再参与顶部倒计时。
+    if(due.deadline.getTime() <= now.getTime()) continue;
+
     rows.push({h,pending,due});
   }
   return rows;
@@ -224,20 +229,22 @@ function renderReminder(){
     list.innerHTML = '<div class="reminder-empty">太棒了！目前没有需要提醒的未完成作业。</div>';
     reminderDeadline = null;
     $('reminderClock').innerHTML = '';
-    $('reminderCountdownLabel').textContent = '作业已全部完成';
+    $('reminderCountdownLabel').textContent = '目前没有需要提醒的作业';
     $('reminderDeadline').textContent = '';
     if(reminderTimer){clearInterval(reminderTimer);reminderTimer=null;}
     return false;
   }
-  // 按布置日期从新到旧排序：顶部倒计时始终对应最新一份仍有未完成项目的作业。
-  // 同一天布置多份作业时，保留 homework.json 中原有的先后顺序。
+
+  // 按布置日期从新到旧排序：顶部倒计时对应最新一份未超时的未完成作业。
   rows.sort((a,b)=>String(b.h.date||'').localeCompare(String(a.h.date||'')));
   const latest = rows[0];
   reminderDeadline = latest.due.deadline;
-  list.innerHTML = rows.flatMap(({h,pending,due})=>pending.map(item=>{
+
+  list.innerHTML = rows.flatMap(({h,pending})=>pending.map(item=>{
     const title = h.title ? `${h.title}：` : '';
     return `<div class="reminder-item"><div class="reminder-item-class">${esc(h.className)} · ${[].concat(h.target||[]).includes('全班')?'全班作业':'个人作业'} · 布置日期：${esc(h.date||'')}</div><div class="reminder-item-title">${esc(title + item)}</div></div>`;
   })).join('');
+
   $('reminderCountdownLabel').textContent = '距离最新一份未完成作业截止还有';
   $('reminderDeadline').textContent = `最新作业截止时间：${latest.due.deadline.toLocaleString('zh-CN',{hour12:false})}`;
   updateReminderCountdown();
@@ -251,7 +258,7 @@ function showHomeworkReminder(){
   $('reminderMask').hidden = false;
   if(reminderTimer) clearInterval(reminderTimer);
   reminderTimer = setInterval(()=>{
-    // 每秒刷新倒计时；若用户刚刚在作业列表中完成了项目，也同步刷新提醒清单。
+    // 每秒刷新倒计时和提醒清单；超时的作业会自动从提醒中消失。
     if(!renderReminder()){$('reminderMask').hidden=true;return;}
     updateReminderCountdown();
   },1000);
