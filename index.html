@@ -153,7 +153,6 @@ function parseLocalDate(dateStr){
 function formatLocalDate(date){
   return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;
 }
-
 // 截止时间必须根据“这份作业对应的上课日期”计算，不能根据打开网页当天计算。
 // 例如作业对应上课日期为上周六，本周六课程一开始，这份作业就已经超时；
 // 不能因为本周课程已开始而自动把旧作业顺延到下周。
@@ -208,12 +207,12 @@ function updateReminderCountdown(){
   if(diff > 0){
     clock.classList.remove('expired');
     clock.innerHTML = formatCountdown(diff);
-    $('reminderCountdownLabel').textContent = '距离最近一项未完成作业截止还有';
+    $('reminderCountdownLabel').textContent = '距离最新一份未完成作业截止还有';
   }else{
     clock.classList.add('expired');
     const elapsed = Math.abs(diff);
     clock.innerHTML = formatCountdown(elapsed);
-    $('reminderCountdownLabel').textContent = '最近一项未完成作业已截止，超时';
+    $('reminderCountdownLabel').textContent = '最新一份未完成作业已截止，超时';
   }
 }
 function renderReminder(){
@@ -230,15 +229,17 @@ function renderReminder(){
     if(reminderTimer){clearInterval(reminderTimer);reminderTimer=null;}
     return false;
   }
-  // 顶部统一显示最早到期的未完成作业倒计时，下面汇总所有未完成项目。
-  rows.sort((a,b)=>a.due.deadline-b.due.deadline);
-  reminderDeadline = rows[0].due.deadline;
+  // 按布置日期从新到旧排序：顶部倒计时始终对应最新一份仍有未完成项目的作业。
+  // 同一天布置多份作业时，保留 homework.json 中原有的先后顺序。
+  rows.sort((a,b)=>String(b.h.date||'').localeCompare(String(a.h.date||'')));
+  const latest = rows[0];
+  reminderDeadline = latest.due.deadline;
   list.innerHTML = rows.flatMap(({h,pending,due})=>pending.map(item=>{
     const title = h.title ? `${h.title}：` : '';
-    return `<div class="reminder-item"><div class="reminder-item-class">${esc(h.className)} · ${[].concat(h.target||[]).includes('全班')?'全班作业':'个人作业'}</div><div class="reminder-item-title">${esc(title + item)}</div></div>`;
+    return `<div class="reminder-item"><div class="reminder-item-class">${esc(h.className)} · ${[].concat(h.target||[]).includes('全班')?'全班作业':'个人作业'} · 布置日期：${esc(h.date||'')}</div><div class="reminder-item-title">${esc(title + item)}</div></div>`;
   })).join('');
-  const first = rows[0].due;
-  $('reminderDeadline').textContent = `截止时间：${first.deadline.toLocaleString('zh-CN',{hour12:false})}`;
+  $('reminderCountdownLabel').textContent = '距离最新一份未完成作业截止还有';
+  $('reminderDeadline').textContent = `最新作业截止时间：${latest.due.deadline.toLocaleString('zh-CN',{hour12:false})}`;
   updateReminderCountdown();
   return true;
 }
