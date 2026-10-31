@@ -153,18 +153,24 @@ function parseLocalDate(dateStr){
 function formatLocalDate(date){
   return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;
 }
-// 截止时间锚定在作业对应的上课日期之后，下一次同班课程开始前一分钟。
-// 教师给缺课学生延期 +7 天时，截止时间顺延一周；多次延期按周累计。
+
+// 截止时间必须根据“这份作业对应的上课日期”计算，不能根据打开网页当天计算。
+// 例如作业对应上课日期为上周六，本周六课程一开始，这份作业就已经超时；
+// 不能因为本周课程已开始而自动把旧作业顺延到下周。
+// 教师为学生延期 +7 天时，再把对应截止课程顺延 7 天。
 function getHomeworkDeadline(hw, student){
   const schedule = getClassSchedule(hw.className);
   if(!schedule) return null;
-  const now = new Date();
-  const today = new Date(now.getFullYear(),now.getMonth(),now.getDate());
-  const diff = (schedule.weekday - today.getDay() + 7) % 7;
-  const lessonDate = new Date(today.getFullYear(),today.getMonth(),today.getDate()+diff);
+  const baseDate = parseLocalDate(hw.lessonDate || hw.date);
+  if(!baseDate) return null;
+
+  // 从作业对应的上课日期出发，找严格晚于该日期的下一次同班课程。
+  // 如果作业对应日期本身就是上课日，则下一次课程是 7 天后。
+  let daysToNextLesson = (schedule.weekday - baseDate.getDay() + 7) % 7;
+  if(daysToNextLesson === 0) daysToNextLesson = 7;
+  const lessonDate = new Date(baseDate.getFullYear(),baseDate.getMonth(),baseDate.getDate()+daysToNextLesson);
   lessonDate.setHours(schedule.hour,schedule.minute,0,0);
-  // 如果本周这节课已经开始，则目标切换到下一周；若尚未上课，即使只剩几十秒也仍以本次课为准。
-  if(lessonDate <= now) lessonDate.setDate(lessonDate.getDate()+7);
+
   const ext = Math.max(0, Number(hw.extensions && hw.extensions[student]) || 0);
   if(ext) lessonDate.setDate(lessonDate.getDate()+ext);
   const deadline = new Date(lessonDate.getTime()-60000); // 上课前一分钟截止
