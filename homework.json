@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-28T12:19:55.678Z",
+  "updated": "2026-10-31T06:12:34.693Z",
   "roster": {
     "【张老师】周六 09:00 C++班级": [
       "郭梓辰",
@@ -42,6 +42,19 @@
     ]
   },
   "homework": [
+    {
+      "id": "hw_mvvs0nsd_uzx3",
+      "className": "【张老师】周六 09:00 C++班级",
+      "target": "全班",
+      "date": "2026-10-31",
+      "lessonDate": "2026-10-31",
+      "dueDate": "2026-11-07",
+      "items": [
+        "浏览器搜过“洛谷”，注册一个账号，注册完复制这个网址“https://www.luogu.com.cn/team/136263”，点击加入团队，点击文件即可看到文件内容"
+      ],
+      "link": "",
+      "extensions": {}
+    },
     {
       "id": "hw_mvnxgsje_w77x",
       "className": "【张老师】周日 19:00 C++班级",
