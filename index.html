@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -30,118 +29,29 @@ button:focus-visible,select:focus-visible,input:focus-visible,a:focus-visible{ou
 .tip{text-align:center;color:#8a97b3;padding:20px}.small{font-size:12px;padding:6px}
 a{color:#2c4a8a}
 
-/* 作业倒计时弹窗 */
-.reminder-mask{
-  position:fixed;
-  inset:0;
-  z-index:9999;
-  display:none;
-  align-items:center;
-  justify-content:center;
-  padding:16px;
-  background:rgba(15,27,49,.62);
-}
-.reminder-mask.show{display:flex}
-.reminder-dialog{
-  width:100%;
-  max-width:560px;
-  max-height:85vh;
-  overflow-y:auto;
-  background:#fff;
-  border-radius:16px;
-  padding:20px;
-  box-shadow:0 18px 60px rgba(0,0,0,.25);
-  animation:reminderIn .2s ease-out;
-}
-@keyframes reminderIn{
-  from{opacity:0;transform:translateY(12px)}
-  to{opacity:1;transform:translateY(0)}
-}
-.reminder-head{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:10px;
-  margin-bottom:5px;
-}
-.reminder-head h2{font-size:20px;margin:0;color:#1b2a4a}
-.reminder-close{
-  border:0;
-  background:#f0f3f8;
-  border-radius:50%;
-  width:34px;
-  height:34px;
-  padding:0;
-  font-size:20px;
-  line-height:1;
-}
-.reminder-desc{font-size:13px;color:#8190aa;margin:5px 0 16px}
-.reminder-summary{
-  background:#f3f6fb;
-  border-radius:9px;
-  padding:10px 12px;
-  margin-bottom:12px;
-  font-size:13px;
-  color:#52617c;
-}
-.reminder-item{
-  border:1px solid #dde4f0;
-  border-left:4px solid #f0a34a;
-  border-radius:10px;
-  padding:12px;
-  margin-bottom:10px;
-}
-.reminder-item.overdue{border-left-color:#d9534f}
-.reminder-item h3{
-  font-size:15px;
-  margin:0 0 7px;
-  color:#1b2a4a;
-  overflow-wrap:anywhere;
-}
-.reminder-time{
-  font-size:19px;
-  font-weight:700;
-  color:#b66a13;
-  font-variant-numeric:tabular-nums;
-  margin:5px 0;
-}
-.reminder-item.overdue .reminder-time{color:#c0392b}
-.reminder-meta{font-size:12px;color:#8290a8}
-.reminder-pending{
-  margin-top:8px;
-  padding-top:8px;
-  border-top:1px solid #edf0f5;
-  font-size:13px;
-  color:#52617c;
-}
-.reminder-pending ul{margin:5px 0 0;padding-left:20px}
-.reminder-pending li{margin:3px 0;overflow-wrap:anywhere}
-.reminder-empty{
-  text-align:center;
-  padding:28px 12px;
-  color:#16845a;
-  background:#effaf4;
-  border-radius:10px;
-  font-size:15px;
-}
-.reminder-footer{
-  display:flex;
-  justify-content:flex-end;
-  margin-top:14px;
-}
-.reminder-ok{
-  background:#1b2a4a;
-  color:#fff;
-  border:0;
-  padding:9px 24px;
-  border-radius:8px;
-}
-.reminder-ok:hover{background:#2c4778}
-@media(max-width:480px){
-  .reminder-dialog{padding:16px}
-  .reminder-head h2{font-size:18px}
-  .reminder-time{font-size:17px}
-}
+/* 课前作业提醒弹窗 */
+.reminder-mask{position:fixed;inset:0;z-index:9999;background:rgba(15,25,45,.58);display:flex;align-items:center;justify-content:center;padding:16px}
+.reminder-mask[hidden]{display:none}
+.reminder-dialog{width:min(100%,560px);max-height:86vh;overflow:auto;background:#fff;border-radius:16px;padding:20px;box-shadow:0 18px 55px rgba(0,0,0,.25)}
+.reminder-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+.reminder-head h2{font-size:19px;margin:0;color:#1b2a4a}
+.reminder-close{border:0;background:#eef2f8;border-radius:50%;width:34px;height:34px;font-size:20px;line-height:1;color:#52617c;padding:0}
+.reminder-countdown{background:#f1f5fb;border:1px solid #e1e8f3;border-radius:12px;padding:16px 10px;text-align:center;margin-bottom:16px}
+.reminder-countdown-label{font-size:13px;color:#687895;margin-bottom:10px}
+.reminder-clock{display:flex;justify-content:center;align-items:baseline;gap:5px;flex-wrap:wrap;font-variant-numeric:tabular-nums}
+.reminder-clock strong{font-size:clamp(25px,7vw,38px);line-height:1.1;color:#16845b;font-weight:750}
+.reminder-clock span{font-size:13px;color:#64728c;margin-right:5px}
+.reminder-clock.expired strong{color:#c24141}
+.reminder-deadline{font-size:12px;color:#8290a8;margin-top:9px}
+.reminder-section-title{font-size:14px;font-weight:700;color:#263858;margin:0 0 9px}
+.reminder-list{display:grid;gap:8px}
+.reminder-item{border:1px solid #e2e8f2;border-radius:9px;padding:10px 12px;background:#fff}
+.reminder-item-class{font-size:11px;color:#71809b;margin-bottom:3px}
+.reminder-item-title{font-size:14px;color:#263858;line-height:1.55;overflow-wrap:anywhere}
+.reminder-empty{font-size:13px;color:#8390a6;text-align:center;padding:12px 4px}
+.reminder-note{font-size:11px;color:#9aa5b8;text-align:center;margin:12px 0 0}
+@media(max-width:420px){.reminder-dialog{padding:16px}.reminder-clock{gap:3px}.reminder-clock strong{font-size:28px}}
+
 </style>
 </head>
 <body>
@@ -160,18 +70,20 @@ a{color:#2c4a8a}
   <p id="upd" class="tip small"></p>
 </main>
 
-<!-- 作业倒计时提醒弹窗 -->
-<div id="reminderMask" class="reminder-mask" role="dialog" aria-modal="true" aria-labelledby="reminderTitle">
+<div id="reminderMask" class="reminder-mask" hidden role="dialog" aria-modal="true" aria-labelledby="reminderTitle">
   <div class="reminder-dialog">
     <div class="reminder-head">
-      <h2 id="reminderTitle">⏰ 作业倒计时提醒</h2>
-      <button type="button" class="reminder-close" id="reminderClose" aria-label="关闭">×</button>
+      <h2 id="reminderTitle">📚 本次课前作业提醒</h2>
+      <button type="button" id="reminderClose" class="reminder-close" aria-label="关闭">×</button>
     </div>
-    <p class="reminder-desc" id="reminderStudent"></p>
-    <div id="reminderContent"></div>
-    <div class="reminder-footer">
-      <button type="button" class="reminder-ok" id="reminderOk">我知道了</button>
+    <div class="reminder-countdown">
+      <div class="reminder-countdown-label" id="reminderCountdownLabel">距离本次作业截止还有</div>
+      <div class="reminder-clock" id="reminderClock"><strong>--</strong><span>天</span><strong>--</strong><span>时</span><strong>--</strong><span>分</span><strong>--</strong><span>秒</span></div>
+      <div class="reminder-deadline" id="reminderDeadline"></div>
     </div>
+    <div class="reminder-section-title">以下是你还没有完成的作业：</div>
+    <div id="reminderList" class="reminder-list"></div>
+    <p class="reminder-note">完成并勾选的项目会保存在本设备，下次打开时不再重复提醒。</p>
   </div>
 </div>
 
@@ -187,7 +99,7 @@ const store = {
 const hash = s => { let h = 0; for (const c of s) h = (h*31 + c.charCodeAt(0)) | 0; return (h >>> 0).toString(36); };
 let D = { roster: {}, homework: [], archivedClasses: {} };
 let reminderTimer = null;
-
+let reminderDeadline = null;
 function isArchivedClass(cls){const a=D.archivedClasses||{};return Array.isArray(a)?a.includes(cls):!!a[cls];}
 
 // 日期加天数：优先使用教师设置的实际截止日期，否则按发布日 + 7 天计算
@@ -197,13 +109,9 @@ function addDays(dateStr, days){
   const x = new Date(y, m-1, d + days);
   return `${x.getFullYear()}-${String(x.getMonth()+1).padStart(2,'0')}-${String(x.getDate()).padStart(2,'0')}`;
 }
-
 // 作业按“截止日期 + 原有宽限期 + 老师为该学生设置的延期天数”决定是否继续显示
 function dueInfo(hw, student){
   const baseDue = hw.dueDate || addDays(hw.date, 7);
-  if (!baseDue || !/^\d{4}-\d{2}-\d{2}$/.test(baseDue)) {
-    return {n:0,visibleDays:-1,text:'截止日期无效',urgent:false,effectiveDue:'',extensionDays:0};
-  }
   const [y,m,d] = baseDue.split('-').map(Number);
   const ext = Math.max(0, Number(hw.extensions && hw.extensions[student]) || 0);
   // 缺课延期会把“实际截止日”整体向后移动，而不只是延长卡片的隐藏时间。
@@ -224,8 +132,127 @@ function dueInfo(hw, student){
   const urgent=n<=2;
   return {n,visibleDays,text,urgent,effectiveDue:addDays(baseDue,ext),extensionDays:ext};
 }
-
 const subKey = (stu, hw, text) => `done_${stu}_${hw.id}_${hash(text)}`;
+
+// 班级名称中包含固定上课星期和时间，例如“周日 14:30”。
+function getClassSchedule(className){
+  const m = String(className || '').match(/周([一二三四五六日天])\s*(\d{1,2}):(\d{2})/);
+  if(!m) return null;
+  const weekMap = {'日':0,'天':0,'一':1,'二':2,'三':3,'四':4,'五':5,'六':6};
+  const hour = Number(m[2]), minute = Number(m[3]);
+  if(hour<0 || hour>23 || minute<0 || minute>59) return null;
+  return {weekday:weekMap[m[1]], hour, minute};
+}
+function parseLocalDate(dateStr){
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(String(dateStr||''))) return null;
+  const [y,m,d] = dateStr.split('-').map(Number);
+  const date = new Date(y,m-1,d);
+  if(date.getFullYear()!==y || date.getMonth()!==m-1 || date.getDate()!==d) return null;
+  return date;
+}
+function formatLocalDate(date){
+  return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;
+}
+// 截止时间锚定在作业对应的上课日期之后，下一次同班课程开始前一分钟。
+// 教师给缺课学生延期 +7 天时，截止时间顺延一周；多次延期按周累计。
+function getHomeworkDeadline(hw, student){
+  const schedule = getClassSchedule(hw.className);
+  if(!schedule) return null;
+  const now = new Date();
+  const today = new Date(now.getFullYear(),now.getMonth(),now.getDate());
+  const diff = (schedule.weekday - today.getDay() + 7) % 7;
+  const lessonDate = new Date(today.getFullYear(),today.getMonth(),today.getDate()+diff);
+  lessonDate.setHours(schedule.hour,schedule.minute,0,0);
+  // 如果本周这节课已经开始，则目标切换到下一周；若尚未上课，即使只剩几十秒也仍以本次课为准。
+  if(lessonDate <= now) lessonDate.setDate(lessonDate.getDate()+7);
+  const ext = Math.max(0, Number(hw.extensions && hw.extensions[student]) || 0);
+  if(ext) lessonDate.setDate(lessonDate.getDate()+ext);
+  const deadline = new Date(lessonDate.getTime()-60000); // 上课前一分钟截止
+  return {deadline, lessonDate, extensionDays:ext};
+}
+function formatCountdown(ms){
+  const total = Math.max(0, Math.floor(ms/1000));
+  const days = Math.floor(total/86400);
+  const hours = Math.floor(total%86400/3600);
+  const minutes = Math.floor(total%3600/60);
+  const seconds = total%60;
+  return `<strong>${String(days).padStart(2,'0')}</strong><span>天</span><strong>${String(hours).padStart(2,'0')}</strong><span>时</span><strong>${String(minutes).padStart(2,'0')}</strong><span>分</span><strong>${String(seconds).padStart(2,'0')}</strong><span>秒</span>`;
+}
+function getPendingHomework(cls, stu){
+  const now = new Date();
+  const rows = [];
+  for(const h of D.homework){
+    if(h.className !== cls || ![].concat(h.target || []).some(t => t === '全班' || t === stu)) continue;
+    const items = Array.isArray(h.items) ? h.items : [];
+    const pending = items.filter(t => store.get(subKey(stu,h,t)) !== '1');
+    if(!pending.length) continue;
+    const oldVisibility = dueInfo(h,stu);
+    if(oldVisibility.visibleDays < 0) continue;
+    const due = getHomeworkDeadline(h,stu);
+    if(!due) continue;
+    rows.push({h,pending,due});
+  }
+  return rows;
+}
+function updateReminderCountdown(){
+  if(!reminderDeadline) return;
+  const now = new Date();
+  const diff = reminderDeadline.getTime() - now.getTime();
+  const clock = $('reminderClock');
+  if(diff > 0){
+    clock.classList.remove('expired');
+    clock.innerHTML = formatCountdown(diff);
+    $('reminderCountdownLabel').textContent = '距离最近一项未完成作业截止还有';
+  }else{
+    clock.classList.add('expired');
+    const elapsed = Math.abs(diff);
+    clock.innerHTML = formatCountdown(elapsed);
+    $('reminderCountdownLabel').textContent = '最近一项未完成作业已截止，超时';
+  }
+}
+function renderReminder(){
+  const cls = $('cls').value, stu = $('stu').value;
+  if(!cls || !stu) return false;
+  const rows = getPendingHomework(cls,stu);
+  const list = $('reminderList');
+  if(!rows.length){
+    list.innerHTML = '<div class="reminder-empty">太棒了！目前没有需要提醒的未完成作业。</div>';
+    reminderDeadline = null;
+    $('reminderClock').innerHTML = '';
+    $('reminderCountdownLabel').textContent = '作业已全部完成';
+    $('reminderDeadline').textContent = '';
+    if(reminderTimer){clearInterval(reminderTimer);reminderTimer=null;}
+    return false;
+  }
+  // 顶部统一显示最早到期的未完成作业倒计时，下面汇总所有未完成项目。
+  rows.sort((a,b)=>a.due.deadline-b.due.deadline);
+  reminderDeadline = rows[0].due.deadline;
+  list.innerHTML = rows.flatMap(({h,pending,due})=>pending.map(item=>{
+    const title = h.title ? `${h.title}：` : '';
+    return `<div class="reminder-item"><div class="reminder-item-class">${esc(h.className)} · ${[].concat(h.target||[]).includes('全班')?'全班作业':'个人作业'}</div><div class="reminder-item-title">${esc(title + item)}</div></div>`;
+  })).join('');
+  const first = rows[0].due;
+  $('reminderDeadline').textContent = `截止时间：${first.deadline.toLocaleString('zh-CN',{hour12:false})}`;
+  updateReminderCountdown();
+  return true;
+}
+function showHomeworkReminder(){
+  if(!renderReminder()){
+    $('reminderMask').hidden = true;
+    return;
+  }
+  $('reminderMask').hidden = false;
+  if(reminderTimer) clearInterval(reminderTimer);
+  reminderTimer = setInterval(()=>{
+    // 每秒刷新倒计时；若用户刚刚在作业列表中完成了项目，也同步刷新提醒清单。
+    if(!renderReminder()){$('reminderMask').hidden=true;return;}
+    updateReminderCountdown();
+  },1000);
+}
+function closeHomeworkReminder(){
+  $('reminderMask').hidden = true;
+  if(reminderTimer){clearInterval(reminderTimer);reminderTimer=null;}
+}
 
 function render(){
   const cls = $('cls').value, stu = $('stu').value, box = $('list'), tip = $('tip');
@@ -263,111 +290,6 @@ function render(){
   }).join('');
 }
 
-/* 计算作业截止时间：截止日期当天 23:59:59 */
-function getHomeworkDeadline(hw, student){
-  const due = dueInfo(hw, student);
-  if (!due.effectiveDue) return null;
-  const parts = due.effectiveDue.split('-').map(Number);
-  if (parts.length !== 3 || parts.some(n => !Number.isFinite(n))) return null;
-  const deadline = new Date(parts[0], parts[1]-1, parts[2], 23, 59, 59);
-  return Number.isNaN(deadline.getTime()) ? null : deadline;
-}
-
-/* 格式化剩余时间 */
-function formatCountdown(ms){
-  const total = Math.max(0, Math.floor(ms / 1000));
-  const days = Math.floor(total / 86400);
-  const hours = Math.floor((total % 86400) / 3600);
-  const minutes = Math.floor((total % 3600) / 60);
-  const seconds = total % 60;
-  return `${days}天 ${String(hours).padStart(2,'0')}时 ${String(minutes).padStart(2,'0')}分 ${String(seconds).padStart(2,'0')}秒`;
-}
-
-/* 更新弹窗内所有作业的倒计时 */
-function updateReminderCountdowns(){
-  const now = Date.now();
-  document.querySelectorAll('#reminderContent [data-deadline]').forEach(el => {
-    const deadline = Number(el.dataset.deadline);
-    if (!Number.isFinite(deadline)) return;
-    const diff = deadline - now;
-    const item = el.closest('.reminder-item');
-    if (diff >= 0) {
-      el.textContent = '剩余 ' + formatCountdown(diff);
-      if (item) item.classList.remove('overdue');
-    } else {
-      el.textContent = '已超期 ' + formatCountdown(Math.abs(diff));
-      if (item) item.classList.add('overdue');
-    }
-  });
-}
-
-/* 生成并显示当前学生的未完成作业提醒 */
-function showHomeworkReminder(){
-  const cls = $('cls').value;
-  const stu = $('stu').value;
-  if (!cls || !stu) return;
-
-  const pendingRows = D.homework
-    .filter(h => h.className === cls && [].concat(h.target).some(t => t === '全班' || t === stu))
-    .map(h => {
-      const items = Array.isArray(h.items) ? h.items : [];
-      const pending = items.filter(t => store.get(subKey(stu, h, t)) !== '1');
-      const due = dueInfo(h, stu);
-      const deadline = getHomeworkDeadline(h, stu);
-      return {h, pending, due, deadline};
-    })
-    .filter(r => r.pending.length > 0 && r.due.visibleDays >= 0 && r.deadline)
-    .sort((a,b) => a.deadline - b.deadline);
-
-  $('reminderStudent').textContent = `📍 ${cls}　👤 ${stu}`;
-  const content = $('reminderContent');
-
-  if (!pendingRows.length) {
-    content.innerHTML = '<div class="reminder-empty">🎉 太棒了！目前没有未完成且仍在提醒期限内的作业。</div>';
-  } else {
-    content.innerHTML = `
-      <div class="reminder-summary">
-        你还有 <strong>${pendingRows.length}</strong> 项未完成作业，以下按截止时间从近到远排列：
-      </div>
-      ${pendingRows.map(({h,pending,due,deadline},i) => {
-        const title = h.title || `作业 ${i+1}`;
-        const deadlineText = due.effectiveDue;
-        const isOverdue = Date.now() > deadline.getTime();
-        return `
-          <div class="reminder-item ${isOverdue ? 'overdue' : ''}">
-            <h3>${i+1}. ${esc(title)}</h3>
-            <div class="reminder-meta">
-              ${esc(h.className)} · ${[].concat(h.target).includes('全班') ? '全班作业' : '专属作业'}
-            </div>
-            <div class="reminder-time" data-deadline="${deadline.getTime()}">
-              ${isOverdue ? '已超期 ' + formatCountdown(Date.now()-deadline.getTime()) : '剩余 ' + formatCountdown(deadline.getTime()-Date.now())}
-            </div>
-            <div class="reminder-meta">截止日期：${esc(deadlineText)} 23:59:59</div>
-            <div class="reminder-pending">
-              <strong>尚未完成（${pending.length} 项）：</strong>
-              <ul>${pending.map(t => `<li>${esc(t)}</li>`).join('')}</ul>
-            </div>
-          </div>`;
-      }).join('')}
-    `;
-  }
-
-  $('reminderMask').classList.add('show');
-
-  if (reminderTimer) clearInterval(reminderTimer);
-  updateReminderCountdowns();
-  reminderTimer = setInterval(updateReminderCountdowns, 1000);
-}
-
-/* 关闭弹窗：不保存关闭状态，下次打开网页仍会提醒 */
-function closeHomeworkReminder(){
-  $('reminderMask').classList.remove('show');
-  if (reminderTimer) {
-    clearInterval(reminderTimer);
-    reminderTimer = null;
-  }
-}
-
 function copyText(text, btn){
   const ok = () => { btn.textContent = '✨ 已复制'; setTimeout(() => btn.textContent = '📋 一键复制作业', 2000); };
   const fallback = () => {
@@ -397,73 +319,37 @@ function init(){
   $('cls').insertAdjacentHTML('beforeend', activeClasses.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join(''));
   const c = store.get('sel_cls'), s = store.get('sel_stu');
   if (c && !isArchivedClass(c) && D.roster[c] && (D.roster[c]).includes(s)) {
-    $('cls').value = c;
-    fillStudents(s);
-    $('reset').hidden = false;
-    // 自动恢复上次学生身份后，每次打开网页都弹出作业提醒
-    showHomeworkReminder();
-  } else if (c && isArchivedClass(c)) {
-    store.del('sel_cls');
-    store.del('sel_stu');
-  }
+    $('cls').value = c; fillStudents(s); $('reset').hidden = false;
+  } else if (c && isArchivedClass(c)) { store.del('sel_cls'); store.del('sel_stu'); }
   if (!activeClasses.length) $('tip').textContent='目前没有正常上课的班级；已结课班级的历史记录仍由老师保留。';
   if (D.updated) $('upd').textContent = '作业最后更新：' + new Date(D.updated).toLocaleString('zh-CN', {hour12:false});
   render();
+  if($('cls').value && $('stu').value) showHomeworkReminder();
 }
 
-$('cls').addEventListener('change', () => {
-  fillStudents();
-  render();
-});
-$('stu').addEventListener('change', () => {
-  saveSel();
-  render();
-  if ($('stu').value) showHomeworkReminder();
-});
+$('cls').addEventListener('change', () => { fillStudents(); render(); });
+$('stu').addEventListener('change', () => { saveSel(); render(); showHomeworkReminder(); });
 $('reset').addEventListener('click', () => {
+  store.del('sel_cls'); store.del('sel_stu');
   closeHomeworkReminder();
-  store.del('sel_cls');
-  store.del('sel_stu');
-  $('cls').value = '';
-  fillStudents();
-  $('reset').hidden = true;
-  render();
+  $('cls').value = ''; fillStudents(); $('reset').hidden = true; render();
 });
 $('list').addEventListener('change', e => {
   const k = e.target.dataset.k;
-  if (k) {
-    store.set(k, e.target.checked ? '1' : '0');
-    render();
-  }
+  if (k) { store.set(k, e.target.checked ? '1' : '0'); render(); if(!$('reminderMask').hidden) showHomeworkReminder(); }
 });
 $('list').addEventListener('click', e => {
   const b = e.target.closest('[data-copy]');
   if (b) copyText(b.dataset.copy, b);
 });
-
-/* 弹窗关闭按钮 */
 $('reminderClose').addEventListener('click', closeHomeworkReminder);
-$('reminderOk').addEventListener('click', closeHomeworkReminder);
-
-/* 按 ESC 关闭弹窗 */
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape' && $('reminderMask').classList.contains('show')) {
-    closeHomeworkReminder();
-  }
-});
+$('reminderMask').addEventListener('click', e => { if(e.target === $('reminderMask')) closeHomeworkReminder(); });
+document.addEventListener('keydown', e => { if(e.key === 'Escape' && !$('reminderMask').hidden) closeHomeworkReminder(); });
 
 fetch('homework.json?t=' + Date.now())
   .then(r => { if (!r.ok) throw 0; return r.json(); })
-  .then(j => {
-    D = j && typeof j==='object' ? j : {roster:{},homework:[]};
-    D.roster=D.roster&&typeof D.roster==='object'?D.roster:{};
-    D.homework=Array.isArray(D.homework)?D.homework:[];
-    D.archivedClasses=D.archivedClasses||{};
-    init();
-  })
-  .catch(() => {
-    $('tip').textContent = '作业加载失败，请检查网络后刷新页面';
-  });
+  .then(j => { D = j && typeof j==='object' ? j : {roster:{},homework:[]}; D.roster=D.roster&&typeof D.roster==='object'?D.roster:{}; D.homework=Array.isArray(D.homework)?D.homework:[]; D.archivedClasses=D.archivedClasses||{}; init(); })
+  .catch(() => { $('tip').textContent = '作业加载失败，请检查网络后刷新页面'; });
 </script>
 </body>
 </html>
