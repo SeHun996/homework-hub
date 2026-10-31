@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -28,35 +29,6 @@ button:focus-visible,select:focus-visible,input:focus-visible,a:focus-visible{ou
 .foot{display:flex;justify-content:space-between;align-items:center;gap:8px;border-top:1px solid #e8edf6;padding-top:10px;margin-top:8px;font-size:12px;color:#8a97b3}
 .tip{text-align:center;color:#8a97b3;padding:20px}.small{font-size:12px;padding:6px}
 a{color:#2c4a8a}
-
-/* 手机端浏览学生作业、逐项打卡和复制作业的适配 */
-*{-webkit-tap-highlight-color:transparent}
-html{scroll-behavior:smooth}
-body{overflow-x:hidden;-webkit-text-size-adjust:100%}
-button,select,input{touch-action:manipulation}
-button,select{min-height:44px;font-size:16px}
-@media(max-width:600px){
-  header{padding:17px 10px}
-  h1{font-size:clamp(18px,5vw,22px);line-height:1.4;overflow-wrap:anywhere}
-  header p{font-size:13px;line-height:1.5}
-  main{margin:12px auto;padding:0 9px 28px}
-  .box,.card{padding:13px;margin-bottom:11px;border-radius:11px}
-  .box{display:flex;flex-direction:column;align-items:stretch;gap:10px}
-  .box label{display:block;width:100%;margin:0}
-  select{width:100%;min-height:46px;padding:8px 10px;font-size:16px}
-  #reset{width:100%;min-height:44px}
-  .card h2{font-size:17px;line-height:1.45;overflow-wrap:anywhere}
-  .top{flex-direction:column;align-items:stretch;gap:5px}
-  .tag{line-height:1.6;white-space:normal;overflow-wrap:anywhere}
-  .subs{padding:7px 10px}
-  .subs label{min-height:44px;align-items:center;padding:8px 2px;gap:10px;font-size:15px;overflow-wrap:anywhere}
-  .subs input[type=checkbox]{width:22px;height:22px;flex:0 0 22px}
-  .foot{flex-direction:column;align-items:stretch;gap:8px;padding-top:12px}
-  .foot button{width:100%;min-height:46px}
-  .foot span{text-align:center}
-  .tip{padding:20px 8px}
-}
-
 </style>
 </head>
 <body>
@@ -168,7 +140,7 @@ function copyText(text, btn){
 function fillStudents(selected){
   const cls = $('cls').value, s = $('stu');
   s.innerHTML = '<option value="">-- 请选择姓名 --</option>' +
-    (D.roster[cls] || []).map(n => `<option>${esc(n)}</option>`).join('');
+    (D.roster[cls] || []).map(n => `<option value="${esc(n)}">${esc(n)}</option>`).join('');
   s.disabled = !cls;
   if (!cls) s.innerHTML = '<option value="">-- 请先选择班级 --</option>';
   if (selected && (D.roster[cls] || []).includes(selected)) s.value = selected;
@@ -181,7 +153,7 @@ function saveSel(){
 
 function init(){
   const activeClasses=Object.keys(D.roster||{}).filter(c=>!isArchivedClass(c)).sort((a,b)=>a.localeCompare(b,'zh-CN'));
-  $('cls').insertAdjacentHTML('beforeend', activeClasses.map(c => `<option>${esc(c)}</option>`).join(''));
+  $('cls').insertAdjacentHTML('beforeend', activeClasses.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join(''));
   const c = store.get('sel_cls'), s = store.get('sel_stu');
   if (c && !isArchivedClass(c) && D.roster[c] && (D.roster[c]).includes(s)) {
     $('cls').value = c; fillStudents(s); $('reset').hidden = false;
