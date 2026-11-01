@@ -300,28 +300,28 @@ async function syncArchiveFromHomework(homework){
   target.sourceIds=Array.from(new Set([...(target.sourceIds||[]),...(source.sourceIds||[])].filter(Boolean)));
   for(const f of ['checkedDate','note','legacyStatus','dueDate','assignedDate'])if(!target[f]&&source[f])target[f]=source[f];
  }
+ function lessonDateOf(l){return String(l&& (l.lessonDate||l.assignedDate)||'').trim()}
+ function lessonClassOf(l){return String(l&&l.className||'').trim()}
  function cleanupStableDuplicates(p){
-  // 同一学生的同一份教师作业以 homework ID（sourceIds）作为最高优先级的稳定身份。
-  // 班级改名、转班或日期字段调整，都不能让同一份作业再次生成一条课次。
-  const byAutoKey=new Map(),bySourceId=new Map(),out=[];
+  // 课次身份必须同时包含学生、班级和上课日期。同一 homework ID 可能因转班/历史错误
+  // 出现在不同班级的档案中，绝不能仅凭 sourceId 把不同课程合并。
+  const bySessionKey=new Map(),bySourceSession=new Map(),out=[];
   for(const l of (p.lessons||[])){
    l.sourceIds=Array.isArray(l.sourceIds)?l.sourceIds.filter(Boolean):[];
-   const autoKey=l.autoLessonKey?String(l.autoLessonKey):'';
-   let target=null;
-   // sourceIds 优先级高于班级/日期组合键，防止两种标识发生冲突时拆出重复课次。
-   for(const sid of l.sourceIds){if(bySourceId.has(String(sid))){target=bySourceId.get(String(sid));break}}
-   if(!target&&autoKey)target=byAutoKey.get(autoKey);
-   if(target){
-    mergeLesson(target,l);changed++;
-    if(target.autoLessonKey)byAutoKey.set(String(target.autoLessonKey),target);
-    for(const sid of (target.sourceIds||[]))bySourceId.set(String(sid),target);
-    // 若重复记录带有新的稳定课次标识，也一并登记，避免后续再次拆分。
-    if(autoKey)byAutoKey.set(autoKey,target);
-    continue;
+   const date=lessonDateOf(l),cls=lessonClassOf(l);
+   const key=l.autoLessonKey?String(l.autoLessonKey):'';
+   const keyDate=key?key.split('|').slice(-1)[0]:'';
+   // autoLessonKey 曾被旧逻辑错误改写过；只有它与实际班级、日期吻合时才可用于去重。
+   const validAutoKey=!!(key&&date&&keyDate===date&&cls&&key.startsWith(cls+'|'));
+   const sessionKey=validAutoKey?key:(date&&cls?`${cls}|${date}`:'');
+   let target=sessionKey?bySessionKey.get(sessionKey):null;
+   if(!target&&date&&cls){
+    for(const sid of l.sourceIds){const candidate=bySourceSession.get(`${sid}|${cls}|${date}`);if(candidate){target=candidate;break}}
    }
+   if(target){mergeLesson(target,l);changed++;continue}
    out.push(l);
-   if(autoKey)byAutoKey.set(autoKey,l);
-   for(const sid of l.sourceIds)bySourceId.set(String(sid),l);
+   if(sessionKey)bySessionKey.set(sessionKey,l);
+   if(date&&cls)for(const sid of l.sourceIds)bySourceSession.set(`${sid}|${cls}|${date}`,l);
   }
   if(out.length!==(p.lessons||[]).length)p.lessons=out;
  }
@@ -353,29 +353,73 @@ async function syncArchiveFromHomework(homework){
   if(!p.classNames.includes(cls))p.classNames.push(cls);if(isNew)changed++;
  }
  for(const h of (Array.isArray(homework)?homework:[])){
-  const names=[].concat(h.target||[]).includes('全班')?(D.roster[h.className]||[]):[].concat(h.target||[]);
+  const targetNames=[].concat(h.target||[]).includes('全班')?(D.roster[h.className]||[]):[].concat(h.target||[]);
+  // 即使学生后来转班/移出名单，也要按这份作业的 ID 更新其已有档案，清理旧班级副本。
+  const archivedNames=h.id?Object.entries(db.students).filter(([student,profile])=>(profile.lessons||[]).some(l=>Array.isArray(l.sourceIds)&&l.sourceIds.some(id=>String(id)===String(h.id)))).map(([student])=>student):[];
+  const names=Array.from(new Set([...targetNames,...archivedNames]));
   for(const name of names){
    if(!name||name==='全班')continue;
    const p=ensureProfile(db,name);p.classNames=Array.isArray(p.classNames)?p.classNames:[];
    const current=currentMembership.get(name)||'';
    if(current){p.currentClass=current;p.className=current;p.rosterManaged=true;if(!p.classNames.includes(current))p.classNames.push(current)}
-   // 日期优先使用作业自身的固定日期；缺失时用作业 ID 生成稳定占位值，绝不使用每次发布都会变化的“今天”。
+   // 日期和班级共同决定一次真实上课课次；同一份作业反复发布不改变这两个身份字段。
    const date=String(h.lessonDate||h.date||h.createdAt||h.created|| (h.id?`未标注日期:${h.id}`:'未标注日期')).trim();
    const cls=String(h.className||'未指定班级').trim();
    const key=`${cls}|${name}|${date}`;
-   let lesson=p.lessons.find(l=>l.autoLessonKey===key);
-   // 作业 ID 是跨班级改名/转班仍保持不变的身份；命中后绝不能因 className 不同而新建课次。
-   if(!lesson&&h.id)lesson=p.lessons.find(l=>Array.isArray(l.sourceIds)&&l.sourceIds.some(id=>String(id)===String(h.id)));
-   if(!lesson)lesson=p.lessons.find(l=>(String(l.lessonDate||l.assignedDate||'')===date)&&String(l.className||'未指定班级').trim()===cls);
-   if(!lesson)lesson=p.lessons.find(l=>!l.autoLessonKey&&l.importedLegacy&&String(l.lessonDate||'')===date&&String(l.className||'未指定班级').trim()===cls);
-   if(lesson&&lesson.autoLessonKey!==key){lesson.autoLessonKey=key;changed++}
+   const dateOf=l=>String(l&& (l.lessonDate||l.assignedDate)||'').trim();
+   const classOf=l=>String(l&&l.className||'').trim();
+   // 第一优先级：班级和真实日期都吻合的课次。不能只看 autoLessonKey，旧版本可能写错过 key。
+   let lesson=p.lessons.find(l=>l.autoLessonKey===key&&dateOf(l)===date&&classOf(l)===cls);
+   if(!lesson)lesson=p.lessons.find(l=>dateOf(l)===date&&classOf(l)===cls);
+   // 第二优先级：按 homework ID 找历史来源，但必须先判断它是否仍属于当前班级/日期。
+   // 同一个 ID 曾可能错误地出现在多个班级课次中，优先选择最吻合当前课程的一条。
+   const sourceCandidates=h.id?p.lessons.filter(l=>Array.isArray(l.sourceIds)&&l.sourceIds.some(id=>String(id)===String(h.id))):[];
+   let sourceLesson=null;
+   const movedItems=[];
+   if(!lesson&&sourceCandidates.length){
+    const scored=sourceCandidates.map(l=>({l,score:(classOf(l)===cls?2:0)+(dateOf(l)===date?1:0)})).sort((a,b)=>b.score-a.score);
+    if(scored.length===1||scored[0].score>scored[1].score)sourceLesson=scored[0].l;
+    if(sourceLesson&&classOf(sourceLesson)===cls&&dateOf(sourceLesson)===date)lesson=sourceLesson;
+   }
+   // 若作业日期或班级已被编辑，必须把该作业从旧课次迁出，而不是沿用旧课次编号。
+   if(sourceLesson&&!lesson){
+    const prefix=String(h.id)+'_';
+    sourceLesson.sourceIds=(sourceLesson.sourceIds||[]).filter(id=>String(id)!==String(h.id));
+    const keepItems=[];
+    for(const it of (sourceLesson.items||[])){if(String(it.sourceItemId||'').startsWith(prefix))movedItems.push(it);else keepItems.push(it)}
+    sourceLesson.items=keepItems;
+    changed++;
+    if(!sourceLesson.sourceIds.length&&!sourceLesson.items.length&&!sourceLesson.note&&!sourceLesson.checkedDate&&!sourceLesson.legacyStatus){
+     p.lessons=p.lessons.filter(l=>l!==sourceLesson);
+    }
+   }
+   // 清理同一作业 ID 在旧版本中留下的其他跨班级/跨日期副本；只移除该作业自己的项目。
+   if(h.id){
+    for(const duplicate of sourceCandidates){
+     if(duplicate===lesson||duplicate===sourceLesson)continue;
+     const beforeIds=(duplicate.sourceIds||[]).length,beforeItems=(duplicate.items||[]).length;
+     duplicate.sourceIds=(duplicate.sourceIds||[]).filter(id=>String(id)!==String(h.id));
+     const prefix=String(h.id)+'_';
+     const keepItems=[];
+     for(const it of (duplicate.items||[])){if(String(it.sourceItemId||'').startsWith(prefix))movedItems.push(it);else keepItems.push(it)}
+     duplicate.items=keepItems;
+     if(duplicate.sourceIds.length!==beforeIds||duplicate.items.length!==beforeItems)changed++;
+     // 仅当旧副本已没有任何作业项目、来源或人工记录时才删除空壳课次。
+     if(!duplicate.sourceIds.length&&!duplicate.items.length&&!duplicate.note&&!duplicate.checkedDate&&!duplicate.legacyStatus){
+      p.lessons=p.lessons.filter(l=>l!==duplicate);changed++;
+     }
+    }
+   }
    if(!lesson){
     const start=maxLesson(p)+1;
     lesson={id:'lesson_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,6),autoLessonKey:key,lessonLabel:`第${start}次`,lessonCount:1,startNumber:start,endNumber:start,className:cls==='未指定班级'?'':cls,lessonDate:date.startsWith('未标注日期:')?'':date,assignedDate:h.date||'',dueDate:h.dueDate||((h.date)?plusDays(h.date,7):''),dueDateText:'',checkedDate:'',items:[],note:'',legacyStatus:'',sourceIds:[]};
     p.lessons.push(lesson);p.nextLessonNumber=start;changed++;
    }
+   if(lesson.autoLessonKey!==key){lesson.autoLessonKey=key;changed++}
+   if(date&&!date.startsWith('未标注日期:')&&lesson.lessonDate!==date){lesson.lessonDate=date;changed++}
+   if(cls&&lesson.className!==cls){lesson.className=cls;changed++}
    lesson.sourceIds=Array.isArray(lesson.sourceIds)?lesson.sourceIds:[];
-   if(h.id&&!lesson.sourceIds.includes(h.id)){lesson.sourceIds.push(h.id);changed++}
+   if(h.id&&!lesson.sourceIds.some(id=>String(id)===String(h.id))){lesson.sourceIds.push(h.id);changed++}
    if(h.date&&lesson.assignedDate!==h.date){lesson.assignedDate=h.date;changed++}
    if(h.dueDate&&lesson.dueDate!==h.dueDate){lesson.dueDate=h.dueDate;changed++}
    // 按作业记录 ID 更新其名下的项目：编辑时删除已移除的旧项目，尽量按文本迁移状态，避免旧内容残留。
@@ -384,18 +428,24 @@ async function syncArchiveFromHomework(homework){
    const usedOwned=new Set();
    for(let i=0;i<(h.items||[]).length;i++){
     const itemText=h.items[i],sourceItemId=makeTaskId(h,i);
-    let existingItem=oldOwned.find(it=>it.sourceItemId===sourceItemId&&!usedOwned.has(it));
-    if(!existingItem){
-     const normText=String(itemText||'').trim().replace(/\s+/g,' ').toLowerCase();
-     existingItem=oldOwned.find(it=>!usedOwned.has(it)&&String(it.text||'').trim().replace(/\s+/g,' ').toLowerCase()===normText);
+    const normText=String(itemText||'').trim().replace(/\s+/g,' ').toLowerCase();
+    const itemCandidates=[...oldOwned,...movedItems].filter(it=>!usedOwned.has(it));
+    const matches=itemCandidates.filter(it=>it.sourceItemId===sourceItemId||String(it.text||'').trim().replace(/\s+/g,' ').toLowerCase()===normText);
+    matches.sort((a,b)=>((b.status?2:0)+(b.note?1:0))-((a.status?2:0)+(a.note?1:0)));
+    let existingItem=matches[0]||null;
+    if(existingItem){
+     for(const other of matches.slice(1)){if(!existingItem.status&&other.status)existingItem.status=other.status;if(!existingItem.note&&other.note)existingItem.note=other.note}
+     if(!lesson.items.includes(existingItem))lesson.items.push(existingItem);
+     usedOwned.add(existingItem);
+     if(existingItem.sourceItemId!==sourceItemId){existingItem.sourceItemId=sourceItemId;changed++}
+     if(existingItem.text!==itemText){existingItem.text=itemText;changed++}
     }
-    if(existingItem){usedOwned.add(existingItem);if(existingItem.sourceItemId!==sourceItemId){existingItem.sourceItemId=sourceItemId;changed++}if(existingItem.text!==itemText){existingItem.text=itemText;changed++}}
     else{lesson.items.push({id:'task_'+Date.now().toString(36)+'_'+i,text:itemText,status:'',note:'',sourceItemId});changed++}
    }
    if(oldOwned.length){const before=lesson.items.length;lesson.items=lesson.items.filter(it=>!oldOwned.includes(it)||usedOwned.has(it));if(lesson.items.length!==before)changed+=before-lesson.items.length}
   }
  }
- // 本轮同步后再按 autoLessonKey 合并一次，防止历史数据中已存在的同课次重复项继续保留。
+ // 本轮同步后再按真实班级+上课日期合并；不同班级/日期绝不因同一 sourceId 被合并。
  for(const p of Object.values(db.students))cleanupStableDuplicates(p);
  if(changed===0)return {ok:true,changed:0,message:'学员档案无需新增内容（发布记录可能已同步过）。'};
  db.updatedAt=new Date().toISOString();
