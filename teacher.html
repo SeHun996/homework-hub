@@ -286,22 +286,104 @@ async function syncArchiveFromHomework(homework){
  const owner=($('archiveOwner').value.trim()||localStorage.getItem('archive_owner')||'sehun996'),repo=($('archiveRepo').value.trim()||localStorage.getItem('archive_repo')||''),path=($('archivePath').value.trim()||localStorage.getItem('archive_path')||'student_archives.json');
  if(!token()||!repo)return {ok:false,skip:true,message:'未配置私有档案仓库，未同步学员档案。'};
  let got;try{got=await ghReadJson(owner,repo,path)}catch(e){return {ok:false,message:'学员档案读取失败：'+explain(e)}}
- const db=got.data&&typeof got.data==='object'?got.data:{schemaVersion:1,updatedAt:'',students:{}};db.students=db.students||{};let changed=0;
- // 改名时把旧姓名主键下的档案迁移到新姓名，保留课次、作业状态、备注和历史班级。
+ const db=got.data&&typeof got.data==='object'?got.data:{schemaVersion:1,updatedAt:'',students:{}};
+ db.students=db.students||{};let changed=0;
+ // 只合并具有相同稳定课次标识的记录；不按“同一天”粗暴删除课次。
+ function mergeLesson(target,source){
+  target.items=Array.isArray(target.items)?target.items:[];
+  for(const it of (source.items||[])){
+   // 只有稳定的 sourceItemId 相同才认定为同一作业项目；没有 ID 的旧项目全部保留，避免误删同名任务。
+   const found=it.sourceItemId?target.items.find(x=>x.sourceItemId===it.sourceItemId):null;
+   if(!found)target.items.push(it);
+   else{if(!found.status&&it.status)found.status=it.status;if(!found.note&&it.note)found.note=it.note}
+  }
+  target.sourceIds=Array.from(new Set([...(target.sourceIds||[]),...(source.sourceIds||[])].filter(Boolean)));
+  for(const f of ['checkedDate','note','legacyStatus','dueDate','assignedDate'])if(!target[f]&&source[f])target[f]=source[f];
+ }
+ function cleanupStableDuplicates(p){
+  const seen=new Map(),out=[];
+  for(const l of (p.lessons||[])){
+   const key=l.autoLessonKey?`auto:${l.autoLessonKey}`:'';
+   if(key&&seen.has(key)){mergeLesson(seen.get(key),l);changed++;continue}
+   if(key)seen.set(key,l);out.push(l);
+  }
+  if(out.length!==(p.lessons||[]).length)p.lessons=out;
+ }
+ // 改名时迁移旧档案；以稳定课次标识防止重复搬运。
  for(const [oldName,newName] of Object.entries(D.studentRenames||{})){
   if(!oldName||!newName||oldName===newName||!db.students[oldName])continue;
   const oldP=db.students[oldName],newP=db.students[newName];
   if(!newP){db.students[newName]=oldP;db.students[newName].name=newName;delete db.students[oldName];changed++}
-  else{const seen=new Set((newP.lessons||[]).map(l=>l.id||l.autoLessonKey||JSON.stringify([l.lessonDate,l.lessonLabel])));for(const l of (oldP.lessons||[])){const k=l.id||l.autoLessonKey||JSON.stringify([l.lessonDate,l.lessonLabel]);if(!seen.has(k)){newP.lessons.push(l);seen.add(k)}}newP.classNames=[...new Set([...(newP.classNames||[]),...(oldP.classNames||[])])];newP.nextLessonNumber=Math.max(Number(newP.nextLessonNumber)||0,Number(oldP.nextLessonNumber)||0);newP.hidden=!!(newP.hidden&&oldP.hidden);delete db.students[oldName];changed++}
+  else{
+   const seen=new Set((newP.lessons||[]).map(l=>l.autoLessonKey||l.id).filter(Boolean));
+   for(const l of (oldP.lessons||[])){const k=l.autoLessonKey||l.id;if(!k||!seen.has(k)){newP.lessons.push(l);if(k)seen.add(k)}}
+   newP.classNames=[...new Set([...(newP.classNames||[]),...(oldP.classNames||[])])];
+   newP.nextLessonNumber=Math.max(Number(newP.nextLessonNumber)||0,Number(oldP.nextLessonNumber)||0);
+   newP.hidden=!!(newP.hidden&&oldP.hidden);delete db.students[oldName];changed++;
+  }
  }
- // 班级名单以教师端 roster 为准。转班只更新 currentClass/className，不更改每一条历史课次的 className。
  const currentMembership=new Map();
- for(const [cls,arr] of Object.entries(D.roster||{})){if(isArchivedClass(cls))continue;for(const name of (Array.isArray(arr)?arr:[])){if(!name)continue;if(!currentMembership.has(name))currentMembership.set(name,cls)}}
- for(const [name,p0] of Object.entries(db.students)){const p=p0||{};p.name=p.name||name;p.classNames=Array.isArray(p.classNames)?p.classNames:[];p.lessons=Array.isArray(p.lessons)?p.lessons:[];const current=currentMembership.get(name)||'';if(p.currentClass!==current||p.className!==current||p.rosterManaged!==true){p.currentClass=current;p.className=current;p.rosterManaged=true;changed++}if(current&&!p.classNames.includes(current))p.classNames.push(current);db.students[name]=p}
- for(const [name,cls] of currentMembership){let isNew=!db.students[name];const p=ensureProfile(db,name);p.currentClass=cls;p.className=cls;p.rosterManaged=true;p.classNames=Array.isArray(p.classNames)?p.classNames:[];if(!p.classNames.includes(cls))p.classNames.push(cls);if(isNew)changed++}
- for(const h of homework){const names=[].concat(h.target||[]).includes('全班')?(D.roster[h.className]||[]):[].concat(h.target||[]);for(const name of names){if(!name||name==='全班')continue;const p=ensureProfile(db,name);p.classNames=Array.isArray(p.classNames)?p.classNames:[];const current=currentMembership.get(name)||'';if(current){p.currentClass=current;p.className=current;p.rosterManaged=true;if(!p.classNames.includes(current))p.classNames.push(current)}const date=h.lessonDate||h.date||ymd(new Date()),key=`${h.className}|${name}|${date}`;let lesson=p.lessons.find(l=>l.autoLessonKey===key);if(!lesson&&h.id)lesson=p.lessons.find(l=>Array.isArray(l.sourceIds)&&l.sourceIds.includes(h.id)&&(!l.className||l.className===h.className));if(!lesson)lesson=p.lessons.find(l=>(l.lessonDate===date||l.assignedDate===date)&&(!l.className||l.className===h.className));if(!lesson){lesson=p.lessons.find(l=>!l.autoLessonKey&&l.importedLegacy&&l.lessonDate===date&&(!l.className||l.className===h.className));}if(lesson&&lesson.autoLessonKey!==key){lesson.autoLessonKey=key;changed++}if(!lesson){const start=maxLesson(p)+1;lesson={id:'lesson_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,6),autoLessonKey:key,lessonLabel:`第${start}次`,lessonCount:1,startNumber:start,endNumber:start,className:h.className,lessonDate:date,assignedDate:h.date,dueDate:h.dueDate||plusDays(h.date,7),dueDateText:'',checkedDate:'',items:[],note:'',legacyStatus:'',sourceIds:[]};p.lessons.push(lesson);p.nextLessonNumber=start;changed++}
- lesson.sourceIds=Array.isArray(lesson.sourceIds)?lesson.sourceIds:[];if(!lesson.sourceIds.includes(h.id))lesson.sourceIds.push(h.id);if(lesson.assignedDate!==h.date||lesson.dueDate!==(h.dueDate||plusDays(h.date,7))){lesson.assignedDate=h.date||lesson.assignedDate;lesson.dueDate=h.dueDate||lesson.dueDate;changed++}for(let i=0;i<(h.items||[]).length;i++){const text=h.items[i];const sourceItemId=makeTaskId(h,i);const existingItem=lesson.items.find(it=>it.sourceItemId===sourceItemId);if(!existingItem){lesson.items.push({id:'task_'+Date.now().toString(36)+'_'+i,text,status:'',note:'',sourceItemId});changed++}else if(existingItem.text!==text){existingItem.text=text;changed++}}}}
- if(changed===0)return {ok:true,changed:0,message:'学员档案无需新增内容（发布记录可能已同步过）。'};db.updatedAt=new Date().toISOString();try{await ghWriteJson(owner,repo,path,db,got.sha,'同步教师名单及作业到学员档案');return {ok:true,changed,message:`已同步教师名单与学员档案（新增或更新 ${changed} 项）。历史课次保留。`}}catch(e){return {ok:false,message:'学员档案写入失败：'+explain(e)}}
+ for(const [cls,arr] of Object.entries(D.roster||{})){if(isArchivedClass(cls))continue;for(const name of (Array.isArray(arr)?arr:[])){if(name&&!currentMembership.has(name))currentMembership.set(name,cls)}}
+ for(const [name,p0] of Object.entries(db.students)){
+  const p=p0||{};p.name=p.name||name;p.classNames=Array.isArray(p.classNames)?p.classNames:[];
+  p.lessons=Array.isArray(p.lessons)?p.lessons:[];cleanupStableDuplicates(p);
+  const current=currentMembership.get(name)||'';
+  if(p.currentClass!==current||p.className!==current||p.rosterManaged!==true){p.currentClass=current;p.className=current;p.rosterManaged=true;changed++}
+  if(current&&!p.classNames.includes(current))p.classNames.push(current);db.students[name]=p;
+ }
+ for(const [name,cls] of currentMembership){
+  const isNew=!db.students[name],p=ensureProfile(db,name);
+  p.currentClass=cls;p.className=cls;p.rosterManaged=true;p.classNames=Array.isArray(p.classNames)?p.classNames:[];
+  if(!p.classNames.includes(cls))p.classNames.push(cls);if(isNew)changed++;
+ }
+ for(const h of (Array.isArray(homework)?homework:[])){
+  const names=[].concat(h.target||[]).includes('全班')?(D.roster[h.className]||[]):[].concat(h.target||[]);
+  for(const name of names){
+   if(!name||name==='全班')continue;
+   const p=ensureProfile(db,name);p.classNames=Array.isArray(p.classNames)?p.classNames:[];
+   const current=currentMembership.get(name)||'';
+   if(current){p.currentClass=current;p.className=current;p.rosterManaged=true;if(!p.classNames.includes(current))p.classNames.push(current)}
+   // 日期优先使用作业自身的固定日期；缺失时用作业 ID 生成稳定占位值，绝不使用每次发布都会变化的“今天”。
+   const date=String(h.lessonDate||h.date||h.createdAt||h.created|| (h.id?`未标注日期:${h.id}`:'未标注日期')).trim();
+   const cls=String(h.className||'未指定班级').trim();
+   const key=`${cls}|${name}|${date}`;
+   let lesson=p.lessons.find(l=>l.autoLessonKey===key);
+   if(!lesson&&h.id)lesson=p.lessons.find(l=>Array.isArray(l.sourceIds)&&l.sourceIds.includes(h.id)&&String(l.className||'未指定班级').trim()===cls);
+   if(!lesson)lesson=p.lessons.find(l=>(String(l.lessonDate||l.assignedDate||'')===date)&&String(l.className||'未指定班级').trim()===cls);
+   if(!lesson)lesson=p.lessons.find(l=>!l.autoLessonKey&&l.importedLegacy&&String(l.lessonDate||'')===date&&String(l.className||'未指定班级').trim()===cls);
+   if(lesson&&lesson.autoLessonKey!==key){lesson.autoLessonKey=key;changed++}
+   if(!lesson){
+    const start=maxLesson(p)+1;
+    lesson={id:'lesson_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,6),autoLessonKey:key,lessonLabel:`第${start}次`,lessonCount:1,startNumber:start,endNumber:start,className:cls==='未指定班级'?'':cls,lessonDate:date.startsWith('未标注日期:')?'':date,assignedDate:h.date||'',dueDate:h.dueDate||((h.date)?plusDays(h.date,7):''),dueDateText:'',checkedDate:'',items:[],note:'',legacyStatus:'',sourceIds:[]};
+    p.lessons.push(lesson);p.nextLessonNumber=start;changed++;
+   }
+   lesson.sourceIds=Array.isArray(lesson.sourceIds)?lesson.sourceIds:[];
+   if(h.id&&!lesson.sourceIds.includes(h.id)){lesson.sourceIds.push(h.id);changed++}
+   if(h.date&&lesson.assignedDate!==h.date){lesson.assignedDate=h.date;changed++}
+   if(h.dueDate&&lesson.dueDate!==h.dueDate){lesson.dueDate=h.dueDate;changed++}
+   // 按作业记录 ID 更新其名下的项目：编辑时删除已移除的旧项目，尽量按文本迁移状态，避免旧内容残留。
+   const ownedPrefix=String(h.id||'')+'_';
+   const oldOwned=lesson.items.filter(it=>h.id&&String(it.sourceItemId||'').startsWith(ownedPrefix));
+   const usedOwned=new Set();
+   for(let i=0;i<(h.items||[]).length;i++){
+    const itemText=h.items[i],sourceItemId=makeTaskId(h,i);
+    let existingItem=oldOwned.find(it=>it.sourceItemId===sourceItemId&&!usedOwned.has(it));
+    if(!existingItem){
+     const normText=String(itemText||'').trim().replace(/\s+/g,' ').toLowerCase();
+     existingItem=oldOwned.find(it=>!usedOwned.has(it)&&String(it.text||'').trim().replace(/\s+/g,' ').toLowerCase()===normText);
+    }
+    if(existingItem){usedOwned.add(existingItem);if(existingItem.sourceItemId!==sourceItemId){existingItem.sourceItemId=sourceItemId;changed++}if(existingItem.text!==itemText){existingItem.text=itemText;changed++}}
+    else{lesson.items.push({id:'task_'+Date.now().toString(36)+'_'+i,text:itemText,status:'',note:'',sourceItemId});changed++}
+   }
+   if(oldOwned.length){const before=lesson.items.length;lesson.items=lesson.items.filter(it=>!oldOwned.includes(it)||usedOwned.has(it));if(lesson.items.length!==before)changed+=before-lesson.items.length}
+  }
+ }
+ // 本轮同步后再按 autoLessonKey 合并一次，防止历史数据中已存在的同课次重复项继续保留。
+ for(const p of Object.values(db.students))cleanupStableDuplicates(p);
+ if(changed===0)return {ok:true,changed:0,message:'学员档案无需新增内容（发布记录可能已同步过）。'};
+ db.updatedAt=new Date().toISOString();
+ try{await ghWriteJson(owner,repo,path,db,got.sha,'同步教师名单及作业到学员档案');return {ok:true,changed,message:`已同步教师名单与学员档案（新增或更新 ${changed} 项）。同一课次重复记录已按稳定标识合并。`}}
+ catch(e){return {ok:false,message:'学员档案写入失败：'+explain(e)}}
 }
 $('pub').addEventListener('click',async()=>{if(!token()){$('settings').open=true;$('settings').scrollIntoView({behavior:'smooth'});return showModal('需要 GitHub 令牌','请先在页面下方的设置里保存 GitHub 访问令牌。','⚠️')};const btn=$('pub');btn.disabled=true;btn.textContent='发布中……';msg('正在发布到学生端……','warn');try{D.updated=new Date().toISOString();try{localStorage.setItem(DK,JSON.stringify({savedAt:D.updated,data:D}))}catch(e){}let sha;const g=await fetch(API,{headers:hdr(),cache:'no-store'});if(g.ok)sha=(await g.json()).sha;else if(g.status!==404)throw g;const r=await fetch(API,{method:'PUT',headers:{...hdr(),'Content-Type':'application/json'},body:JSON.stringify({message:'更新作业 '+new Date().toLocaleString('zh-CN',{hour12:false}),content:btoa(unescape(encodeURIComponent(JSON.stringify(D,null,2)))),sha})});if(!r.ok)throw r;let extra='已成功发布到学生端。学生端通常会在 GitHub Pages 更新后看到作业。';let icon='✅';const a=await syncArchiveFromHomework(D.homework);if(a.ok)extra+='\n'+a.message;else if(a.skip)extra+='\n⚠️ '+a.message;else{icon='⚠️';extra+='\n但'+a.message}msg(a.ok?'作业发布成功，学员档案同步完成。':a.skip?'作业发布成功，但学员档案尚未配置。':'作业已发布到学生端，但学员档案同步失败。',a.ok?'ok':'warn');renderList();showModal(a.ok?'作业发布成功':a.skip?'作业发布成功（档案未同步）':'作业已发布，档案同步失败',extra,icon)}catch(e){msg('发布失败：'+explain(e),'bad');showModal('作业发布失败',explain(e)+'\n本地草稿仍然保留，可以修复权限或网络后重试。','❌')}finally{btn.disabled=false;btn.textContent='发布到学生端'}});
 boot();

@@ -152,7 +152,25 @@ async function loadInitial(){
  else{if(local&&local.data)DB=normalizeDB(local.data);statusMsg(local?'已读取本地草稿；未配置云端，修改只保存在本地。':'未找到档案数据。请导入 Excel 或新增学员。','warn')}
  DB=normalizeDB(DB);if(duplicateCleanupPending){duplicateCleanupPending=false;persistLocal();renderAll();statusMsg('发现重复作业项目并已在本地草稿中合并；请检查后手动同步。','warn')}else renderAll();refreshPublicRoster(false).catch(()=>{})
 }
-function normalizeDB(x){x=x&&typeof x==='object'?x:emptyDB();x.schemaVersion=1;x.students=x.students&&typeof x.students==='object'?x.students:{};for(const [name,p0] of Object.entries(x.students)){const p=p0||{};p.name=p.name||name;p.classNames=Array.isArray(p.classNames)?p.classNames:[];p.currentClass=String(p.currentClass??p.className??'');p.hidden=!!p.hidden;p.rosterManaged=!!p.rosterManaged;p.lessons=Array.isArray(p.lessons)?p.lessons:[];for(const l of p.lessons){l.items=Array.isArray(l.items)?l.items:[];const originalItemCount=l.items.length;l.items=dedupeLessonItems(l.items);if(l.items.length<originalItemCount)l.itemsDirty=true;if(!syncLessonNumberFields(l))l.lessonCount=Number(l.lessonCount)||((Number(l.endNumber)||0)-(Number(l.startNumber)||0)+1)||1;l.note=String(l.note??'');l.legacyStatus=String(l.legacyStatus??'');}p.nextLessonNumber=maxNo(p);x.students[name]=p}return x}
+function dedupeLessonRecords(lessons){
+ const out=[],byKey=new Map();
+ for(const raw of (Array.isArray(lessons)?lessons:[])){
+  const l=raw||{},key=String(l.autoLessonKey||'').trim();
+  if(!key||!byKey.has(key)){out.push(l);if(key)byKey.set(key,l);continue}
+  const keep=byKey.get(key);duplicateCleanupPending=true;
+  keep.items=Array.isArray(keep.items)?keep.items:[];
+  for(const it of (l.items||[])){
+   // 只有 sourceItemId 完全相同才合并；没有稳定 ID 的历史项目不按文字去重，以免误删同名作业。
+   const found=it.sourceItemId?keep.items.find(x=>x.sourceItemId===it.sourceItemId):null;
+   if(!found)keep.items.push(it);
+   else{if(!found.status&&it.status)found.status=it.status;if(!found.note&&it.note)found.note=it.note}
+  }
+  keep.sourceIds=Array.from(new Set([...(keep.sourceIds||[]),...(l.sourceIds||[])].filter(Boolean)));
+  for(const f of ['checkedDate','note','legacyStatus','dueDate','assignedDate'])if(!keep[f]&&l[f])keep[f]=l[f];
+ }
+ return out;
+}
+function normalizeDB(x){x=x&&typeof x==='object'?x:emptyDB();x.schemaVersion=1;x.students=x.students&&typeof x.students==='object'?x.students:{};for(const [name,p0] of Object.entries(x.students)){const p=p0||{};p.name=p.name||name;p.classNames=Array.isArray(p.classNames)?p.classNames:[];p.currentClass=String(p.currentClass??p.className??'');p.hidden=!!p.hidden;p.rosterManaged=!!p.rosterManaged;p.lessons=dedupeLessonRecords(Array.isArray(p.lessons)?p.lessons:[]);for(const l of p.lessons){l.items=Array.isArray(l.items)?l.items:[];const originalItemCount=l.items.length;l.items=dedupeLessonItems(l.items);if(l.items.length<originalItemCount)l.itemsDirty=true;if(!syncLessonNumberFields(l))l.lessonCount=Number(l.lessonCount)||((Number(l.endNumber)||0)-(Number(l.startNumber)||0)+1)||1;l.note=String(l.note??'');l.legacyStatus=String(l.legacyStatus??'');}p.nextLessonNumber=maxNo(p);x.students[name]=p}return x}
 function renderAll(){renderStudentList();renderProfile();renderWorkArea()}
 function archiveCurrentClass(p){return String(p?.currentClass??p?.className??'').trim()}
 function profileCurrentClassLabel(p){const c=archiveCurrentClass(p);if(c)return c;const closed=(p?.classNames||[]).filter(x=>isArchivedPublicClass(x));if(closed.length)return '已结课：'+closed.join('、');return p?.rosterManaged?'已移出教师名单':'未设置'}
