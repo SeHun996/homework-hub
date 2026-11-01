@@ -301,11 +301,27 @@ async function syncArchiveFromHomework(homework){
   for(const f of ['checkedDate','note','legacyStatus','dueDate','assignedDate'])if(!target[f]&&source[f])target[f]=source[f];
  }
  function cleanupStableDuplicates(p){
-  const seen=new Map(),out=[];
+  // 同一学生的同一份教师作业以 homework ID（sourceIds）作为最高优先级的稳定身份。
+  // 班级改名、转班或日期字段调整，都不能让同一份作业再次生成一条课次。
+  const byAutoKey=new Map(),bySourceId=new Map(),out=[];
   for(const l of (p.lessons||[])){
-   const key=l.autoLessonKey?`auto:${l.autoLessonKey}`:'';
-   if(key&&seen.has(key)){mergeLesson(seen.get(key),l);changed++;continue}
-   if(key)seen.set(key,l);out.push(l);
+   l.sourceIds=Array.isArray(l.sourceIds)?l.sourceIds.filter(Boolean):[];
+   const autoKey=l.autoLessonKey?String(l.autoLessonKey):'';
+   let target=null;
+   // sourceIds 优先级高于班级/日期组合键，防止两种标识发生冲突时拆出重复课次。
+   for(const sid of l.sourceIds){if(bySourceId.has(String(sid))){target=bySourceId.get(String(sid));break}}
+   if(!target&&autoKey)target=byAutoKey.get(autoKey);
+   if(target){
+    mergeLesson(target,l);changed++;
+    if(target.autoLessonKey)byAutoKey.set(String(target.autoLessonKey),target);
+    for(const sid of (target.sourceIds||[]))bySourceId.set(String(sid),target);
+    // 若重复记录带有新的稳定课次标识，也一并登记，避免后续再次拆分。
+    if(autoKey)byAutoKey.set(autoKey,target);
+    continue;
+   }
+   out.push(l);
+   if(autoKey)byAutoKey.set(autoKey,l);
+   for(const sid of l.sourceIds)bySourceId.set(String(sid),l);
   }
   if(out.length!==(p.lessons||[]).length)p.lessons=out;
  }
@@ -348,7 +364,8 @@ async function syncArchiveFromHomework(homework){
    const cls=String(h.className||'未指定班级').trim();
    const key=`${cls}|${name}|${date}`;
    let lesson=p.lessons.find(l=>l.autoLessonKey===key);
-   if(!lesson&&h.id)lesson=p.lessons.find(l=>Array.isArray(l.sourceIds)&&l.sourceIds.includes(h.id)&&String(l.className||'未指定班级').trim()===cls);
+   // 作业 ID 是跨班级改名/转班仍保持不变的身份；命中后绝不能因 className 不同而新建课次。
+   if(!lesson&&h.id)lesson=p.lessons.find(l=>Array.isArray(l.sourceIds)&&l.sourceIds.some(id=>String(id)===String(h.id)));
    if(!lesson)lesson=p.lessons.find(l=>(String(l.lessonDate||l.assignedDate||'')===date)&&String(l.className||'未指定班级').trim()===cls);
    if(!lesson)lesson=p.lessons.find(l=>!l.autoLessonKey&&l.importedLegacy&&String(l.lessonDate||'')===date&&String(l.className||'未指定班级').trim()===cls);
    if(lesson&&lesson.autoLessonKey!==key){lesson.autoLessonKey=key;changed++}
