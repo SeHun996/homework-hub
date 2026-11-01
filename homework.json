@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-31T12:42:01.692Z",
+  "updated": "2026-11-01T04:02:23.696Z",
   "roster": {
     "【张老师】周六 09:00 C++班级": [
       "郭梓辰",
@@ -43,6 +43,61 @@
     ]
   },
   "homework": [
+    {
+      "id": "hw_mvxb0f8o_btx6",
+      "className": "【张老师】周日 10:30  C++班级",
+      "target": "林楚炫",
+      "date": "2026-11-01",
+      "lessonDate": "2026-11-01",
+      "dueDate": "2026-11-08",
+      "items": [
+        "楚炫补课堂set前三题"
+      ],
+      "link": "",
+      "extensions": {}
+    },
+    {
+      "id": "hw_mvxazwvo_ieu1",
+      "className": "【张老师】周日 10:30  C++班级",
+      "target": [
+        "郑黄岩",
+        "叶奕辰"
+      ],
+      "date": "2026-11-01",
+      "lessonDate": "2026-11-01",
+      "dueDate": "2026-11-08",
+      "items": [
+        "完成两份GESP真题202609、202606纸质试卷"
+      ],
+      "link": "",
+      "extensions": {}
+    },
+    {
+      "id": "hw_mvxayr7o_vokf",
+      "className": "【张老师】周日 10:30  C++班级",
+      "target": "全班",
+      "date": "2026-11-01",
+      "lessonDate": "2026-11-01",
+      "dueDate": "2026-11-08",
+      "items": [
+        "完成课后挑战5题"
+      ],
+      "link": "",
+      "extensions": {}
+    },
+    {
+      "id": "hw_mvxatuph_p3ns",
+      "className": "【张老师】周日 09:00 C++班级",
+      "target": "全班",
+      "date": "2026-11-01",
+      "lessonDate": "2026-11-01",
+      "dueDate": "2026-11-08",
+      "items": [
+        "完成洛谷题单UVA11572(这题在未来金刚平台提交)、P4653、P1714、P1725这四题"
+      ],
+      "link": "",
+      "extensions": {}
+    },
     {
       "id": "hw_mvwdsi4p_pw6i",
       "className": "【张老师】周六 19:00 C++班级",
