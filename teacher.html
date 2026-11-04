@@ -164,7 +164,7 @@ const ymd=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+Stri
 const plusDays=(str,n)=>{if(!str)return '';const [y,m,d]=str.split('-').map(Number);return ymd(new Date(y,m-1,d+n))};
 let D={updated:'',roster:{},homework:[],archivedClasses:{}},editing=null,modalHandler=null,extensionHwId=null,rosterManagerClass='';
 function msg(t,kind=''){ $('status').textContent=t;$('status').className='note '+kind; }
-function touch(){D.updated=new Date().toISOString();try{localStorage.setItem(DK,JSON.stringify({savedAt:D.updated,data:D}))}catch(e){} }
+function touch(){ensureTeacherIdentityMaps();D.updated=new Date().toISOString();try{localStorage.setItem(DK,JSON.stringify({savedAt:D.updated,data:D}))}catch(e){} }
 function showModal(title,text,icon='✅',extra='',onOK=null,okLabel='确认'){
  $('modalTitle').textContent=title;$('modalText').textContent=text;$('modalIcon').textContent=icon;$('modalExtra').innerHTML=extra;
  $('modalOK').hidden=!onOK;$('modalOK').textContent=okLabel;$('modal').classList.add('show');modalHandler=onOK;
@@ -174,13 +174,15 @@ $('modalCancel').onclick=closeModal;$('modalOK').onclick=()=>{const fn=modalHand
 function explain(e){const s=e&&e.status;if(s===401)return 'GitHub 令牌无效或已过期，请重新保存令牌。';if(s===403||s===404)return '令牌权限不足，或仓库名、文件路径不正确。';if(s===409||s===422)return 'GitHub 文件可能被其他位置修改，请刷新后重试。';return s?'GitHub 返回状态码 '+s+'。':'网络连接失败，请检查网络后重试。'}
 async function readLive(){if(token()){try{const r=await fetch(API,{headers:hdr('application/vnd.github.raw+json'),cache:'no-store'});if(r.ok)return await r.json()}catch(e){}}try{const r=await fetch(LIVE+'?t='+Date.now());if(r.ok)return await r.json()}catch(e){}return null}
 async function boot(){let live=null,draft=null;live=await readLive();try{draft=JSON.parse(localStorage.getItem(DK))}catch(e){}
- if(live&&(!draft||draft.savedAt<=(live.updated||''))){D=normalize(live);msg(`已读取线上作业（${D.homework.length} 条）；历史记录不会按天数自动删除。`,'ok')}
- else if(draft&&draft.data){D=normalize(draft.data);msg(live?'⚠️ 已读取本地草稿；发布前请核对同步状态。':'⚠️ 当前未能读取线上数据，已读取本地草稿。','warn')}
- else {D=normalize({roster:{},homework:[]});msg('⚠️ 暂未读取到 homework.json。可导入已有 JSON，再保存或发布。','warn')}
+ if(live&&(!draft||draft.savedAt<=(live.updated||''))){D=normalize(live);ensureTeacherIdentityMaps();msg(`已读取线上作业（${D.homework.length} 条）；历史记录不会按天数自动删除。`,'ok')}
+ else if(draft&&draft.data){D=normalize(draft.data);ensureTeacherIdentityMaps();msg(live?'⚠️ 已读取本地草稿；发布前请核对同步状态。':'⚠️ 当前未能读取线上数据，已读取本地草稿。','warn')}
+ else {D=normalize({roster:{},homework:[]});ensureTeacherIdentityMaps();msg('⚠️ 暂未读取到 homework.json。可导入已有 JSON，再保存或发布。','warn')}
  const today=ymd(new Date());$('date').value=today;$('lessonDate').value=today;$('dueDate').value=plusDays(today,7);$('filterDate').value=today;
  if($('archiveOwner'))$('archiveOwner').value=localStorage.getItem('archive_owner')||'sehun996';$('archiveRepo').value=localStorage.getItem('archive_repo')||'';$('archivePath').value=localStorage.getItem('archive_path')||'student_archives.json';
  fillClasses();renderList();}
-function normalize(x){if(!x||typeof x!=='object')x={};x.roster=x.roster&&typeof x.roster==='object'?x.roster:{};x.homework=Array.isArray(x.homework)?x.homework:[];if(Array.isArray(x.archivedClasses))x.archivedClasses=Object.fromEntries(x.archivedClasses.map(c=>[c,true]));x.archivedClasses=x.archivedClasses&&typeof x.archivedClasses==='object'?x.archivedClasses:{};x.studentRenames=x.studentRenames&&typeof x.studentRenames==='object'?x.studentRenames:{};x.homework=x.homework.map(h=>({...h,items:Array.isArray(h.items)?h.items:[],extensions:h.extensions&&typeof h.extensions==='object'?h.extensions:{},dueDate:h.dueDate||plusDays(h.date,7),lessonDate:h.lessonDate||h.date}));return x}
+function newStableId(prefix){return prefix+'_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,8)}
+function ensureTeacherIdentityMaps(){D.classIds=D.classIds&&typeof D.classIds==='object'?D.classIds:{};D.classAliases=D.classAliases&&typeof D.classAliases==='object'?D.classAliases:{};D.studentIds=D.studentIds&&typeof D.studentIds==='object'?D.studentIds:{};for(const cls of new Set([...Object.keys(D.roster||{}),...(D.homework||[]).map(h=>h.className).filter(Boolean)])){if(!D.classIds[cls])D.classIds[cls]=newStableId('class')}for(const name of new Set([].concat(...Object.values(D.roster||{}),...(D.homework||[]).flatMap(h=>[].concat(h.target||[]).filter(x=>x&&x!=='全班'))))){if(name&&!D.studentIds[name])D.studentIds[name]=newStableId('student')}for(const h of D.homework||[]){if(!h.classId&&h.className)h.classId=D.classIds[h.className]}}
+function normalize(x){if(!x||typeof x!=='object')x={};x.roster=x.roster&&typeof x.roster==='object'?x.roster:{};x.homework=Array.isArray(x.homework)?x.homework:[];if(Array.isArray(x.archivedClasses))x.archivedClasses=Object.fromEntries(x.archivedClasses.map(c=>[c,true]));x.archivedClasses=x.archivedClasses&&typeof x.archivedClasses==='object'?x.archivedClasses:{};x.studentRenames=x.studentRenames&&typeof x.studentRenames==='object'?x.studentRenames:{};x.classIds=x.classIds&&typeof x.classIds==='object'?x.classIds:{};x.classAliases=x.classAliases&&typeof x.classAliases==='object'?x.classAliases:{};x.studentIds=x.studentIds&&typeof x.studentIds==='object'?x.studentIds:{};x.homework=x.homework.map(h=>({...h,items:Array.isArray(h.items)?h.items:[],extensions:h.extensions&&typeof h.extensions==='object'?h.extensions:{},dueDate:h.dueDate||plusDays(h.date,7),lessonDate:h.lessonDate||h.date}));return x}
 function isArchivedClass(c){return !!(D.archivedClasses&&D.archivedClasses[c])}
 function allClassNames(){return Object.keys(D.roster||{}).sort((a,b)=>a.localeCompare(b,'zh-CN'))}
 function fillClasses(keep){const names=allClassNames().filter(c=>!isArchivedClass(c));$('cls').innerHTML=names.map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join('');if(!names.length)$('cls').innerHTML='<option value="">暂无正常上课班级（可在班级管理中恢复已结课班级）</option>';if(keep&&names.includes(keep))$('cls').value=keep;else if(names.length&&!names.includes($('cls').value))$('cls').value=names[0];fillTargets();renderRosterManager();renderClassArchiveControl()}
@@ -189,7 +191,7 @@ $('cls').addEventListener('change',()=>fillTargets());$('tgt').addEventListener(
 $('date').addEventListener('change',()=>{if($('date').value)$('dueDate').value=plusDays($('date').value,7)});
 function resetForm(){editing=null;$('formTitle').textContent='发布新作业';$('cancel').hidden=true;$('items').value='';$('link').value='';const t=ymd(new Date());$('date').value=t;$('lessonDate').value=t;$('dueDate').value=plusDays(t,7);fillTargets()}
 $('save').addEventListener('click',()=>{const items=$('items').value.split('\n').map(s=>s.trim()).filter(Boolean);if(!$('cls').value)return showModal('无法保存','请先选择正常上课的班级。','⚠️');if(isArchivedClass($('cls').value))return showModal('班级已结课','不能向已结课班级发布新作业。需要继续上课请先恢复班级。','⚠️');if(!items.length)return showModal('无法保存','请至少填写一条作业项目。','⚠️');if(!$('date').value||!$('dueDate').value)return showModal('无法保存','请填写作业布置日期和截止日期。','⚠️');const picked=[...$('tgt').querySelectorAll('input:checked')].map(b=>b.value);const target=picked.includes('全班')?'全班':picked.length===1?picked[0]:picked;if(!target||(Array.isArray(target)&&!target.length))return showModal('无法保存','请选择布置对象。','⚠️');
- const old=D.homework.find(h=>h.id===editing);const hw={...(old||{}),id:editing||'hw_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,6),className:$('cls').value,target,date:$('date').value,lessonDate:$('lessonDate').value||$('date').value,dueDate:$('dueDate').value,items,link:$('link').value.trim(),extensions:old?.extensions||{}};const i=D.homework.findIndex(h=>h.id===editing);if(i>=0)D.homework[i]=hw;else D.homework.unshift(hw);touch();resetForm();renderList();showModal('作业保存成功','这条发布记录已保存到当前教师发布台的本地草稿。确认后，点击“发布到学生端”才会同步给学生。','✅');msg('作业已保存到当前浏览器草稿，尚未发布到学生端。','warn')});
+ const old=D.homework.find(h=>h.id===editing);ensureTeacherIdentityMaps();const selectedClass=$('cls').value;const targetSnapshot=([].concat(target||[]).includes('全班'))?((old&&old.className===selectedClass&&old.targetSnapshot)?old.targetSnapshot.slice():(D.roster[selectedClass]||[]).slice()):[].concat(target||[]);const hw={...(old||{}),id:editing||'hw_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,6),className:selectedClass,classId:D.classIds[selectedClass],target,targetSnapshot,date:$('date').value,lessonDate:$('lessonDate').value||$('date').value,dueDate:$('dueDate').value,items,link:$('link').value.trim(),extensions:old?.extensions||{}};const i=D.homework.findIndex(h=>h.id===editing);if(i>=0)D.homework[i]=hw;else D.homework.unshift(hw);touch();resetForm();renderList();showModal('作业保存成功','这条发布记录已保存到当前教师发布台的本地草稿。确认后，点击“发布到学生端”才会同步给学生。','✅');msg('作业已保存到当前浏览器草稿，尚未发布到学生端。','warn')});
 $('cancel').addEventListener('click',resetForm);
 function recordClasses(){const filtered=D.homework.filter(h=>($('allDates').checked||!$('filterDate').value||h.date===$('filterDate').value)&&($('showArchivedHistory').checked||!isArchivedClass(h.className)));return [...new Set(filtered.map(h=>h.className).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'zh-CN'))}
 function renderRosterManager(keep){
@@ -238,14 +240,14 @@ $('addClassBtn').addEventListener('click',()=>{
 $('renameClassBtn').addEventListener('click',()=>{
  const old=$('rosterClass').value,name=$('renameClassName').value.trim();if(!old)return showModal('请选择班级','先选择要重命名的班级。','⚠️');if(isArchivedClass(old))return showModal('班级已结课','请先恢复班级，再修改名称。','⚠️');if(!name)return showModal('请输入新名称','班级名称不能为空。','⚠️');if(name===old)return; if(Object.prototype.hasOwnProperty.call(D.roster,name))return showModal('班级名称已存在',`“${name}”已经存在，未修改。`,'⚠️');
  if(!confirm(`确定将班级“${old}”重命名为“${name}”吗？历史作业的班级标记也会更新，学生档案中的历史课次记录会保留原样。`))return;
- D.roster[name]=D.roster[old]||[];delete D.roster[old];if(D.archivedClasses[old]){D.archivedClasses[name]=true;delete D.archivedClasses[old]}for(const h of D.homework)if(h.className===old)h.className=name;
+ ensureTeacherIdentityMaps();const stableClassId=D.classIds[old]||newStableId('class');D.classIds[name]=stableClassId;D.classAliases[old]=stableClassId;delete D.classIds[old];D.roster[name]=D.roster[old]||[];delete D.roster[old];if(D.archivedClasses[old]){D.archivedClasses[name]=true;delete D.archivedClasses[old]}for(const h of D.homework)if(h.className===old){h.classId=stableClassId;h.className=name;}
  $('renameClassName').value='';rosterUpdated(`已将班级“${old}”重命名为“${name}”`,name);
 });
 $('renameRosterStudentBtn').addEventListener('click',()=>{
  const cls=$('rosterClass').value,old=$('rosterStudent').value,name=$('renameStudentName').value.trim();if(!cls||!old)return showModal('请选择学生','先选择班级和要修改姓名的学生。','⚠️');if(isArchivedClass(cls))return showModal('班级已结课','请先恢复班级，再修改学生姓名。','⚠️');if(!name)return showModal('请输入新姓名','学生姓名不能为空。','⚠️');if(name===old)return;const exists=Object.values(D.roster).some(a=>(a||[]).includes(name));if(exists)return showModal('姓名已存在',`“${name}”已在教师名单中。为避免把两个学生档案合并，未执行修改。`,'⚠️');
  if(!confirm(`确定将学生“${old}”改名为“${name}”吗？将同步更新当前名单、历史作业的布置对象和延期信息；私有档案同步时会迁移旧姓名下的课次和备注。`))return;
- for(const c of Object.keys(D.roster))D.roster[c]=(D.roster[c]||[]).map(n=>n===old?name:n);
- for(const h of D.homework){if(h.target===old)h.target=name;else if(Array.isArray(h.target))h.target=h.target.map(n=>n===old?name:n);if(h.extensions&&Object.prototype.hasOwnProperty.call(h.extensions,old)){h.extensions[name]=(Number(h.extensions[name])||0)+(Number(h.extensions[old])||0);delete h.extensions[old]}}
+ ensureTeacherIdentityMaps();D.studentIds[name]=D.studentIds[old]||newStableId('student');delete D.studentIds[old];for(const c of Object.keys(D.roster))D.roster[c]=(D.roster[c]||[]).map(n=>n===old?name:n);
+ for(const h of D.homework){if(h.target===old)h.target=name;else if(Array.isArray(h.target))h.target=h.target.map(n=>n===old?name:n);if(Array.isArray(h.targetSnapshot))h.targetSnapshot=h.targetSnapshot.map(n=>n===old?name:n);if(h.extensions&&Object.prototype.hasOwnProperty.call(h.extensions,old)){h.extensions[name]=(Number(h.extensions[name])||0)+(Number(h.extensions[old])||0);delete h.extensions[old]}}
  D.studentRenames=D.studentRenames&&typeof D.studentRenames==='object'?D.studentRenames:{};D.studentRenames[old]=name;$('renameStudentName').value='';rosterUpdated(`已将学生“${old}”改名为“${name}”`,cls);
 });
 $('addRosterStudentBtn').addEventListener('click',()=>{
@@ -253,7 +255,7 @@ $('addRosterStudentBtn').addEventListener('click',()=>{
  const other=Object.entries(D.roster).filter(([c,a])=>c!==cls&&(a||[]).includes(name)).map(([c])=>c);
  if((D.roster[cls]||[]).includes(name))return showModal('学生已存在',`${name} 已经在 ${cls}。`,'⚠️');
  if(other.length)return showModal('学生已在其他班级',`${name} 已在：${other.join('、')}。如果是转班，请使用“转移到所选班级”，避免重复名单。`,'⚠️');
- D.roster[cls]=Array.isArray(D.roster[cls])?D.roster[cls]:[];D.roster[cls].push(name);$('newRosterStudent').value='';rosterUpdated(`已将 ${name} 添加到 ${cls}`,cls);
+ D.roster[cls]=Array.isArray(D.roster[cls])?D.roster[cls]:[];D.roster[cls].push(name);D.studentIds=D.studentIds||{};if(!D.studentIds[name])D.studentIds[name]=newStableId('student');$('newRosterStudent').value='';rosterUpdated(`已将 ${name} 添加到 ${cls}`,cls);
 });
 $('moveRosterStudentBtn').addEventListener('click',()=>{
  const from=$('rosterClass').value,name=$('rosterStudent').value,to=$('moveTargetClass').value;
@@ -287,7 +289,7 @@ async function syncArchiveFromHomework(homework){
  if(!token()||!repo)return {ok:false,skip:true,message:'未配置私有档案仓库，未同步学员档案。'};
  let got;try{got=await ghReadJson(owner,repo,path)}catch(e){return {ok:false,message:'学员档案读取失败：'+explain(e)}}
  const db=got.data&&typeof got.data==='object'?got.data:{schemaVersion:1,updatedAt:'',students:{}};
- db.students=db.students||{};let changed=0;
+ db.students=db.students||{};ensureTeacherIdentityMaps();let changed=0;
  // 只合并具有相同稳定课次标识的记录；不按“同一天”粗暴删除课次。
  function mergeLesson(target,source){
   target.items=Array.isArray(target.items)?target.items:[];
@@ -302,26 +304,27 @@ async function syncArchiveFromHomework(homework){
  }
  function lessonDateOf(l){return String(l&& (l.lessonDate||l.assignedDate)||'').trim()}
  function lessonClassOf(l){return String(l&&l.className||'').trim()}
+ function stableClassOf(l){const c=lessonClassOf(l);return String(l&&l.classId||D.classAliases[c]||D.classIds[c]||c)}
  function cleanupStableDuplicates(p){
   // 课次身份必须同时包含学生、班级和上课日期。同一 homework ID 可能因转班/历史错误
   // 出现在不同班级的档案中，绝不能仅凭 sourceId 把不同课程合并。
   const bySessionKey=new Map(),bySourceSession=new Map(),out=[];
   for(const l of (p.lessons||[])){
    l.sourceIds=Array.isArray(l.sourceIds)?l.sourceIds.filter(Boolean):[];
-   const date=lessonDateOf(l),cls=lessonClassOf(l);
+   const date=lessonDateOf(l),cls=lessonClassOf(l),stableClass=stableClassOf(l);
    const key=l.autoLessonKey?String(l.autoLessonKey):'';
    const keyDate=key?key.split('|').slice(-1)[0]:'';
    // autoLessonKey 曾被旧逻辑错误改写过；只有它与实际班级、日期吻合时才可用于去重。
    const validAutoKey=!!(key&&date&&keyDate===date&&cls&&key.startsWith(cls+'|'));
-   const sessionKey=validAutoKey?key:(date&&cls?`${cls}|${date}`:'');
+   const sessionKey=date&&stableClass?`${stableClass}|${date}`:'';
    let target=sessionKey?bySessionKey.get(sessionKey):null;
-   if(!target&&date&&cls){
-    for(const sid of l.sourceIds){const candidate=bySourceSession.get(`${sid}|${cls}|${date}`);if(candidate){target=candidate;break}}
+   if(!target&&date&&stableClass){
+    for(const sid of l.sourceIds){const candidate=bySourceSession.get(`${sid}|${stableClass}|${date}`);if(candidate){target=candidate;break}}
    }
    if(target){mergeLesson(target,l);changed++;continue}
    out.push(l);
    if(sessionKey)bySessionKey.set(sessionKey,l);
-   if(date&&cls)for(const sid of l.sourceIds)bySourceSession.set(`${sid}|${cls}|${date}`,l);
+   if(date&&stableClass)for(const sid of l.sourceIds)bySourceSession.set(`${sid}|${stableClass}|${date}`,l);
   }
   if(out.length!==(p.lessons||[]).length)p.lessons=out;
  }
@@ -333,7 +336,7 @@ async function syncArchiveFromHomework(homework){
   else{
    const seen=new Set((newP.lessons||[]).map(l=>l.autoLessonKey||l.id).filter(Boolean));
    for(const l of (oldP.lessons||[])){const k=l.autoLessonKey||l.id;if(!k||!seen.has(k)){newP.lessons.push(l);if(k)seen.add(k)}}
-   newP.classNames=[...new Set([...(newP.classNames||[]),...(oldP.classNames||[])])];
+   newP.studentId=newP.studentId||oldP.studentId;newP.deletedSourceIds=Array.from(new Set([...(newP.deletedSourceIds||[]),...(oldP.deletedSourceIds||[])].map(String)));newP.deletedSourceItemIds=Array.from(new Set([...(newP.deletedSourceItemIds||[]),...(oldP.deletedSourceItemIds||[])].map(String)));newP.classNames=[...new Set([...(newP.classNames||[]),...(oldP.classNames||[])])];
    newP.nextLessonNumber=Math.max(Number(newP.nextLessonNumber)||0,Number(oldP.nextLessonNumber)||0);
    newP.hidden=!!(newP.hidden&&oldP.hidden);delete db.students[oldName];changed++;
   }
@@ -341,7 +344,7 @@ async function syncArchiveFromHomework(homework){
  const currentMembership=new Map();
  for(const [cls,arr] of Object.entries(D.roster||{})){if(isArchivedClass(cls))continue;for(const name of (Array.isArray(arr)?arr:[])){if(name&&!currentMembership.has(name))currentMembership.set(name,cls)}}
  for(const [name,p0] of Object.entries(db.students)){
-  const p=p0||{};p.name=p.name||name;p.classNames=Array.isArray(p.classNames)?p.classNames:[];
+  const p=p0||{};p.name=p.name||name;p.studentId=p.studentId||D.studentIds[name]||newStableId('student');D.studentIds[name]=p.studentId;p.deletedSourceIds=Array.isArray(p.deletedSourceIds)?p.deletedSourceIds:[];p.deletedSourceItemIds=Array.isArray(p.deletedSourceItemIds)?p.deletedSourceItemIds:[];p.classNames=Array.isArray(p.classNames)?p.classNames:[];
   p.lessons=Array.isArray(p.lessons)?p.lessons:[];cleanupStableDuplicates(p);
   const current=currentMembership.get(name)||'';
   if(p.currentClass!==current||p.className!==current||p.rosterManaged!==true){p.currentClass=current;p.className=current;p.rosterManaged=true;changed++}
@@ -353,40 +356,70 @@ async function syncArchiveFromHomework(homework){
   if(!p.classNames.includes(cls))p.classNames.push(cls);if(isNew)changed++;
  }
  for(const h of (Array.isArray(homework)?homework:[])){
-  const targetNames=[].concat(h.target||[]).includes('全班')?(D.roster[h.className]||[]):[].concat(h.target||[]);
+  const targetNames=Array.isArray(h.targetSnapshot)?h.targetSnapshot.slice():([].concat(h.target||[]).includes('全班')?(D.roster[h.className]||[]):[].concat(h.target||[]));
   // 即使学生后来转班/移出名单，也要按这份作业的 ID 更新其已有档案，清理旧班级副本。
-  const archivedNames=h.id?Object.entries(db.students).filter(([student,profile])=>(profile.lessons||[]).some(l=>Array.isArray(l.sourceIds)&&l.sourceIds.some(id=>String(id)===String(h.id)))).map(([student])=>student):[];
+  const archivedNames=h.id?Object.entries(db.students).filter(([student,profile])=>(profile.lessons||[]).some(l=>Array.isArray(l.sourceIds)&&l.sourceIds.some(id=>String(id)===String(h.id)))||(profile.deletedSourceIds||[]).some(id=>String(id)===String(h.id))||(profile.deletedSourceItemIds||[]).some(id=>String(id).startsWith(String(h.id)+'_'))).map(([student])=>student):[];
   const names=Array.from(new Set([...targetNames,...archivedNames]));
   for(const name of names){
    if(!name||name==='全班')continue;
-   const p=ensureProfile(db,name);p.classNames=Array.isArray(p.classNames)?p.classNames:[];
+   const p=ensureProfile(db,name);p.studentId=p.studentId||D.studentIds[name]||newStableId('student');D.studentIds[name]=p.studentId;p.deletedSourceIds=Array.isArray(p.deletedSourceIds)?p.deletedSourceIds:[];p.deletedSourceItemIds=Array.isArray(p.deletedSourceItemIds)?p.deletedSourceItemIds:[];p.classNames=Array.isArray(p.classNames)?p.classNames:[];
+   if(h.id&&p.deletedSourceIds.includes(String(h.id)))continue;
+   if((h.items||[]).length&&(h.items||[]).every((_,i)=>p.deletedSourceItemIds.includes(String(makeTaskId(h,i)))))continue;
    const current=currentMembership.get(name)||'';
    if(current){p.currentClass=current;p.className=current;p.rosterManaged=true;if(!p.classNames.includes(current))p.classNames.push(current)}
    // 日期和班级共同决定一次真实上课课次；同一份作业反复发布不改变这两个身份字段。
    const date=String(h.lessonDate||h.date||h.createdAt||h.created|| (h.id?`未标注日期:${h.id}`:'未标注日期')).trim();
    const cls=String(h.className||'未指定班级').trim();
-   const key=`${cls}|${name}|${date}`;
+   const classId=h.classId||(D.classIds&&D.classIds[cls])||newStableId('class');h.classId=classId;
+   const studentId=p.studentId||D.studentIds[name]||name;
+   const key=`${classId}|${studentId}|${date}`;
    const dateOf=l=>String(l&& (l.lessonDate||l.assignedDate)||'').trim();
    const classOf=l=>String(l&&l.className||'').trim();
    // 第一优先级：班级和真实日期都吻合的课次。不能只看 autoLessonKey，旧版本可能写错过 key。
-   let lesson=p.lessons.find(l=>l.autoLessonKey===key&&dateOf(l)===date&&classOf(l)===cls);
+   let lesson=p.lessons.find(l=>(l.classId||D.classAliases[classOf(l)]||D.classIds[classOf(l)]||classOf(l))===classId&&dateOf(l)===date);
+   if(!lesson)lesson=p.lessons.find(l=>l.autoLessonKey===key&&dateOf(l)===date&&classOf(l)===cls);
    if(!lesson)lesson=p.lessons.find(l=>dateOf(l)===date&&classOf(l)===cls);
    // 第二优先级：按 homework ID 找历史来源，但必须先判断它是否仍属于当前班级/日期。
    // 同一个 ID 曾可能错误地出现在多个班级课次中，优先选择最吻合当前课程的一条。
-   const sourceCandidates=h.id?p.lessons.filter(l=>Array.isArray(l.sourceIds)&&l.sourceIds.some(id=>String(id)===String(h.id))):[];
+   let sourceCandidates=h.id?p.lessons.filter(l=>Array.isArray(l.sourceIds)&&l.sourceIds.some(id=>String(id)===String(h.id))):[];
    let sourceLesson=null;
    const movedItems=[];
    if(!lesson&&sourceCandidates.length){
-    const scored=sourceCandidates.map(l=>({l,score:(classOf(l)===cls?2:0)+(dateOf(l)===date?1:0)})).sort((a,b)=>b.score-a.score);
-    if(scored.length===1||scored[0].score>scored[1].score)sourceLesson=scored[0].l;
-    if(sourceLesson&&classOf(sourceLesson)===cls&&dateOf(sourceLesson)===date)lesson=sourceLesson;
+    const scored=sourceCandidates.map(l=>({l,score:((l.classId||D.classAliases[classOf(l)]||D.classIds[classOf(l)]||classOf(l))===classId?4:0)+(classOf(l)===cls?2:0)+(dateOf(l)===date?1:0)})).sort((a,b)=>b.score-a.score);
+    if(scored.length)sourceLesson=scored[0].l;
+    // 同一 homework ID 在单个学生档案中代表同一条发布来源；即使班级已改名或学生已转班，
+    // 只要上课日期未变，就复用原课次，避免把旧课次再创建一份。
+    if(sourceLesson&&dateOf(sourceLesson)===date)lesson=sourceLesson;
+   }
+   // 兼容升级前已经发生的“班级改名后产生副本”：旧课次可能没有 sourceIds，
+   // 但若同一天、旧课次项目与这条教师发布记录逐项完全一致，可将其作为原课次保留。
+   if(h.id&&(h.items||[]).length){
+    const normTask=v=>String(v||'').trim().replace(/^\s*(?:(?:\d+\s*[、.．:：)）])|[-•])\s*/,'').replace(/\s+/g,' ').toLowerCase();
+    const wanted=(h.items||[]).map(normTask);
+    const legacyMatches=p.lessons.filter(l=>l!==lesson&&dateOf(l)===date&&(!Array.isArray(l.sourceIds)||!l.sourceIds.length)&&(l.items||[]).length===wanted.length&&(l.items||[]).every(it=>wanted.includes(normTask(it.text))));
+    if(legacyMatches.length===1){
+     const legacy=legacyMatches[0],generated=lesson;
+     for(let i=0;i<wanted.length;i++){
+      const targetItem=(legacy.items||[]).find(it=>normTask(it.text)===wanted[i]);
+      const generatedItem=generated&&(generated.items||[]).find(it=>normTask(it.text)===wanted[i]);
+      if(targetItem){targetItem.sourceItemId=makeTaskId(h,i);targetItem.sourceItemIds=Array.from(new Set([...(targetItem.sourceItemIds||[]),targetItem.sourceItemId]));if(generatedItem){if(!targetItem.status&&generatedItem.status)targetItem.status=generatedItem.status;if(!targetItem.note&&generatedItem.note)targetItem.note=generatedItem.note;else if(targetItem.note&&generatedItem.note&&targetItem.note!==generatedItem.note)targetItem.note+='\n'+generatedItem.note;}}
+     }
+     if(generated&&generated!==legacy){
+      legacy.sourceIds=Array.from(new Set([...(legacy.sourceIds||[]),...(generated.sourceIds||[]),h.id].filter(Boolean)));
+      for(const f of ['checkedDate','note','legacyStatus','dueDate','assignedDate'])if(!legacy[f]&&generated[f])legacy[f]=generated[f];
+      const generatedLeft=(generated.items||[]).filter(it=>!wanted.includes(normTask(it.text)));
+      if(generatedLeft.length){generated.items=generatedLeft;generated.sourceIds=(generated.sourceIds||[]).filter(id=>String(id)!==String(h.id));}
+      else{p.lessons=p.lessons.filter(l=>l!==generated);sourceCandidates=sourceCandidates.filter(l=>l!==generated);}
+     }else legacy.sourceIds=Array.from(new Set([...(legacy.sourceIds||[]),h.id]));
+     legacy.classId=classId;legacy.autoLessonKey=key;lesson=legacy;sourceLesson=legacy;changed++;
+    }
    }
    // 若作业日期或班级已被编辑，必须把该作业从旧课次迁出，而不是沿用旧课次编号。
    if(sourceLesson&&!lesson){
     const prefix=String(h.id)+'_';
     sourceLesson.sourceIds=(sourceLesson.sourceIds||[]).filter(id=>String(id)!==String(h.id));
     const keepItems=[];
-    for(const it of (sourceLesson.items||[])){if(String(it.sourceItemId||'').startsWith(prefix))movedItems.push(it);else keepItems.push(it)}
+    for(const it of (sourceLesson.items||[])){if(String(it.sourceItemId||'').startsWith(prefix)||(it.sourceItemIds||[]).some(id=>String(id).startsWith(prefix)))movedItems.push(it);else keepItems.push(it)}
     sourceLesson.items=keepItems;
     changed++;
     if(!sourceLesson.sourceIds.length&&!sourceLesson.items.length&&!sourceLesson.note&&!sourceLesson.checkedDate&&!sourceLesson.legacyStatus){
@@ -401,7 +434,7 @@ async function syncArchiveFromHomework(homework){
      duplicate.sourceIds=(duplicate.sourceIds||[]).filter(id=>String(id)!==String(h.id));
      const prefix=String(h.id)+'_';
      const keepItems=[];
-     for(const it of (duplicate.items||[])){if(String(it.sourceItemId||'').startsWith(prefix))movedItems.push(it);else keepItems.push(it)}
+     for(const it of (duplicate.items||[])){if(String(it.sourceItemId||'').startsWith(prefix)||(it.sourceItemIds||[]).some(id=>String(id).startsWith(prefix)))movedItems.push(it);else keepItems.push(it)}
      duplicate.items=keepItems;
      if(duplicate.sourceIds.length!==beforeIds||duplicate.items.length!==beforeItems)changed++;
      // 仅当旧副本已没有任何作业项目、来源或人工记录时才删除空壳课次。
@@ -412,32 +445,34 @@ async function syncArchiveFromHomework(homework){
    }
    if(!lesson){
     const start=maxLesson(p)+1;
-    lesson={id:'lesson_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,6),autoLessonKey:key,lessonLabel:`第${start}次`,lessonCount:1,startNumber:start,endNumber:start,className:cls==='未指定班级'?'':cls,lessonDate:date.startsWith('未标注日期:')?'':date,assignedDate:h.date||'',dueDate:h.dueDate||((h.date)?plusDays(h.date,7):''),dueDateText:'',checkedDate:'',items:[],note:'',legacyStatus:'',sourceIds:[]};
+    lesson={id:'lesson_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,6),classId,autoLessonKey:key,lessonLabel:`第${start}次`,lessonCount:1,startNumber:start,endNumber:start,className:cls==='未指定班级'?'':cls,lessonDate:date.startsWith('未标注日期:')?'':date,assignedDate:h.date||'',dueDate:h.dueDate||((h.date)?plusDays(h.date,7):''),dueDateText:'',checkedDate:'',items:[],note:'',legacyStatus:'',sourceIds:[]};
     p.lessons.push(lesson);p.nextLessonNumber=start;changed++;
    }
+   if(lesson.classId!==classId){lesson.classId=classId;changed++}
    if(lesson.autoLessonKey!==key){lesson.autoLessonKey=key;changed++}
    if(date&&!date.startsWith('未标注日期:')&&lesson.lessonDate!==date){lesson.lessonDate=date;changed++}
-   if(cls&&lesson.className!==cls){lesson.className=cls;changed++}
+   if(cls&&lesson.className!==cls&&!(lesson.classId===classId&&lesson.className)){lesson.className=cls;changed++}
    lesson.sourceIds=Array.isArray(lesson.sourceIds)?lesson.sourceIds:[];
    if(h.id&&!lesson.sourceIds.some(id=>String(id)===String(h.id))){lesson.sourceIds.push(h.id);changed++}
    if(h.date&&lesson.assignedDate!==h.date){lesson.assignedDate=h.date;changed++}
    if(h.dueDate&&lesson.dueDate!==h.dueDate){lesson.dueDate=h.dueDate;changed++}
    // 按作业记录 ID 更新其名下的项目：编辑时删除已移除的旧项目，尽量按文本迁移状态，避免旧内容残留。
    const ownedPrefix=String(h.id||'')+'_';
-   const oldOwned=lesson.items.filter(it=>h.id&&String(it.sourceItemId||'').startsWith(ownedPrefix));
+   const oldOwned=lesson.items.filter(it=>h.id&&(String(it.sourceItemId||'').startsWith(ownedPrefix)||(it.sourceItemIds||[]).some(id=>String(id).startsWith(ownedPrefix))));
    const usedOwned=new Set();
    for(let i=0;i<(h.items||[]).length;i++){
     const itemText=h.items[i],sourceItemId=makeTaskId(h,i);
+    if(p.deletedSourceItemIds.includes(String(sourceItemId)))continue;
     const normText=String(itemText||'').trim().replace(/\s+/g,' ').toLowerCase();
     const itemCandidates=[...oldOwned,...movedItems].filter(it=>!usedOwned.has(it));
-    const matches=itemCandidates.filter(it=>it.sourceItemId===sourceItemId||String(it.text||'').trim().replace(/\s+/g,' ').toLowerCase()===normText);
+    const matches=itemCandidates.filter(it=>it.sourceItemId===sourceItemId||(Array.isArray(it.sourceItemIds)&&it.sourceItemIds.includes(sourceItemId))||String(it.text||'').trim().replace(/\s+/g,' ').toLowerCase()===normText);
     matches.sort((a,b)=>((b.status?2:0)+(b.note?1:0))-((a.status?2:0)+(a.note?1:0)));
     let existingItem=matches[0]||null;
     if(existingItem){
      for(const other of matches.slice(1)){if(!existingItem.status&&other.status)existingItem.status=other.status;if(!existingItem.note&&other.note)existingItem.note=other.note}
      if(!lesson.items.includes(existingItem))lesson.items.push(existingItem);
      usedOwned.add(existingItem);
-     if(existingItem.sourceItemId!==sourceItemId){existingItem.sourceItemId=sourceItemId;changed++}
+     existingItem.sourceItemIds=Array.from(new Set([...(existingItem.sourceItemIds||[]),existingItem.sourceItemId,sourceItemId].filter(Boolean)));if(existingItem.sourceItemId!==sourceItemId&&!existingItem.sourceItemId){existingItem.sourceItemId=sourceItemId;changed++}
      if(existingItem.text!==itemText){existingItem.text=itemText;changed++}
     }
     else{lesson.items.push({id:'task_'+Date.now().toString(36)+'_'+i,text:itemText,status:'',note:'',sourceItemId});changed++}
@@ -452,6 +487,6 @@ async function syncArchiveFromHomework(homework){
  try{await ghWriteJson(owner,repo,path,db,got.sha,'同步教师名单及作业到学员档案');return {ok:true,changed,message:`已同步教师名单与学员档案（新增或更新 ${changed} 项）。同一课次重复记录已按稳定标识合并。`}}
  catch(e){return {ok:false,message:'学员档案写入失败：'+explain(e)}}
 }
-$('pub').addEventListener('click',async()=>{if(!token()){$('settings').open=true;$('settings').scrollIntoView({behavior:'smooth'});return showModal('需要 GitHub 令牌','请先在页面下方的设置里保存 GitHub 访问令牌。','⚠️')};const btn=$('pub');btn.disabled=true;btn.textContent='发布中……';msg('正在发布到学生端……','warn');try{D.updated=new Date().toISOString();try{localStorage.setItem(DK,JSON.stringify({savedAt:D.updated,data:D}))}catch(e){}let sha;const g=await fetch(API,{headers:hdr(),cache:'no-store'});if(g.ok)sha=(await g.json()).sha;else if(g.status!==404)throw g;const r=await fetch(API,{method:'PUT',headers:{...hdr(),'Content-Type':'application/json'},body:JSON.stringify({message:'更新作业 '+new Date().toLocaleString('zh-CN',{hour12:false}),content:btoa(unescape(encodeURIComponent(JSON.stringify(D,null,2)))),sha})});if(!r.ok)throw r;let extra='已成功发布到学生端。学生端通常会在 GitHub Pages 更新后看到作业。';let icon='✅';const a=await syncArchiveFromHomework(D.homework);if(a.ok)extra+='\n'+a.message;else if(a.skip)extra+='\n⚠️ '+a.message;else{icon='⚠️';extra+='\n但'+a.message}msg(a.ok?'作业发布成功，学员档案同步完成。':a.skip?'作业发布成功，但学员档案尚未配置。':'作业已发布到学生端，但学员档案同步失败。',a.ok?'ok':'warn');renderList();showModal(a.ok?'作业发布成功':a.skip?'作业发布成功（档案未同步）':'作业已发布，档案同步失败',extra,icon)}catch(e){msg('发布失败：'+explain(e),'bad');showModal('作业发布失败',explain(e)+'\n本地草稿仍然保留，可以修复权限或网络后重试。','❌')}finally{btn.disabled=false;btn.textContent='发布到学生端'}});
+$('pub').addEventListener('click',async()=>{if(!token()){$('settings').open=true;$('settings').scrollIntoView({behavior:'smooth'});return showModal('需要 GitHub 令牌','请先在页面下方的设置里保存 GitHub 访问令牌。','⚠️')};const btn=$('pub');btn.disabled=true;btn.textContent='发布中……';msg('正在发布到学生端……','warn');showModal('正在同步','正在更新学生端作业，并同步学员档案到 GitHub。请稍候，不要关闭页面。','⏳');$('modalCancel').hidden=true;try{D.updated=new Date().toISOString();try{localStorage.setItem(DK,JSON.stringify({savedAt:D.updated,data:D}))}catch(e){}let sha;const g=await fetch(API,{headers:hdr(),cache:'no-store'});if(g.ok)sha=(await g.json()).sha;else if(g.status!==404)throw g;const r=await fetch(API,{method:'PUT',headers:{...hdr(),'Content-Type':'application/json'},body:JSON.stringify({message:'更新作业 '+new Date().toLocaleString('zh-CN',{hour12:false}),content:btoa(unescape(encodeURIComponent(JSON.stringify(D,null,2)))),sha})});if(!r.ok)throw r;let extra='已成功发布到学生端。学生端通常会在 GitHub Pages 更新后看到作业。';let icon='✅';const a=await syncArchiveFromHomework(D.homework);if(a.ok)extra+='\n'+a.message;else if(a.skip)extra+='\n⚠️ '+a.message;else{icon='⚠️';extra+='\n但'+a.message}msg(a.ok?'作业发布成功，学员档案同步完成。':a.skip?'作业发布成功，但学员档案尚未配置。':'作业已发布到学生端，但学员档案同步失败。',a.ok?'ok':'warn');renderList();showModal(a.ok?'更新完成':a.skip?'作业已发布（档案未同步）':'作业已发布，档案同步失败',extra,icon);$('modalCancel').hidden=false}catch(e){msg('发布失败：'+explain(e),'bad');showModal('更新失败',explain(e)+'\n本地草稿仍然保留，可以修复权限或网络后重试。','❌');$('modalCancel').hidden=false}finally{$('modalCancel').hidden=false;btn.disabled=false;btn.textContent='发布到学生端'}});
 boot();
 </script></body></html>
