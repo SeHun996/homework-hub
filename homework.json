@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-01T12:59:38.643Z",
+  "updated": "2026-11-04T09:07:17.726Z",
   "roster": {
     "【张老师】周六 09:00 C++班级": [
       "郭梓辰",
@@ -62,7 +62,8 @@
         "复习前面所学的所有知识点、笔记、学生讲义，下周阶段测试"
       ],
       "link": "",
-      "extensions": {}
+      "extensions": {},
+      "classId": "class_mw1vwr15_i0juet"
     },
     {
       "id": "hw_mvxnml41_7n02",
@@ -76,7 +77,8 @@
         "补做团队题单未完成的题目，优先补做：第9课 字符类型char、第13课 printf和scanf函数、1~2级 Day4 分支结构-2"
       ],
       "link": "",
-      "extensions": {}
+      "extensions": {},
+      "classId": "class_mw1vwr15_4dcqm2"
     },
     {
       "id": "hw_mvxnecub_i67r",
@@ -91,7 +93,8 @@
         "完成信奥专区--》团队题单--》周六19:00/周日14:30C++班级--》第20课 逻辑运算符题单里的题目"
       ],
       "link": "",
-      "extensions": {}
+      "extensions": {},
+      "classId": "class_mw1vwr15_4dcqm2"
     },
     {
       "id": "hw_mvxb0f8o_btx6",
@@ -104,7 +107,8 @@
         "楚炫补课堂set前三题（讲义直接在未来金刚平台上看）"
       ],
       "link": "",
-      "extensions": {}
+      "extensions": {},
+      "classId": "class_mw1vwr15_3a1bvk"
     },
     {
       "id": "hw_mvxazwvo_ieu1",
@@ -120,7 +124,8 @@
         "完成两份GESP真题202609、202606纸质试卷"
       ],
       "link": "",
-      "extensions": {}
+      "extensions": {},
+      "classId": "class_mw1vwr15_3a1bvk"
     },
     {
       "id": "hw_mvxayr7o_vokf",
@@ -133,7 +138,8 @@
         "完成课后挑战5题"
       ],
       "link": "",
-      "extensions": {}
+      "extensions": {},
+      "classId": "class_mw1vwr15_3a1bvk"
     },
     {
       "id": "hw_mvxatuph_p3ns",
@@ -146,7 +152,8 @@
         "完成洛谷题单UVA11572(这题在未来金刚平台提交)、P4653、P1714、P1725这四题"
       ],
       "link": "",
-      "extensions": {}
+      "extensions": {},
+      "classId": "class_mw1vwr15_h1xm59"
     },
     {
       "id": "hw_mvwdsi4p_pw6i",
@@ -161,7 +168,8 @@
         "完成信奥专区--》团队题单--》周六19:00/周日14:30C++班级--》第20课 逻辑运算符题单里的题目"
       ],
       "link": "",
-      "extensions": {}
+      "extensions": {},
+      "classId": "class_mw1vwr15_quaefl"
     },
     {
       "id": "hw_mvwa5wei_33hm",
@@ -174,7 +182,8 @@
         "瑾浩，题解我已经给你开了。你把做错的题目都订正一遍，但不允许直接抄题解——题解只是在你做题没有思路时，给你提供思路的。每道题订正完后，你还要再理解一遍：代码为什么要这么写？题目中的哪句话决定了代码要这么写？最后自己尝试着归纳总结。"
       ],
       "link": "",
-      "extensions": {}
+      "extensions": {},
+      "classId": "class_mw1vwr15_l8gkx4"
     },
     {
       "id": "hw_mvw6beck_2c6x",
@@ -187,7 +196,8 @@
         "1.把信奥专区--》团队题单--》GESP Python 1级 大题汇总里剩余的题目完成，下周测试"
       ],
       "link": "",
-      "extensions": {}
+      "extensions": {},
+      "classId": "class_mw1vwr15_l8gkx4"
     },
     {
       "id": "hw_mvw0drvx_l0wb",
@@ -200,7 +210,8 @@
         "补做课堂第3题"
       ],
       "link": "",
-      "extensions": {}
+      "extensions": {},
+      "classId": "class_mw1vwr15_nqstof"
     },
     {
       "id": "hw_mvw0c7ax_6mi3",
@@ -214,7 +225,8 @@
         "补做信奥专区--》团队题单--》GESP C++ 3级 大题汇总--》第14、15、16题"
       ],
       "link": "",
-      "extensions": {}
+      "extensions": {},
+      "classId": "class_mw1vwr15_nqstof"
     },
     {
       "id": "hw_mvvs0nsd_uzx3",
@@ -228,7 +240,8 @@
         "完成课后挑战剩余的题目，所有题目均自己先思考，尝试完成，确实思考不出来，到洛谷--》团队--》文件查找相对应题目的题解"
       ],
       "link": "",
-      "extensions": {}
+      "extensions": {},
+      "classId": "class_mw1vwr15_nqstof"
     },
     {
       "id": "hw_mvnxgsje_w77x",
@@ -241,7 +254,8 @@
         "请完成老师发布在微信群里的练习：先完成推导练习（可手写在纸上，也可打印后填写在打印纸上），再进行上机编程实操。上机编程实操位置：信奥专区 → 团队题单 → 四年级上 01 解决问题（一）对应题目。"
       ],
       "link": "",
-      "extensions": {}
+      "extensions": {},
+      "classId": "class_mw1vwr15_i0juet"
     },
     {
       "id": "hw_mvnpa5z0_0cd8",
@@ -255,7 +269,8 @@
         "把CSP-J2019年到2025年历年真题中不是第一遍就通过的题目再次重写一遍"
       ],
       "link": "",
-      "extensions": {}
+      "extensions": {},
+      "classId": "class_mw1vwr15_4bzhke"
     },
     {
       "id": "hw_mvnp88z1_5tt1",
@@ -269,7 +284,8 @@
         "把CSP-J/S2019年到2025年历年真题中不是第一次AC的题目再次重写一遍"
       ],
       "link": "",
-      "extensions": {}
+      "extensions": {},
+      "classId": "class_mw1vwr15_h1xm59"
     },
     {
       "id": "hw_mvmg56rm_yik9",
@@ -282,7 +298,8 @@
         "2.补做上节课的题目"
       ],
       "link": "",
-      "extensions": {}
+      "extensions": {},
+      "classId": "class_mw1vwr15_l8gkx4"
     },
     {
       "id": "hw_mvmg2adp_ycuw",
@@ -295,7 +312,8 @@
         "test"
       ],
       "link": "",
-      "extensions": {}
+      "extensions": {},
+      "classId": "class_mw1vwr15_h1xm59"
     },
     {
       "id": "hw_mvme077q_rixb",
@@ -308,7 +326,8 @@
         "完成GESP Python 1级 大题汇总第13~17题共5题"
       ],
       "link": "",
-      "extensions": {}
+      "extensions": {},
+      "classId": "class_mw1vwr15_l8gkx4"
     },
     {
       "id": "hw_mvm90xcn_qtdn",
@@ -325,7 +344,8 @@
         "补做团队题单里未完成的题目"
       ],
       "link": "",
-      "extensions": {}
+      "extensions": {},
+      "classId": "class_mw1vwr15_4dcqm2"
     },
     {
       "id": "hw_mvm76lno_6gxd",
@@ -338,7 +358,8 @@
         "完成洛谷 → 训练题单 → 深入浅出基础篇 → 【入门4】数组中第6~10题"
       ],
       "link": "",
-      "extensions": {}
+      "extensions": {},
+      "classId": "class_mw1vwr15_3a1bvk"
     },
     {
       "id": "hw_mvm75vor_6gn3",
@@ -351,7 +372,8 @@
         "完成洛谷GESP 三级救命题单第一周题目"
       ],
       "link": "",
-      "extensions": {}
+      "extensions": {},
+      "classId": "class_mw1vwr15_3a1bvk"
     },
     {
       "id": "hw_mvm75qtg_mo9l",
@@ -364,7 +386,8 @@
         "完成洛谷GESP 四级救命题单第一周题目"
       ],
       "link": "",
-      "extensions": {}
+      "extensions": {},
+      "classId": "class_mw1vwr15_3a1bvk"
     },
     {
       "id": "hw_mvm74z69_uiad",
@@ -377,7 +400,8 @@
         "完成课堂第4、5、6题"
       ],
       "link": "",
-      "extensions": {}
+      "extensions": {},
+      "classId": "class_mw1vwr15_3a1bvk"
     },
     {
       "id": "hw_mvlsymlr_1uoh",
@@ -390,7 +414,8 @@
         "补做课堂第3、4题"
       ],
       "link": "",
-      "extensions": {}
+      "extensions": {},
+      "classId": "class_mw1vwr15_nqstof"
     },
     {
       "id": "hw_mvlsyab3_ge7y",
@@ -403,7 +428,8 @@
         "重做课堂第六题"
       ],
       "link": "",
-      "extensions": {}
+      "extensions": {},
+      "classId": "class_mw1vwr15_nqstof"
     },
     {
       "id": "hw_mvlrygtc_tvk6",
@@ -418,7 +444,8 @@
         "完成赛考中心--》我的考试--》GESP 2026.09 C++ 3级--10.28 test试卷（只有选择、判断题，认真写，25题错误率保证在7题内！！！）"
       ],
       "link": "",
-      "extensions": {}
+      "extensions": {},
+      "classId": "class_mw1vwr15_nqstof"
     },
     {
       "id": "hw_mvlrxk0p_s430",
@@ -432,7 +459,8 @@
         "这三道题的题解我发群里了，不会做的话可以先看群里的题解，看完后再自己独立复现一遍"
       ],
       "link": "",
-      "extensions": {}
+      "extensions": {},
+      "classId": "class_mw1vwr15_nqstof"
     },
     {
       "id": "hw_mvl4dayj_2g73",
@@ -448,7 +476,8 @@
         "1.完成信奥专区---》团队题单--》第9课 字符类型char、第13课 printf和scanf函数题单的全部题目"
       ],
       "link": "",
-      "extensions": {}
+      "extensions": {},
+      "classId": "class_mw1vwr15_4dcqm2"
     },
     {
       "id": "hw_mvdu6bwq",
@@ -466,7 +495,8 @@
       "link": "",
       "extensions": {},
       "dueDate": "2026-10-25",
-      "lessonDate": "2026-10-18"
+      "lessonDate": "2026-10-18",
+      "classId": "class_mw1vwr15_i0juet"
     },
     {
       "id": "hw_mvdtdxqj",
@@ -479,7 +509,8 @@
       "link": "",
       "extensions": {},
       "dueDate": "2026-10-25",
-      "lessonDate": "2026-10-18"
+      "lessonDate": "2026-10-18",
+      "classId": "class_mw1vwr15_i0juet"
     },
     {
       "id": "hw_mvdpzkim",
@@ -492,7 +523,8 @@
       "link": "",
       "extensions": {},
       "dueDate": "2026-10-25",
-      "lessonDate": "2026-10-18"
+      "lessonDate": "2026-10-18",
+      "classId": "class_mw1vwr15_4bzhke"
     },
     {
       "id": "hw_mvdpk6x1",
@@ -508,7 +540,8 @@
       "link": "",
       "extensions": {},
       "dueDate": "2026-10-25",
-      "lessonDate": "2026-10-18"
+      "lessonDate": "2026-10-18",
+      "classId": "class_mw1vwr15_4bzhke"
     },
     {
       "id": "hw_mvdlrwl3",
@@ -521,7 +554,8 @@
       "link": "https://www.feixianglaoshi.com/#/chat?share=1&communityContentId=7CBB92EFE1C37E3E5B91369E0459BD9F&featureId=20&si=undefined&suid=1158160385&from=user-page",
       "extensions": {},
       "dueDate": "2026-10-25",
-      "lessonDate": "2026-10-18"
+      "lessonDate": "2026-10-18",
+      "classId": "class_mw1vwr15_4bzhke"
     },
     {
       "id": "hw_mvdart2q",
@@ -534,7 +568,8 @@
       "link": "",
       "extensions": {},
       "dueDate": "2026-10-25",
-      "lessonDate": "2026-10-18"
+      "lessonDate": "2026-10-18",
+      "classId": "class_mw1vwr15_h1xm59"
     },
     {
       "id": "hw_mvcfenuk",
@@ -547,7 +582,8 @@
       "link": "",
       "extensions": {},
       "dueDate": "2026-10-24",
-      "lessonDate": "2026-10-17"
+      "lessonDate": "2026-10-17",
+      "classId": "class_mw1vwr15_l8gkx4"
     },
     {
       "id": "hw_mvcert90",
@@ -564,7 +600,8 @@
       "link": "",
       "extensions": {},
       "dueDate": "2026-10-24",
-      "lessonDate": "2026-10-17"
+      "lessonDate": "2026-10-17",
+      "classId": "class_mw1vwr15_4dcqm2"
     },
     {
       "id": "hw_mvceqt56",
@@ -579,7 +616,8 @@
         "李偲菡": 7
       },
       "dueDate": "2026-10-24",
-      "lessonDate": "2026-10-17"
+      "lessonDate": "2026-10-17",
+      "classId": "class_mw1vwr15_4dcqm2"
     },
     {
       "id": "hw_mvcdb37t",
@@ -592,7 +630,8 @@
       "link": "",
       "extensions": {},
       "dueDate": "2026-10-24",
-      "lessonDate": "2026-10-17"
+      "lessonDate": "2026-10-17",
+      "classId": "class_mw1vwr15_l8gkx4"
     },
     {
       "id": "hw_mvcd36mb",
@@ -605,7 +644,8 @@
       "link": "",
       "extensions": {},
       "dueDate": "2026-10-24",
-      "lessonDate": "2026-10-17"
+      "lessonDate": "2026-10-17",
+      "classId": "class_mw1vwr15_3a1bvk"
     },
     {
       "id": "hw_mvcd2y49",
@@ -618,7 +658,8 @@
       "link": "",
       "extensions": {},
       "dueDate": "2026-10-24",
-      "lessonDate": "2026-10-17"
+      "lessonDate": "2026-10-17",
+      "classId": "class_mw1vwr15_3a1bvk"
     },
     {
       "id": "hw_mvcd2l2x",
@@ -631,7 +672,8 @@
       "link": "",
       "extensions": {},
       "dueDate": "2026-10-24",
-      "lessonDate": "2026-10-17"
+      "lessonDate": "2026-10-17",
+      "classId": "class_mw1vwr15_3a1bvk"
     },
     {
       "id": "hw_mvcd251f",
@@ -644,7 +686,8 @@
       "link": "",
       "extensions": {},
       "dueDate": "2026-10-24",
-      "lessonDate": "2026-10-17"
+      "lessonDate": "2026-10-17",
+      "classId": "class_mw1vwr15_3a1bvk"
     },
     {
       "id": "hw_mvcac1s7",
@@ -658,7 +701,8 @@
       "link": "",
       "extensions": {},
       "dueDate": "2026-10-24",
-      "lessonDate": "2026-10-17"
+      "lessonDate": "2026-10-17",
+      "classId": "class_mw1vwr15_nqstof"
     },
     {
       "id": "hw_mvcabpff",
@@ -671,7 +715,8 @@
       "link": "",
       "extensions": {},
       "dueDate": "2026-10-24",
-      "lessonDate": "2026-10-17"
+      "lessonDate": "2026-10-17",
+      "classId": "class_mw1vwr15_nqstof"
     },
     {
       "id": "hw_mvcaawk6",
@@ -684,11 +729,51 @@
       "link": "",
       "extensions": {},
       "dueDate": "2026-10-24",
-      "lessonDate": "2026-10-17"
+      "lessonDate": "2026-10-17",
+      "classId": "class_mw1vwr15_nqstof"
     }
   ],
   "archivedClasses": {
     "【张老师】周日 14:30 CSP-J复赛集训班": true
   },
-  "studentRenames": {}
+  "studentRenames": {},
+  "classIds": {
+    "【张老师】周六 09:00 C++班级": "class_mw1vwr15_nqstof",
+    "【张老师】周日 14:30 CSP-J复赛集训班": "class_mw1vwr15_4bzhke",
+    "【张老师】周日 19:00 C++班级": "class_mw1vwr15_i0juet",
+    "【张老师】周六 14:30 Python班级": "class_mw1vwr15_l8gkx4",
+    "【张老师】周日 14:30 C++班级": "class_mw1vwr15_4dcqm2",
+    "【张老师】周日 10:30  C++班级": "class_mw1vwr15_3a1bvk",
+    "【张老师】周六 19:00 C++班级": "class_mw1vwr15_quaefl",
+    "【张老师】周日 09:00 C++班级": "class_mw1vwr15_h1xm59"
+  },
+  "classAliases": {},
+  "studentIds": {
+    "郭梓辰": "student_mw1vwr16_vxxiap",
+    "郑杰琨": "student_mw1vwr16_yabe1e",
+    "廖宇枫": "student_mw1vwr16_4thxt2",
+    "林洪睿": "student_mw1vwr16_52o3wm",
+    "林婧茹": "student_mw1vwr16_16k4oe",
+    "陈靖奇": "student_mw1vwr16_hmr2od",
+    "黄域轩": "student_mw1vwr16_ssjggw",
+    "余东霖": "student_mw1vwr16_o0kgfv",
+    "王恺博": "student_mw1vwr16_iqba0x",
+    "林逸轩": "student_mw1vwr16_hr1onp",
+    "黄亦博": "student_mw1vwr16_69ineo",
+    "林宇杰": "student_mw1vwr16_f2bhal",
+    "邱颜浠": "student_mw1vwr16_jzm4yl",
+    "林瑾浩": "student_mw1vwr16_fods8o",
+    "李霈恒": "student_mw1vwr16_8dtpvm",
+    "黄皓冉": "student_mw1vwr16_iqv7j7",
+    "林楷哲": "student_mw1vwr16_t5coaf",
+    "徐林暄": "student_mw1vwr16_cz288p",
+    "郑黄岩": "student_mw1vwr16_q1m3lt",
+    "叶奕辰": "student_mw1vwr16_qghml0",
+    "李兴凯": "student_mw1vwr16_3q79x2",
+    "林楚炫": "student_mw1vwr16_v4xovq",
+    "李偲菡": "student_mw1vwr16_0iwool",
+    "戴辰昊": "student_mw1vwr16_af1qh5",
+    "陈俊羽": "student_mw1vwr16_h0hqxd",
+    "林靖茹": "student_mw1vwr16_twcgbb"
+  }
 }
