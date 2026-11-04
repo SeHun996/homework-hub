@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-04T09:30:59.765Z",
+  "updated": "2026-11-04T09:31:19.456Z",
   "roster": {
     "【张老师】周六 09:00 C++班级": [
       "郭梓辰",
@@ -63,7 +63,15 @@
       ],
       "link": "",
       "extensions": {},
-      "classId": "class_mw1vwr15_i0juet"
+      "classId": "class_mw1vwr15_i0juet",
+      "targetSnapshot": [
+        "黄域轩",
+        "余东霖",
+        "王恺博",
+        "林逸轩",
+        "黄亦博",
+        "林宇杰"
+      ]
     },
     {
       "id": "hw_mvxnml41_7n02",
@@ -78,7 +86,10 @@
       ],
       "link": "",
       "extensions": {},
-      "classId": "class_mw1vwr15_4dcqm2"
+      "classId": "class_mw1vwr15_4dcqm2",
+      "targetSnapshot": [
+        "林楷哲"
+      ]
     },
     {
       "id": "hw_mvxnecub_i67r",
@@ -94,7 +105,11 @@
       ],
       "link": "",
       "extensions": {},
-      "classId": "class_mw1vwr15_4dcqm2"
+      "classId": "class_mw1vwr15_4dcqm2",
+      "targetSnapshot": [
+        "林楷哲",
+        "徐林暄"
+      ]
     },
     {
       "id": "hw_mvxb0f8o_btx6",
@@ -108,7 +123,10 @@
       ],
       "link": "",
       "extensions": {},
-      "classId": "class_mw1vwr15_3a1bvk"
+      "classId": "class_mw1vwr15_3a1bvk",
+      "targetSnapshot": [
+        "林楚炫"
+      ]
     },
     {
       "id": "hw_mvxazwvo_ieu1",
@@ -125,7 +143,11 @@
       ],
       "link": "",
       "extensions": {},
-      "classId": "class_mw1vwr15_3a1bvk"
+      "classId": "class_mw1vwr15_3a1bvk",
+      "targetSnapshot": [
+        "郑黄岩",
+        "叶奕辰"
+      ]
     },
     {
       "id": "hw_mvxayr7o_vokf",
@@ -139,7 +161,13 @@
       ],
       "link": "",
       "extensions": {},
-      "classId": "class_mw1vwr15_3a1bvk"
+      "classId": "class_mw1vwr15_3a1bvk",
+      "targetSnapshot": [
+        "林楚炫",
+        "郑黄岩",
+        "李兴凯",
+        "叶奕辰"
+      ]
     },
     {
       "id": "hw_mvxatuph_p3ns",
@@ -153,7 +181,10 @@
       ],
       "link": "",
       "extensions": {},
-      "classId": "class_mw1vwr15_h1xm59"
+      "classId": "class_mw1vwr15_h1xm59",
+      "targetSnapshot": [
+        "戴辰昊"
+      ]
     },
     {
       "id": "hw_mvwdsi4p_pw6i",
@@ -169,7 +200,10 @@
       ],
       "link": "",
       "extensions": {},
-      "classId": "class_mw1vwr15_quaefl"
+      "classId": "class_mw1vwr15_quaefl",
+      "targetSnapshot": [
+        "李偲菡"
+      ]
     },
     {
       "id": "hw_mvwa5wei_33hm",
@@ -183,7 +217,10 @@
       ],
       "link": "",
       "extensions": {},
-      "classId": "class_mw1vwr15_l8gkx4"
+      "classId": "class_mw1vwr15_l8gkx4",
+      "targetSnapshot": [
+        "林瑾浩"
+      ]
     },
     {
       "id": "hw_mvw6beck_2c6x",
@@ -197,7 +234,12 @@
       ],
       "link": "",
       "extensions": {},
-      "classId": "class_mw1vwr15_l8gkx4"
+      "classId": "class_mw1vwr15_l8gkx4",
+      "targetSnapshot": [
+        "林瑾浩",
+        "李霈恒",
+        "黄皓冉"
+      ]
     },
     {
       "id": "hw_mvw0drvx_l0wb",
@@ -211,7 +253,10 @@
       ],
       "link": "",
       "extensions": {},
-      "classId": "class_mw1vwr15_nqstof"
+      "classId": "class_mw1vwr15_nqstof",
+      "targetSnapshot": [
+        "廖宇枫"
+      ]
     },
     {
       "id": "hw_mvw0c7ax_6mi3",
@@ -226,7 +271,10 @@
       ],
       "link": "",
       "extensions": {},
-      "classId": "class_mw1vwr15_nqstof"
+      "classId": "class_mw1vwr15_nqstof",
+      "targetSnapshot": [
+        "郭梓辰"
+      ]
     },
     {
       "id": "hw_mvvs0nsd_uzx3",
@@ -241,7 +289,12 @@
       ],
       "link": "",
       "extensions": {},
-      "classId": "class_mw1vwr15_nqstof"
+      "classId": "class_mw1vwr15_nqstof",
+      "targetSnapshot": [
+        "廖宇枫",
+        "郭梓辰",
+        "郑杰琨"
+      ]
     },
     {
       "id": "hw_mvnxgsje_w77x",
@@ -255,7 +308,17 @@
       ],
       "link": "",
       "extensions": {},
-      "classId": "class_mw1vwr15_i0juet"
+      "classId": "class_mw1vwr15_i0juet",
+      "targetSnapshot": [
+        "陈靖奇",
+        "黄域轩",
+        "余东霖",
+        "王恺博",
+        "林逸轩",
+        "黄亦博",
+        "林宇杰",
+        "邱颜浠"
+      ]
     },
     {
       "id": "hw_mvnpa5z0_0cd8",
@@ -270,7 +333,12 @@
       ],
       "link": "",
       "extensions": {},
-      "classId": "class_mw1vwr15_4bzhke"
+      "classId": "class_mw1vwr15_4bzhke",
+      "targetSnapshot": [
+        "林楚炫",
+        "林洪睿",
+        "林婧茹"
+      ]
     },
     {
       "id": "hw_mvnp88z1_5tt1",
@@ -285,7 +353,10 @@
       ],
       "link": "",
       "extensions": {},
-      "classId": "class_mw1vwr15_h1xm59"
+      "classId": "class_mw1vwr15_h1xm59",
+      "targetSnapshot": [
+        "戴辰昊"
+      ]
     },
     {
       "id": "hw_mvmg56rm_yik9",
@@ -299,7 +370,10 @@
       ],
       "link": "",
       "extensions": {},
-      "classId": "class_mw1vwr15_l8gkx4"
+      "classId": "class_mw1vwr15_l8gkx4",
+      "targetSnapshot": [
+        "林瑾浩"
+      ]
     },
     {
       "id": "hw_mvmg2adp_ycuw",
@@ -313,7 +387,10 @@
       ],
       "link": "",
       "extensions": {},
-      "classId": "class_mw1vwr15_h1xm59"
+      "classId": "class_mw1vwr15_h1xm59",
+      "targetSnapshot": [
+        "戴辰昊"
+      ]
     },
     {
       "id": "hw_mvme077q_rixb",
@@ -327,7 +404,12 @@
       ],
       "link": "",
       "extensions": {},
-      "classId": "class_mw1vwr15_l8gkx4"
+      "classId": "class_mw1vwr15_l8gkx4",
+      "targetSnapshot": [
+        "林瑾浩",
+        "李霈恒",
+        "黄皓冉"
+      ]
     },
     {
       "id": "hw_mvm90xcn_qtdn",
@@ -345,7 +427,11 @@
       ],
       "link": "",
       "extensions": {},
-      "classId": "class_mw1vwr15_4dcqm2"
+      "classId": "class_mw1vwr15_4dcqm2",
+      "targetSnapshot": [
+        "林楷哲",
+        "徐林暄"
+      ]
     },
     {
       "id": "hw_mvm76lno_6gxd",
@@ -359,7 +445,10 @@
       ],
       "link": "",
       "extensions": {},
-      "classId": "class_mw1vwr15_3a1bvk"
+      "classId": "class_mw1vwr15_3a1bvk",
+      "targetSnapshot": [
+        "叶奕辰"
+      ]
     },
     {
       "id": "hw_mvm75vor_6gn3",
@@ -373,7 +462,10 @@
       ],
       "link": "",
       "extensions": {},
-      "classId": "class_mw1vwr15_3a1bvk"
+      "classId": "class_mw1vwr15_3a1bvk",
+      "targetSnapshot": [
+        "郑黄岩"
+      ]
     },
     {
       "id": "hw_mvm75qtg_mo9l",
@@ -387,7 +479,10 @@
       ],
       "link": "",
       "extensions": {},
-      "classId": "class_mw1vwr15_3a1bvk"
+      "classId": "class_mw1vwr15_3a1bvk",
+      "targetSnapshot": [
+        "陈俊羽"
+      ]
     },
     {
       "id": "hw_mvm74z69_uiad",
@@ -401,7 +496,14 @@
       ],
       "link": "",
       "extensions": {},
-      "classId": "class_mw1vwr15_3a1bvk"
+      "classId": "class_mw1vwr15_3a1bvk",
+      "targetSnapshot": [
+        "林楚炫",
+        "陈俊羽",
+        "郑黄岩",
+        "李兴凯",
+        "叶奕辰"
+      ]
     },
     {
       "id": "hw_mvlsymlr_1uoh",
@@ -415,7 +517,10 @@
       ],
       "link": "",
       "extensions": {},
-      "classId": "class_mw1vwr15_nqstof"
+      "classId": "class_mw1vwr15_nqstof",
+      "targetSnapshot": [
+        "廖宇枫"
+      ]
     },
     {
       "id": "hw_mvlsyab3_ge7y",
@@ -429,7 +534,10 @@
       ],
       "link": "",
       "extensions": {},
-      "classId": "class_mw1vwr15_nqstof"
+      "classId": "class_mw1vwr15_nqstof",
+      "targetSnapshot": [
+        "郑杰琨"
+      ]
     },
     {
       "id": "hw_mvlrygtc_tvk6",
@@ -445,7 +553,10 @@
       ],
       "link": "",
       "extensions": {},
-      "classId": "class_mw1vwr15_nqstof"
+      "classId": "class_mw1vwr15_nqstof",
+      "targetSnapshot": [
+        "郭梓辰"
+      ]
     },
     {
       "id": "hw_mvlrxk0p_s430",
@@ -460,7 +571,12 @@
       ],
       "link": "",
       "extensions": {},
-      "classId": "class_mw1vwr15_nqstof"
+      "classId": "class_mw1vwr15_nqstof",
+      "targetSnapshot": [
+        "廖宇枫",
+        "郭梓辰",
+        "郑杰琨"
+      ]
     },
     {
       "id": "hw_mvl4dayj_2g73",
@@ -477,7 +593,11 @@
       ],
       "link": "",
       "extensions": {},
-      "classId": "class_mw1vwr15_4dcqm2"
+      "classId": "class_mw1vwr15_4dcqm2",
+      "targetSnapshot": [
+        "林楷哲",
+        "徐林暄"
+      ]
     },
     {
       "id": "hw_mvdu6bwq",
@@ -496,7 +616,13 @@
       "extensions": {},
       "dueDate": "2026-10-25",
       "lessonDate": "2026-10-18",
-      "classId": "class_mw1vwr15_i0juet"
+      "classId": "class_mw1vwr15_i0juet",
+      "targetSnapshot": [
+        "陈靖奇",
+        "余东霖",
+        "王恺博",
+        "邱颜浠"
+      ]
     },
     {
       "id": "hw_mvdtdxqj",
@@ -510,7 +636,17 @@
       "extensions": {},
       "dueDate": "2026-10-25",
       "lessonDate": "2026-10-18",
-      "classId": "class_mw1vwr15_i0juet"
+      "classId": "class_mw1vwr15_i0juet",
+      "targetSnapshot": [
+        "陈靖奇",
+        "黄域轩",
+        "余东霖",
+        "王恺博",
+        "林逸轩",
+        "黄亦博",
+        "林宇杰",
+        "邱颜浠"
+      ]
     },
     {
       "id": "hw_mvdpzkim",
@@ -524,7 +660,10 @@
       "extensions": {},
       "dueDate": "2026-10-25",
       "lessonDate": "2026-10-18",
-      "classId": "class_mw1vwr15_4bzhke"
+      "classId": "class_mw1vwr15_4bzhke",
+      "targetSnapshot": [
+        "林洪睿"
+      ]
     },
     {
       "id": "hw_mvdpk6x1",
@@ -541,7 +680,11 @@
       "extensions": {},
       "dueDate": "2026-10-25",
       "lessonDate": "2026-10-18",
-      "classId": "class_mw1vwr15_4bzhke"
+      "classId": "class_mw1vwr15_4bzhke",
+      "targetSnapshot": [
+        "林楚炫",
+        "林靖茹"
+      ]
     },
     {
       "id": "hw_mvdlrwl3",
@@ -555,7 +698,10 @@
       "extensions": {},
       "dueDate": "2026-10-25",
       "lessonDate": "2026-10-18",
-      "classId": "class_mw1vwr15_4bzhke"
+      "classId": "class_mw1vwr15_4bzhke",
+      "targetSnapshot": [
+        "林楚炫"
+      ]
     },
     {
       "id": "hw_mvdart2q",
@@ -569,7 +715,10 @@
       "extensions": {},
       "dueDate": "2026-10-25",
       "lessonDate": "2026-10-18",
-      "classId": "class_mw1vwr15_h1xm59"
+      "classId": "class_mw1vwr15_h1xm59",
+      "targetSnapshot": [
+        "戴辰昊"
+      ]
     },
     {
       "id": "hw_mvcfenuk",
@@ -583,7 +732,10 @@
       "extensions": {},
       "dueDate": "2026-10-24",
       "lessonDate": "2026-10-17",
-      "classId": "class_mw1vwr15_l8gkx4"
+      "classId": "class_mw1vwr15_l8gkx4",
+      "targetSnapshot": [
+        "李霈恒"
+      ]
     },
     {
       "id": "hw_mvcert90",
@@ -601,7 +753,11 @@
       "extensions": {},
       "dueDate": "2026-10-24",
       "lessonDate": "2026-10-17",
-      "classId": "class_mw1vwr15_4dcqm2"
+      "classId": "class_mw1vwr15_4dcqm2",
+      "targetSnapshot": [
+        "林楷哲",
+        "徐林暄"
+      ]
     },
     {
       "id": "hw_mvceqt56",
@@ -617,7 +773,12 @@
       },
       "dueDate": "2026-10-24",
       "lessonDate": "2026-10-17",
-      "classId": "class_mw1vwr15_4dcqm2"
+      "classId": "class_mw1vwr15_4dcqm2",
+      "targetSnapshot": [
+        "林楷哲",
+        "徐林暄",
+        "李偲菡"
+      ]
     },
     {
       "id": "hw_mvcdb37t",
@@ -631,7 +792,12 @@
       "extensions": {},
       "dueDate": "2026-10-24",
       "lessonDate": "2026-10-17",
-      "classId": "class_mw1vwr15_l8gkx4"
+      "classId": "class_mw1vwr15_l8gkx4",
+      "targetSnapshot": [
+        "林瑾浩",
+        "李霈恒",
+        "黄皓冉"
+      ]
     },
     {
       "id": "hw_mvcd36mb",
@@ -645,7 +811,10 @@
       "extensions": {},
       "dueDate": "2026-10-24",
       "lessonDate": "2026-10-17",
-      "classId": "class_mw1vwr15_3a1bvk"
+      "classId": "class_mw1vwr15_3a1bvk",
+      "targetSnapshot": [
+        "叶奕辰"
+      ]
     },
     {
       "id": "hw_mvcd2y49",
@@ -659,7 +828,10 @@
       "extensions": {},
       "dueDate": "2026-10-24",
       "lessonDate": "2026-10-17",
-      "classId": "class_mw1vwr15_3a1bvk"
+      "classId": "class_mw1vwr15_3a1bvk",
+      "targetSnapshot": [
+        "郑黄岩"
+      ]
     },
     {
       "id": "hw_mvcd2l2x",
@@ -673,7 +845,10 @@
       "extensions": {},
       "dueDate": "2026-10-24",
       "lessonDate": "2026-10-17",
-      "classId": "class_mw1vwr15_3a1bvk"
+      "classId": "class_mw1vwr15_3a1bvk",
+      "targetSnapshot": [
+        "陈俊羽"
+      ]
     },
     {
       "id": "hw_mvcd251f",
@@ -687,7 +862,14 @@
       "extensions": {},
       "dueDate": "2026-10-24",
       "lessonDate": "2026-10-17",
-      "classId": "class_mw1vwr15_3a1bvk"
+      "classId": "class_mw1vwr15_3a1bvk",
+      "targetSnapshot": [
+        "林楚炫",
+        "陈俊羽",
+        "郑黄岩",
+        "李兴凯",
+        "叶奕辰"
+      ]
     },
     {
       "id": "hw_mvcac1s7",
@@ -702,7 +884,10 @@
       "extensions": {},
       "dueDate": "2026-10-24",
       "lessonDate": "2026-10-17",
-      "classId": "class_mw1vwr15_nqstof"
+      "classId": "class_mw1vwr15_nqstof",
+      "targetSnapshot": [
+        "郑杰琨"
+      ]
     },
     {
       "id": "hw_mvcabpff",
@@ -716,7 +901,10 @@
       "extensions": {},
       "dueDate": "2026-10-24",
       "lessonDate": "2026-10-17",
-      "classId": "class_mw1vwr15_nqstof"
+      "classId": "class_mw1vwr15_nqstof",
+      "targetSnapshot": [
+        "郭梓辰"
+      ]
     },
     {
       "id": "hw_mvcaawk6",
@@ -730,7 +918,12 @@
       "extensions": {},
       "dueDate": "2026-10-24",
       "lessonDate": "2026-10-17",
-      "classId": "class_mw1vwr15_nqstof"
+      "classId": "class_mw1vwr15_nqstof",
+      "targetSnapshot": [
+        "廖宇枫",
+        "郭梓辰",
+        "郑杰琨"
+      ]
     }
   ],
   "archivedClasses": {
