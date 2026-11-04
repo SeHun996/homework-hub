@@ -289,7 +289,7 @@ async function syncArchiveFromHomework(homework){
  if(!token()||!repo)return {ok:false,skip:true,message:'未配置私有档案仓库，未同步学员档案。'};
  let got;try{got=await ghReadJson(owner,repo,path)}catch(e){return {ok:false,message:'学员档案读取失败：'+explain(e)}}
  const db=got.data&&typeof got.data==='object'?got.data:{schemaVersion:1,updatedAt:'',students:{}};
- db.students=db.students||{};ensureTeacherIdentityMaps();let changed=0;
+ db.students=db.students||{};const originalArchiveJson=JSON.stringify(db);ensureTeacherIdentityMaps();let changed=0;
  // 只合并具有相同稳定课次标识的记录；不按“同一天”粗暴删除课次。
  function mergeLesson(target,source){
   target.items=Array.isArray(target.items)?target.items:[];
@@ -336,7 +336,7 @@ async function syncArchiveFromHomework(homework){
   else{
    const seen=new Set((newP.lessons||[]).map(l=>l.autoLessonKey||l.id).filter(Boolean));
    for(const l of (oldP.lessons||[])){const k=l.autoLessonKey||l.id;if(!k||!seen.has(k)){newP.lessons.push(l);if(k)seen.add(k)}}
-   newP.studentId=newP.studentId||oldP.studentId;newP.deletedSourceIds=Array.from(new Set([...(newP.deletedSourceIds||[]),...(oldP.deletedSourceIds||[])].map(String)));newP.deletedSourceItemIds=Array.from(new Set([...(newP.deletedSourceItemIds||[]),...(oldP.deletedSourceItemIds||[])].map(String)));newP.classNames=[...new Set([...(newP.classNames||[]),...(oldP.classNames||[])])];
+   newP.studentId=newP.studentId||oldP.studentId;newP.deletedSourceIds=Array.from(new Set([...(newP.deletedSourceIds||[]),...(oldP.deletedSourceIds||[])].map(String)));newP.deletedSourceItemIds=Array.from(new Set([...(newP.deletedSourceItemIds||[]),...(oldP.deletedSourceItemIds||[])].map(String)));newP.deletedLessonKeys=Array.from(new Set([...(newP.deletedLessonKeys||[]),...(oldP.deletedLessonKeys||[])].map(String)));newP.classNames=[...new Set([...(newP.classNames||[]),...(oldP.classNames||[])])];
    newP.nextLessonNumber=Math.max(Number(newP.nextLessonNumber)||0,Number(oldP.nextLessonNumber)||0);
    newP.hidden=!!(newP.hidden&&oldP.hidden);delete db.students[oldName];changed++;
   }
@@ -356,21 +356,31 @@ async function syncArchiveFromHomework(homework){
   if(!p.classNames.includes(cls))p.classNames.push(cls);if(isNew)changed++;
  }
  for(const h of (Array.isArray(homework)?homework:[])){
-  const targetNames=Array.isArray(h.targetSnapshot)?h.targetSnapshot.slice():([].concat(h.target||[]).includes('全班')?(D.roster[h.className]||[]):[].concat(h.target||[]));
-  // 即使学生后来转班/移出名单，也要按这份作业的 ID 更新其已有档案，清理旧班级副本。
-  const archivedNames=h.id?Object.entries(db.students).filter(([student,profile])=>(profile.lessons||[]).some(l=>Array.isArray(l.sourceIds)&&l.sourceIds.some(id=>String(id)===String(h.id)))||(profile.deletedSourceIds||[]).some(id=>String(id)===String(h.id))||(profile.deletedSourceItemIds||[]).some(id=>String(id).startsWith(String(h.id)+'_'))).map(([student])=>student):[];
+  // 空作业发布记录不应创建空课次；没有稳定 ID 的记录也不参与自动同步。
+  if(!h||!h.id||!Array.isArray(h.items)||!h.items.some(x=>String(x||'').trim()))continue;
+  const date=String(h.lessonDate||h.date||h.createdAt||h.created||`未标注日期:${h.id}`).trim();
+  const cls=String(h.className||'未指定班级').trim();
+  const classId=h.classId||(D.classIds&&D.classIds[cls])||(D.classAliases&&D.classAliases[cls])||newStableId('class');h.classId=classId;
+  const lessonDeleteKey=`${classId}|${date}`;
+  // 先找出已经存在或已删除过这条来源的学生，再决定历史全班作业的接收名单。
+  const archivedNames=Object.entries(db.students).filter(([student,profile])=>(profile.lessons||[]).some(l=>Array.isArray(l.sourceIds)&&l.sourceIds.some(id=>String(id)===String(h.id)))||(profile.deletedSourceIds||[]).some(id=>String(id)===String(h.id))||(profile.deletedSourceItemIds||[]).some(id=>String(id).startsWith(String(h.id)+'_'))||(profile.deletedLessonKeys||[]).includes(lessonDeleteKey)).map(([student])=>student);
+  const rawTargets=[].concat(h.target||[]);
+  let targetNames=Array.isArray(h.targetSnapshot)?h.targetSnapshot.slice():(rawTargets.includes('全班')?(archivedNames.length?archivedNames:(D.roster[h.className]||[]).slice()):rawTargets.slice());
+  // 旧记录第一次迁移时冻结接收名单，之后转班不会反向改变历史作业对象。
+  if(!Array.isArray(h.targetSnapshot))h.targetSnapshot=targetNames.slice();
   const names=Array.from(new Set([...targetNames,...archivedNames]));
   for(const name of names){
    if(!name||name==='全班')continue;
    const p=ensureProfile(db,name);p.studentId=p.studentId||D.studentIds[name]||newStableId('student');D.studentIds[name]=p.studentId;p.deletedSourceIds=Array.isArray(p.deletedSourceIds)?p.deletedSourceIds:[];p.deletedSourceItemIds=Array.isArray(p.deletedSourceItemIds)?p.deletedSourceItemIds:[];p.classNames=Array.isArray(p.classNames)?p.classNames:[];
+   p.deletedLessonKeys=Array.isArray(p.deletedLessonKeys)?p.deletedLessonKeys:[];
    if(h.id&&p.deletedSourceIds.includes(String(h.id)))continue;
-   if((h.items||[]).length&&(h.items||[]).every((_,i)=>p.deletedSourceItemIds.includes(String(makeTaskId(h,i)))))continue;
+   if(p.deletedLessonKeys.includes(lessonDeleteKey))continue;
+   const activeItemIndexes=(h.items||[]).map((_,i)=>i).filter(i=>!p.deletedSourceItemIds.includes(String(makeTaskId(h,i))));
+   if(!activeItemIndexes.length)continue;
    const current=currentMembership.get(name)||'';
    if(current){p.currentClass=current;p.className=current;p.rosterManaged=true;if(!p.classNames.includes(current))p.classNames.push(current)}
    // 日期和班级共同决定一次真实上课课次；同一份作业反复发布不改变这两个身份字段。
-   const date=String(h.lessonDate||h.date||h.createdAt||h.created|| (h.id?`未标注日期:${h.id}`:'未标注日期')).trim();
-   const cls=String(h.className||'未指定班级').trim();
-   const classId=h.classId||(D.classIds&&D.classIds[cls])||newStableId('class');h.classId=classId;
+   // date、cls、classId 在本条发布记录循环开始时统一计算。
    const studentId=p.studentId||D.studentIds[name]||name;
    const key=`${classId}|${studentId}|${date}`;
    const dateOf=l=>String(l&& (l.lessonDate||l.assignedDate)||'').trim();
@@ -395,14 +405,15 @@ async function syncArchiveFromHomework(homework){
    // 但若同一天、旧课次项目与这条教师发布记录逐项完全一致，可将其作为原课次保留。
    if(h.id&&(h.items||[]).length){
     const normTask=v=>String(v||'').trim().replace(/^\s*(?:(?:\d+\s*[、.．:：)）])|[-•])\s*/,'').replace(/\s+/g,' ').toLowerCase();
-    const wanted=(h.items||[]).map(normTask);
+    const wanted=activeItemIndexes.map(i=>normTask(h.items[i]));
     const legacyMatches=p.lessons.filter(l=>l!==lesson&&dateOf(l)===date&&(!Array.isArray(l.sourceIds)||!l.sourceIds.length)&&(l.items||[]).length===wanted.length&&(l.items||[]).every(it=>wanted.includes(normTask(it.text))));
     if(legacyMatches.length===1){
      const legacy=legacyMatches[0],generated=lesson;
      for(let i=0;i<wanted.length;i++){
+      const sourceIndex=activeItemIndexes[i];
       const targetItem=(legacy.items||[]).find(it=>normTask(it.text)===wanted[i]);
       const generatedItem=generated&&(generated.items||[]).find(it=>normTask(it.text)===wanted[i]);
-      if(targetItem){targetItem.sourceItemId=makeTaskId(h,i);targetItem.sourceItemIds=Array.from(new Set([...(targetItem.sourceItemIds||[]),targetItem.sourceItemId]));if(generatedItem){if(!targetItem.status&&generatedItem.status)targetItem.status=generatedItem.status;if(!targetItem.note&&generatedItem.note)targetItem.note=generatedItem.note;else if(targetItem.note&&generatedItem.note&&targetItem.note!==generatedItem.note)targetItem.note+='\n'+generatedItem.note;}}
+      if(targetItem){targetItem.sourceItemId=makeTaskId(h,sourceIndex);targetItem.sourceItemIds=Array.from(new Set([...(targetItem.sourceItemIds||[]),targetItem.sourceItemId]));if(generatedItem){if(!targetItem.status&&generatedItem.status)targetItem.status=generatedItem.status;if(!targetItem.note&&generatedItem.note)targetItem.note=generatedItem.note;else if(targetItem.note&&generatedItem.note&&targetItem.note!==generatedItem.note)targetItem.note+='\n'+generatedItem.note;}}
      }
      if(generated&&generated!==legacy){
       legacy.sourceIds=Array.from(new Set([...(legacy.sourceIds||[]),...(generated.sourceIds||[]),h.id].filter(Boolean)));
@@ -460,9 +471,8 @@ async function syncArchiveFromHomework(homework){
    const ownedPrefix=String(h.id||'')+'_';
    const oldOwned=lesson.items.filter(it=>h.id&&(String(it.sourceItemId||'').startsWith(ownedPrefix)||(it.sourceItemIds||[]).some(id=>String(id).startsWith(ownedPrefix))));
    const usedOwned=new Set();
-   for(let i=0;i<(h.items||[]).length;i++){
+   for(const i of activeItemIndexes){
     const itemText=h.items[i],sourceItemId=makeTaskId(h,i);
-    if(p.deletedSourceItemIds.includes(String(sourceItemId)))continue;
     const normText=String(itemText||'').trim().replace(/\s+/g,' ').toLowerCase();
     const itemCandidates=[...oldOwned,...movedItems].filter(it=>!usedOwned.has(it));
     const matches=itemCandidates.filter(it=>it.sourceItemId===sourceItemId||(Array.isArray(it.sourceItemIds)&&it.sourceItemIds.includes(sourceItemId))||String(it.text||'').trim().replace(/\s+/g,' ').toLowerCase()===normText);
@@ -482,11 +492,11 @@ async function syncArchiveFromHomework(homework){
  }
  // 本轮同步后再按真实班级+上课日期合并；不同班级/日期绝不因同一 sourceId 被合并。
  for(const p of Object.values(db.students))cleanupStableDuplicates(p);
- if(changed===0)return {ok:true,changed:0,message:'学员档案无需新增内容（发布记录可能已同步过）。'};
+ if(JSON.stringify(db)===originalArchiveJson)return {ok:true,changed:0,message:'学员档案没有发生数据变化，本次未重复写入云端。'};
  db.updatedAt=new Date().toISOString();
- try{await ghWriteJson(owner,repo,path,db,got.sha,'同步教师名单及作业到学员档案');return {ok:true,changed,message:`已同步教师名单与学员档案（新增或更新 ${changed} 项）。同一课次重复记录已按稳定标识合并。`}}
+ try{await ghWriteJson(owner,repo,path,db,got.sha,'同步教师名单及作业到学员档案');return {ok:true,changed,message:`已同步教师名单与学员档案（处理 ${changed} 项数据变更）。重复课次仅按稳定身份合并。`}}
  catch(e){return {ok:false,message:'学员档案写入失败：'+explain(e)}}
 }
-$('pub').addEventListener('click',async()=>{if(!token()){$('settings').open=true;$('settings').scrollIntoView({behavior:'smooth'});return showModal('需要 GitHub 令牌','请先在页面下方的设置里保存 GitHub 访问令牌。','⚠️')};const btn=$('pub');btn.disabled=true;btn.textContent='发布中……';msg('正在发布到学生端……','warn');showModal('正在同步','正在更新学生端作业，并同步学员档案到 GitHub。请稍候，不要关闭页面。','⏳');$('modalCancel').hidden=true;try{D.updated=new Date().toISOString();try{localStorage.setItem(DK,JSON.stringify({savedAt:D.updated,data:D}))}catch(e){}let sha;const g=await fetch(API,{headers:hdr(),cache:'no-store'});if(g.ok)sha=(await g.json()).sha;else if(g.status!==404)throw g;const r=await fetch(API,{method:'PUT',headers:{...hdr(),'Content-Type':'application/json'},body:JSON.stringify({message:'更新作业 '+new Date().toLocaleString('zh-CN',{hour12:false}),content:btoa(unescape(encodeURIComponent(JSON.stringify(D,null,2)))),sha})});if(!r.ok)throw r;let extra='已成功发布到学生端。学生端通常会在 GitHub Pages 更新后看到作业。';let icon='✅';const a=await syncArchiveFromHomework(D.homework);if(a.ok)extra+='\n'+a.message;else if(a.skip)extra+='\n⚠️ '+a.message;else{icon='⚠️';extra+='\n但'+a.message}msg(a.ok?'作业发布成功，学员档案同步完成。':a.skip?'作业发布成功，但学员档案尚未配置。':'作业已发布到学生端，但学员档案同步失败。',a.ok?'ok':'warn');renderList();showModal(a.ok?'更新完成':a.skip?'作业已发布（档案未同步）':'作业已发布，档案同步失败',extra,icon);$('modalCancel').hidden=false}catch(e){msg('发布失败：'+explain(e),'bad');showModal('更新失败',explain(e)+'\n本地草稿仍然保留，可以修复权限或网络后重试。','❌');$('modalCancel').hidden=false}finally{$('modalCancel').hidden=false;btn.disabled=false;btn.textContent='发布到学生端'}});
+$('pub').addEventListener('click',async()=>{if(!token()){$('settings').open=true;$('settings').scrollIntoView({behavior:'smooth'});return showModal('需要 GitHub 令牌','请先在页面下方的设置里保存 GitHub 访问令牌。','⚠️')};const btn=$('pub');btn.disabled=true;btn.textContent='发布中……';msg('正在发布到学生端……','warn');showModal('正在同步','正在更新学生端作业，并同步学员档案到 GitHub。请稍候，不要关闭页面。','⏳');$('modalCancel').hidden=true;try{ensureTeacherIdentityMaps();D.updated=new Date().toISOString();try{localStorage.setItem(DK,JSON.stringify({savedAt:D.updated,data:D}))}catch(e){}let sha;const g=await fetch(API,{headers:hdr(),cache:'no-store'});if(g.ok)sha=(await g.json()).sha;else if(g.status!==404)throw g;const r=await fetch(API,{method:'PUT',headers:{...hdr(),'Content-Type':'application/json'},body:JSON.stringify({message:'更新作业 '+new Date().toLocaleString('zh-CN',{hour12:false}),content:btoa(unescape(encodeURIComponent(JSON.stringify(D,null,2)))),sha})});if(!r.ok)throw r;const published=await r.json();let publishedSha=published.content&&published.content.sha;let extra='已成功发布到学生端。学生端通常会在 GitHub Pages 更新后看到作业。';let icon='✅';const beforeArchive=JSON.stringify(D);const a=await syncArchiveFromHomework(D.homework);if(JSON.stringify(D)!==beforeArchive){D.updated=new Date().toISOString();try{localStorage.setItem(DK,JSON.stringify({savedAt:D.updated,data:D}))}catch(e){}const g2=await fetch(API,{headers:hdr(),cache:'no-store'});if(!g2.ok)throw new Error('档案同步后需要保存班级身份/历史名单快照，但重新读取 homework.json 失败。');const meta2=await g2.json();const r2=await fetch(API,{method:'PUT',headers:{...hdr(),'Content-Type':'application/json'},body:JSON.stringify({message:'保存班级身份及历史名单快照 '+new Date().toLocaleString('zh-CN',{hour12:false}),content:btoa(unescape(encodeURIComponent(JSON.stringify(D,null,2)))),sha:meta2.sha||publishedSha})});if(!r2.ok)throw new Error('学员档案已同步，但教师端班级身份/历史名单快照未能回写，请检查 GitHub 权限后重试。')}if(a.ok)extra+='\n'+a.message;else if(a.skip)extra+='\n⚠️ '+a.message;else{icon='⚠️';extra+='\n但'+a.message}msg(a.ok?'作业发布成功，学员档案同步完成。':a.skip?'作业发布成功，但学员档案尚未配置。':'作业已发布到学生端，但学员档案同步失败。',a.ok?'ok':'warn');renderList();showModal(a.ok?'更新完成':a.skip?'作业已发布（档案未同步）':'作业已发布，档案同步失败',extra,icon);$('modalCancel').hidden=false}catch(e){msg('发布失败：'+explain(e),'bad');showModal('更新失败',explain(e)+'\n本地草稿仍然保留，可以修复权限或网络后重试。','❌');$('modalCancel').hidden=false}finally{$('modalCancel').hidden=false;btn.disabled=false;btn.textContent='发布到学生端'}});
 boot();
 </script></body></html>
