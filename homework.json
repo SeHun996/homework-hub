@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-06T11:29:23.640Z",
+  "updated": "2026-11-06T12:45:06.400Z",
   "roster": {
     "【张老师】周六 09:00 C++班级": [
       "郭梓辰",
@@ -47,6 +47,24 @@
     ]
   },
   "homework": [
+    {
+      "id": "hw_mw4yvv7u_cu19",
+      "className": "【张老师】周六 10:30 GESPC++3级班级",
+      "classId": "class_mw4w433u_k05g6w",
+      "target": "叶奕辰【GESP C++3级集训】",
+      "targetSnapshot": [
+        "叶奕辰【GESP C++3级集训】"
+      ],
+      "date": "2026-11-06",
+      "lessonDate": "2026-11-06",
+      "dueDate": "2026-11-13",
+      "items": [
+        "每天完成一份三级必备-进制转换练习题（群里拍照打卡）",
+        "每天看4页老师提供的GESP C++ 三级考前核心知识手册纸质文件"
+      ],
+      "link": "",
+      "extensions": {}
+    },
     {
       "id": "hw_mvxu7c2f_n2ur",
       "className": "【张老师】周日 19:00 C++班级",
