@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-04T09:37:08.526Z",
+  "updated": "2026-11-06T11:29:23.640Z",
   "roster": {
     "【张老师】周六 09:00 C++班级": [
       "郭梓辰",
@@ -40,6 +40,10 @@
     ],
     "【张老师】周日 09:00 C++班级": [
       "戴辰昊"
+    ],
+    "【张老师】周六 10:30 GESPC++3级班级": [
+      "叶奕辰【GESP C++3级集训】",
+      "郭梓辰【GESP C++3级集训】"
     ]
   },
   "homework": [
@@ -938,7 +942,8 @@
     "【张老师】周日 14:30 C++班级": "class_mw1vwr15_4dcqm2",
     "【张老师】周日 10:30  C++班级": "class_mw1vwr15_3a1bvk",
     "【张老师】周六 19:00 C++班级": "class_mw1vwr15_quaefl",
-    "【张老师】周日 09:00 C++班级": "class_mw1vwr15_h1xm59"
+    "【张老师】周日 09:00 C++班级": "class_mw1vwr15_h1xm59",
+    "【张老师】周六 10:30 GESPC++3级班级": "class_mw4w433u_k05g6w"
   },
   "classAliases": {},
   "studentIds": {
@@ -970,6 +975,8 @@
     "林靖茹": "student_mw1vwr16_twcgbb",
     "庄子麒": "student_mw1w8dux_i3hd6k",
     "陈泓宇": "student_mw1w8dux_q6mv5i",
-    "倪国轩": "student_mw1w8dux_orebod"
+    "倪国轩": "student_mw1w8dux_orebod",
+    "叶奕辰【GESP C++3级集训】": "student_mw4w4mqc_jexpx6",
+    "郭梓辰【GESP C++3级集训】": "student_mw4w64sz_8qcxj4"
   }
 }
