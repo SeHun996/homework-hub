@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-07T10:43:36.466Z",
+  "updated": "2026-11-07T12:26:42.033Z",
   "roster": {
     "【张老师】周六 09:00 C++班级": [
       "郭梓辰",
@@ -47,6 +47,24 @@
     ]
   },
   "homework": [
+    {
+      "id": "hw_mw6do0hf_9ysk",
+      "className": "【张老师】周六 19:00 C++班级",
+      "classId": "class_mw1vwr15_quaefl",
+      "target": "全班",
+      "targetSnapshot": [
+        "李偲菡"
+      ],
+      "date": "2026-11-07",
+      "lessonDate": "2026-11-07",
+      "dueDate": "2026-11-14",
+      "items": [
+        "补做逻辑运算符随堂强化题目",
+        "完成《分支嵌套与switch》课堂未完成的题目"
+      ],
+      "link": "",
+      "extensions": {}
+    },
     {
       "id": "hw_mw69zhk9_5d8q",
       "className": "【张老师】周六 14:30 Python班级",
