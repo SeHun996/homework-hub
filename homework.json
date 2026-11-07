@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-07T06:40:36.634Z",
+  "updated": "2026-11-07T06:44:12.717Z",
   "roster": {
     "【张老师】周六 09:00 C++班级": [
       "郭梓辰",
@@ -47,6 +47,45 @@
     ]
   },
   "homework": [
+    {
+      "id": "hw_mw61f0u7_hoe8",
+      "className": "【张老师】周六 09:00 C++班级",
+      "classId": "class_mw1vwr15_nqstof",
+      "target": "郭梓辰",
+      "targetSnapshot": [
+        "郭梓辰"
+      ],
+      "date": "2026-11-07",
+      "lessonDate": "2026-11-07",
+      "dueDate": "2026-11-14",
+      "items": [
+        "补做两份GESP真题202609、202606（202609在未来金刚平台做过，先去查看错题解析，订正后重新写在纸质试卷上）",
+        "重做信奥专区--》团队题单--》GESP C++ 3级 大题汇总--》第14、15、16题"
+      ],
+      "link": "",
+      "extensions": {}
+    },
+    {
+      "id": "hw_mw61e9gj_mrkn",
+      "className": "【张老师】周六 09:00 C++班级",
+      "classId": "class_mw1vwr15_nqstof",
+      "target": [
+        "郭梓辰",
+        "郑杰琨"
+      ],
+      "targetSnapshot": [
+        "郭梓辰",
+        "郑杰琨"
+      ],
+      "date": "2026-11-07",
+      "lessonDate": "2026-11-07",
+      "dueDate": "2026-11-14",
+      "items": [
+        "补完《模拟进阶》课后挑战中剩余的全部题目"
+      ],
+      "link": "",
+      "extensions": {}
+    },
     {
       "id": "hw_mw61az5l_buxu",
       "className": "【张老师】周日 19:00 C++班级",
