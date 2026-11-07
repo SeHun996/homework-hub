@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-07T12:26:42.033Z",
+  "updated": "2026-11-07T12:27:46.533Z",
   "roster": {
     "【张老师】周六 09:00 C++班级": [
       "郭梓辰",
@@ -408,7 +408,9 @@
         "补做课堂第3题"
       ],
       "link": "",
-      "extensions": {},
+      "extensions": {
+        "廖宇枫": 7
+      },
       "classId": "class_mw1vwr15_nqstof",
       "targetSnapshot": [
         "廖宇枫"
@@ -444,7 +446,9 @@
         "完成课后挑战剩余的题目，所有题目均自己先思考，尝试完成，确实思考不出来，到洛谷--》团队--》文件查找相对应题目的题解"
       ],
       "link": "",
-      "extensions": {},
+      "extensions": {
+        "廖宇枫": 7
+      },
       "classId": "class_mw1vwr15_nqstof",
       "targetSnapshot": [
         "廖宇枫",
