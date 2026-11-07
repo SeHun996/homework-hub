@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-06T12:45:06.400Z",
+  "updated": "2026-11-07T06:40:36.634Z",
   "roster": {
     "【张老师】周六 09:00 C++班级": [
       "郭梓辰",
@@ -47,6 +47,24 @@
     ]
   },
   "homework": [
+    {
+      "id": "hw_mw61az5l_buxu",
+      "className": "【张老师】周日 19:00 C++班级",
+      "classId": "class_mw1vwr15_i0juet",
+      "target": "邱颜浠",
+      "targetSnapshot": [
+        "邱颜浠"
+      ],
+      "date": "2026-11-07",
+      "lessonDate": "2026-11-07",
+      "dueDate": "2026-11-08",
+      "items": [
+        "完成信奥专区 → 团队题单 → 四年级上 01 解决问题（一）剩余的题目",
+        "复习前面所学的所有知识点、笔记、学生讲义，周日阶段测试"
+      ],
+      "link": "",
+      "extensions": {}
+    },
     {
       "id": "hw_mw4yvv7u_cu19",
       "className": "【张老师】周六 10:30 GESPC++3级班级",
