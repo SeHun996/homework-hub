@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-07T06:44:12.717Z",
+  "updated": "2026-11-07T10:43:36.466Z",
   "roster": {
     "【张老师】周六 09:00 C++班级": [
       "郭梓辰",
@@ -47,6 +47,65 @@
     ]
   },
   "homework": [
+    {
+      "id": "hw_mw69zhk9_5d8q",
+      "className": "【张老师】周六 14:30 Python班级",
+      "classId": "class_mw1vwr15_l8gkx4",
+      "target": [
+        "林瑾浩",
+        "李霈恒"
+      ],
+      "targetSnapshot": [
+        "林瑾浩",
+        "李霈恒"
+      ],
+      "date": "2026-11-07",
+      "lessonDate": "2026-11-07",
+      "dueDate": "2026-11-14",
+      "items": [
+        "信奥专区--》团队题单--》GESP Python 1级 大题汇总里错误的题目请订正完毕，详细题解已发布在家长微信群"
+      ],
+      "link": "",
+      "extensions": {}
+    },
+    {
+      "id": "hw_mw69xnsa_ymx4",
+      "className": "【张老师】周六 14:30 Python班级",
+      "classId": "class_mw1vwr15_l8gkx4",
+      "target": "李霈恒",
+      "targetSnapshot": [
+        "李霈恒"
+      ],
+      "date": "2026-11-07",
+      "lessonDate": "2026-11-07",
+      "dueDate": "2026-11-14",
+      "items": [
+        "1.错题代码+注释罚抄4遍在本子上，一遍复现在平台--》赛考中心--》周六 14:30 Python阶段检测（笔记）上"
+      ],
+      "link": "",
+      "extensions": {}
+    },
+    {
+      "id": "hw_mw69xb6t_qzt6",
+      "className": "【张老师】周六 14:30 Python班级",
+      "classId": "class_mw1vwr15_l8gkx4",
+      "target": [
+        "林瑾浩",
+        "黄皓冉"
+      ],
+      "targetSnapshot": [
+        "林瑾浩",
+        "黄皓冉"
+      ],
+      "date": "2026-11-07",
+      "lessonDate": "2026-11-07",
+      "dueDate": "2026-11-14",
+      "items": [
+        "错题代码+注释罚抄9遍在本子上，一遍复现在平台--》赛考中心--》周六 14:30 Python阶段检测（笔记）上"
+      ],
+      "link": "",
+      "extensions": {}
+    },
     {
       "id": "hw_mw61f0u7_hoe8",
       "className": "【张老师】周六 09:00 C++班级",
