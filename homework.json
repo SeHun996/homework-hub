@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-08T08:23:52.416Z",
+  "updated": "2026-11-08T08:41:57.404Z",
   "roster": {
     "【张老师】周六 09:00 C++班级": [
       "郭梓辰",
@@ -48,6 +48,70 @@
     ]
   },
   "homework": [
+    {
+      "id": "hw_mw7l2ton_11z4",
+      "className": "【张老师】周日 10:30  C++班级",
+      "classId": "class_mw1vwr15_3a1bvk",
+      "target": [
+        "郑黄岩",
+        "李兴凯"
+      ],
+      "targetSnapshot": [
+        "郑黄岩",
+        "李兴凯"
+      ],
+      "date": "2026-11-08",
+      "lessonDate": "2026-11-08",
+      "dueDate": "2026-11-15",
+      "items": [
+        "背诵老师提供的GESP C++ 三级考前核心知识手册纸质材料，每天4页"
+      ],
+      "link": "",
+      "extensions": {}
+    },
+    {
+      "id": "hw_mw7l2f4i_aqm2",
+      "className": "【张老师】周日 10:30  C++班级",
+      "classId": "class_mw1vwr15_3a1bvk",
+      "target": "郑黄岩",
+      "targetSnapshot": [
+        "郑黄岩"
+      ],
+      "date": "2026-11-08",
+      "lessonDate": "2026-11-08",
+      "dueDate": "2026-11-15",
+      "items": [
+        "补做未完成GESP真题试卷"
+      ],
+      "link": "",
+      "extensions": {}
+    },
+    {
+      "id": "hw_mw7l0eb2_bfjp",
+      "className": "【张老师】周日 10:30  C++班级",
+      "classId": "class_mw1vwr15_3a1bvk",
+      "target": [
+        "郑黄岩",
+        "李兴凯",
+        "林楚炫",
+        "陈俊羽"
+      ],
+      "targetSnapshot": [
+        "郑黄岩",
+        "李兴凯",
+        "林楚炫",
+        "陈俊羽"
+      ],
+      "date": "2026-11-08",
+      "lessonDate": "2026-11-08",
+      "dueDate": "2026-11-15",
+      "items": [
+        "在信奥专区--》团队题单--》第23讲 map与set 课后--》重做[GESP 202409 五级 T2] 挑战怪物这题",
+        "完成课后挑战第2题到第6题（如果没有思路 ，可以去洛谷--》团队--》文件区搜索引导式题解）"
+      ],
+      "link": "",
+      "extensions": {}
+    },
     {
       "id": "hw_mw7kdxnm_xij9",
       "className": "【张老师】周日 09:00 C++班级",
