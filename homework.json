@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-14T10:31:24.872Z",
+  "updated": "2026-11-14T10:39:33.905Z",
   "roster": {
     "【张老师】周六 09:00 C++班级": [
       "郭梓辰",
@@ -44,7 +44,8 @@
     ],
     "【张老师】周六 10:30 GESPC++3级班级": [
       "叶奕辰【GESP C++3级集训】",
-      "郭梓辰【GESP C++3级集训】"
+      "郭梓辰【GESP C++3级集训】",
+      "郑黄岩【GESP C++3级集训】"
     ]
   },
   "homework": [
@@ -1297,6 +1298,7 @@
     "陈泓宇": "student_mw1w8dux_q6mv5i",
     "倪国轩": "student_mw1w8dux_orebod",
     "叶奕辰【GESP C++3级集训】": "student_mw4w4mqc_jexpx6",
-    "郭梓辰【GESP C++3级集训】": "student_mw4w64sz_8qcxj4"
+    "郭梓辰【GESP C++3级集训】": "student_mw4w64sz_8qcxj4",
+    "郑黄岩【GESP C++3级集训】": "student_mwg9wu0e_tzticq"
   }
 }
