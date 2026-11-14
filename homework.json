@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-14T10:42:54.998Z",
+  "updated": "2026-11-14T10:49:51.278Z",
   "roster": {
     "【张老师】周六 09:00 C++班级": [
       "郭梓辰",
@@ -49,6 +49,28 @@
     ]
   },
   "homework": [
+    {
+      "id": "hw_mwgaahld_j2bh",
+      "className": "【张老师】周六 14:30 Python班级",
+      "classId": "class_mw1vwr15_l8gkx4",
+      "target": [
+        "林瑾浩",
+        "李霈恒"
+      ],
+      "targetSnapshot": [
+        "林瑾浩",
+        "李霈恒"
+      ],
+      "date": "2026-11-14",
+      "lessonDate": "2026-11-14",
+      "dueDate": "2026-11-21",
+      "items": [
+        "复习讲义（下节课抽查背诵）",
+        "完成课后挑战题目"
+      ],
+      "link": "",
+      "extensions": {}
+    },
     {
       "id": "hw_mwg9z8is_61dn",
       "className": "【张老师】周六 10:30 GESPC++3级班级",
