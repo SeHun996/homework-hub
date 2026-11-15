@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-14T12:39:58.346Z",
+  "updated": "2026-11-15T06:17:10.677Z",
   "roster": {
     "【张老师】周六 09:00 C++班级": [
       "郭梓辰",
@@ -49,6 +49,23 @@
     ]
   },
   "homework": [
+    {
+      "id": "hw_mwhfzop4_uakr",
+      "className": "【张老师】周日 09:00 C++班级",
+      "classId": "class_mw1vwr15_h1xm59",
+      "target": "全班",
+      "targetSnapshot": [
+        "戴辰昊"
+      ],
+      "date": "2026-11-15",
+      "lessonDate": "2026-11-15",
+      "dueDate": "2026-11-22",
+      "items": [
+        "完成洛谷题目P1901、B4273"
+      ],
+      "link": "",
+      "extensions": {}
+    },
     {
       "id": "hw_mwge757m_eabf",
       "className": "【张老师】周六 19:00 C++班级",
