@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-15T06:17:10.677Z",
+  "updated": "2026-11-15T06:35:08.801Z",
   "roster": {
     "【张老师】周六 09:00 C++班级": [
       "郭梓辰",
@@ -49,6 +49,45 @@
     ]
   },
   "homework": [
+    {
+      "id": "hw_mwhgmrtb_p0t1",
+      "className": "【张老师】周日 10:30  C++班级",
+      "classId": "class_mw1vwr15_3a1bvk",
+      "target": "李兴凯",
+      "targetSnapshot": [
+        "李兴凯"
+      ],
+      "date": "2026-11-15",
+      "lessonDate": "2026-11-15",
+      "dueDate": "2026-11-22",
+      "items": [
+        "完成202606、202609真题纸质练习"
+      ],
+      "link": "",
+      "extensions": {}
+    },
+    {
+      "id": "hw_mwhgm9ha_4nit",
+      "className": "【张老师】周日 10:30  C++班级",
+      "classId": "class_mw1vwr15_3a1bvk",
+      "target": "全班",
+      "targetSnapshot": [
+        "郑黄岩",
+        "叶奕辰",
+        "李兴凯",
+        "林楚炫",
+        "陈俊羽"
+      ],
+      "date": "2026-11-15",
+      "lessonDate": "2026-11-15",
+      "dueDate": "2026-11-22",
+      "items": [
+        "完成剩余的课后题目",
+        "复习《map与set 》全部题目，下周将从课堂练习以及课后题目中抽取3题进行随堂测试"
+      ],
+      "link": "",
+      "extensions": {}
+    },
     {
       "id": "hw_mwhfzop4_uakr",
       "className": "【张老师】周日 09:00 C++班级",
