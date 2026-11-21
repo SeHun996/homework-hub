@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-15T12:56:45.427Z",
+  "updated": "2026-11-21T06:18:50.267Z",
   "roster": {
     "【张老师】周六 09:00 C++班级": [
       "郭梓辰",
@@ -49,6 +49,43 @@
     ]
   },
   "homework": [
+    {
+      "id": "hw_mwq0oxg6_q2cr",
+      "className": "【张老师】周六 10:30 GESPC++3级班级",
+      "classId": "class_mw4w433u_k05g6w",
+      "target": "郭梓辰【GESP C++3级集训】",
+      "targetSnapshot": [
+        "郭梓辰【GESP C++3级集训】"
+      ],
+      "date": "2026-11-21",
+      "lessonDate": "2026-11-21",
+      "dueDate": "2026-11-28",
+      "items": [
+        "依据老师提供的题解认真订正202609、202606剩余错误的题目",
+        "完整202603纸质练习"
+      ],
+      "link": "",
+      "extensions": {}
+    },
+    {
+      "id": "hw_mwq0mz6t_gkpf",
+      "className": "【张老师】周六 09:00 C++班级",
+      "classId": "class_mw1vwr15_nqstof",
+      "target": "全班",
+      "targetSnapshot": [
+        "郭梓辰",
+        "郑杰琨",
+        "廖宇枫"
+      ],
+      "date": "2026-11-21",
+      "lessonDate": "2026-11-21",
+      "dueDate": "2026-11-28",
+      "items": [
+        "完成信奥专区--》团队题单--》模拟算法测试重写题单里的全部题目"
+      ],
+      "link": "",
+      "extensions": {}
+    },
     {
       "id": "hw_mwhu9iwu_it55",
       "className": "【张老师】周日 19:00 C++班级",
