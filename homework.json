@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-22T07:11:15.869Z",
+  "updated": "2026-11-22T08:58:34.576Z",
   "roster": {
     "【张老师】周六 09:00 C++班级": [
       "郭梓辰",
@@ -51,6 +51,27 @@
     ]
   },
   "homework": [
+    {
+      "id": "hw_mwrlu78r_mndc",
+      "className": "【张老师】周日 10:30  C++班级",
+      "classId": "class_mw1vwr15_3a1bvk",
+      "target": [
+        "林楚炫",
+        "陈俊羽"
+      ],
+      "targetSnapshot": [
+        "林楚炫",
+        "陈俊羽"
+      ],
+      "date": "2026-11-22",
+      "lessonDate": "2026-11-22",
+      "dueDate": "2026-11-29",
+      "items": [
+        "完成信奥专区--》团队题单--》周日 10:30 C++班级--》mp与set测试重写"
+      ],
+      "link": "",
+      "extensions": {}
+    },
     {
       "id": "hw_mwri073c_kva2",
       "className": "【张老师】周日 09:00 C++班级",
