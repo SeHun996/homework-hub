@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-22T09:08:44.817Z",
+  "updated": "2026-11-22T09:13:00.995Z",
   "roster": {
     "【张老师】周六 09:00 C++班级": [
       "郭梓辰",
@@ -51,6 +51,23 @@
     ]
   },
   "homework": [
+    {
+      "id": "hw_mwrmcs0h_z18o",
+      "className": "【张老师】周日 14:30 C++班级",
+      "classId": "class_mw1vwr15_4dcqm2",
+      "target": "林楷哲",
+      "targetSnapshot": [
+        "林楷哲"
+      ],
+      "date": "2026-11-22",
+      "lessonDate": "2026-11-22",
+      "dueDate": "2026-11-29",
+      "items": [
+        "补做《分支嵌套与switch》课后挑战的全部题目"
+      ],
+      "link": "",
+      "extensions": {}
+    },
     {
       "id": "hw_mwrm7ahm_mixl",
       "className": "【张老师】周日 14:30 C++班级",
