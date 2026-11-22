@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-22T08:58:34.576Z",
+  "updated": "2026-11-22T09:08:44.817Z",
   "roster": {
     "【张老师】周六 09:00 C++班级": [
       "郭梓辰",
@@ -51,6 +51,24 @@
     ]
   },
   "homework": [
+    {
+      "id": "hw_mwrm7ahm_mixl",
+      "className": "【张老师】周日 14:30 C++班级",
+      "classId": "class_mw1vwr15_4dcqm2",
+      "target": "徐林暄",
+      "targetSnapshot": [
+        "徐林暄"
+      ],
+      "date": "2026-11-22",
+      "lessonDate": "2026-11-22",
+      "dueDate": "2026-11-29",
+      "items": [
+        "完成信奥专区--》团队题单--》周六19:00/周日14:30C++班级--》顺序结构题单里的题目",
+        "补做B-08 《分支嵌套与switch》 随堂强化题目"
+      ],
+      "link": "",
+      "extensions": {}
+    },
     {
       "id": "hw_mwrlu78r_mndc",
       "className": "【张老师】周日 10:30  C++班级",
