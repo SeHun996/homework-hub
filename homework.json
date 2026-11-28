@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-28T02:35:00.553Z",
+  "updated": "2026-11-28T07:58:45.640Z",
   "roster": {
     "【张老师】周六 09:00 C++班级": [
       "郭梓辰",
@@ -51,6 +51,24 @@
     ]
   },
   "homework": [
+    {
+      "id": "hw_mx04ccv1_6abq",
+      "className": "【张老师】周六 14:30 Python班级",
+      "classId": "class_mw1vwr15_l8gkx4",
+      "target": "全班",
+      "targetSnapshot": [
+        "林瑾浩",
+        "李霈恒"
+      ],
+      "date": "2026-11-28",
+      "lessonDate": "2026-11-28",
+      "dueDate": "2026-12-05",
+      "items": [
+        "完成《特工密语大全》隐藏任务"
+      ],
+      "link": "",
+      "extensions": {}
+    },
     {
       "id": "hw_mwzsqg87_1tmq",
       "className": "【张老师】周六 09:00 C++班级",
