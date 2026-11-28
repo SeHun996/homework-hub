@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-22T13:55:07.884Z",
+  "updated": "2026-11-28T02:33:48.200Z",
   "roster": {
     "【张老师】周六 09:00 C++班级": [
       "郭梓辰",
@@ -51,6 +51,25 @@
     ]
   },
   "homework": [
+    {
+      "id": "hw_mwzsqg87_1tmq",
+      "className": "【张老师】周六 09:00 C++班级",
+      "classId": "class_mw1vwr15_nqstof",
+      "target": "全班",
+      "targetSnapshot": [
+        "郭梓辰",
+        "郑杰琨",
+        "廖宇枫"
+      ],
+      "date": "2026-11-28",
+      "lessonDate": "2026-11-28",
+      "dueDate": "2026-12-05",
+      "items": [
+        "完成课堂练习第3、4题"
+      ],
+      "link": "",
+      "extensions": {}
+    },
     {
       "id": "hw_mwrwfku6_rmep",
       "className": "【张老师】周日 19:00 C++班级",
