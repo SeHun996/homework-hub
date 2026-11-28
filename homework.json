@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-28T07:58:45.640Z",
+  "updated": "2026-11-28T12:54:44.812Z",
   "roster": {
     "【张老师】周六 09:00 C++班级": [
       "郭梓辰",
@@ -51,6 +51,25 @@
     ]
   },
   "homework": [
+    {
+      "id": "hw_mx0ex1jv_z3h9",
+      "className": "【张老师】周六 10:30 GESPC++3级班级",
+      "classId": "class_mw4w433u_k05g6w",
+      "target": "郭梓辰【GESP C++3级集训】",
+      "targetSnapshot": [
+        "郭梓辰【GESP C++3级集训】"
+      ],
+      "date": "2026-11-28",
+      "lessonDate": "2026-11-28",
+      "dueDate": "2026-12-05",
+      "items": [
+        "认真订正202606、202609真题试卷错题，一定要记得订正",
+        "完成202512纸质试卷（下周讲评）",
+        "完成GESP C++ 三级考前训练打卡计划"
+      ],
+      "link": "",
+      "extensions": {}
+    },
     {
       "id": "hw_mx04ccv1_6abq",
       "className": "【张老师】周六 14:30 Python班级",
