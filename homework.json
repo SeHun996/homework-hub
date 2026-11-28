@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-28T13:07:01.135Z",
+  "updated": "2026-11-28T13:24:10.297Z",
   "roster": {
     "【张老师】周六 09:00 C++班级": [
       "郭梓辰",
@@ -51,6 +51,23 @@
     ]
   },
   "homework": [
+    {
+      "id": "hw_mx0fyvtf_9j2w",
+      "className": "【张老师】周六 19:00 C++班级",
+      "classId": "class_mw1vwr15_quaefl",
+      "target": "全班",
+      "targetSnapshot": [
+        "李偲菡"
+      ],
+      "date": "2026-11-28",
+      "lessonDate": "2026-11-28",
+      "dueDate": "2026-12-05",
+      "items": [
+        "完成信奥专区--》团队题单--》周六19:00/周日14:30C++班级--》顺序结构题单里的题目"
+      ],
+      "link": "",
+      "extensions": {}
+    },
     {
       "id": "hw_mx0fctna_5lcl",
       "className": "【张老师】周六 10:30 GESPC++3级班级",
